@@ -14,7 +14,7 @@ export default function HistoryPage() {
   return (
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title="발급 내역" />
-      <PageHeader title="진행 중인 문서" subtitle="신청하신 서류의 발급 상황을 확인하세요" />
+      <PageHeader size="hero" title="진행 중인 문서" subtitle="신청하신 서류의 발급 상황을 확인하세요" />
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-4">
         {mockApplications.length === 0 ? (
