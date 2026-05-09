@@ -27,7 +27,7 @@ export default function HistoryPage() {
           />
         ) : (
           mockApplications.map(app => (
-            <Card key={app.id} clickable onClick={() => router.push(`/history/${app.id}`)}>
+            <Card key={app.id} clickable className="border border-hairline" onClick={() => router.push(`/history/${app.id}`)}>
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <span className="ds-headline block">
