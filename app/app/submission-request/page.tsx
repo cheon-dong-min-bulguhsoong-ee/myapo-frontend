@@ -10,7 +10,7 @@ export default function SubmissionRequestPage() {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title="제출 기관 선택" />
       <main className="flex-1 px-5 py-4 space-y-3">
         <p className="text-sm text-ink-secondary">문서를 제출할 기관을 선택해 주세요</p>

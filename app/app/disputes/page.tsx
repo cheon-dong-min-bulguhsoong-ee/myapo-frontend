@@ -18,7 +18,7 @@ export default function DisputesPage() {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title="이의 신청" />
       <main className="flex-1 px-5 py-3 space-y-3">
         {mockDisputes.length === 0 ? (

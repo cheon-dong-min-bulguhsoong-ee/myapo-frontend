@@ -16,7 +16,7 @@ export default function PersonaSelectPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title="언어 선택" showBack={false} />
       <div className="flex-1 flex flex-col justify-center px-5 gap-6">
         <div>

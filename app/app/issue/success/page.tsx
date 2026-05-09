@@ -13,7 +13,7 @@ export default function IssueSuccessPage() {
   }, [router])
 
   return (
-    <div className="flex flex-col h-dvh bg-canvas">
+    <div className="flex flex-col h-full bg-canvas">
       <main className="flex-1 flex flex-col items-center justify-center px-5 text-center">
         <CheckCircle size={64} className="text-success mb-4" />
         <h1 className="text-xl font-bold text-ink mb-2">발급 신청이 완료됐어요</h1>

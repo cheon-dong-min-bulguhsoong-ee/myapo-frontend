@@ -15,7 +15,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-dvh px-5" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full px-5" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="flex-1 flex flex-col items-center justify-center gap-3">
         <h1 className="text-4xl font-bold text-primary tracking-tight">MyApo</h1>
         <p className="text-sm text-ink-secondary text-center">

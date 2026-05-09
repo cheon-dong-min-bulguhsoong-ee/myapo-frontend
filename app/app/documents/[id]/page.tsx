@@ -14,7 +14,7 @@ export default function DocumentDetailPage() {
   if (!doc) return <div className="p-5 text-ink-secondary">문서를 찾을 수 없어요</div>
 
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title={doc.type} />
       <main className="flex-1 px-5 py-4 space-y-4">
         <div className="bg-paper rounded-2xl border border-hairline p-5 space-y-3" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>

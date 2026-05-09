@@ -17,7 +17,7 @@ export default function IssueSelectPage() {
   const selectedCount = selected.length
 
   return (
-    <div className="flex flex-col h-dvh bg-canvas">
+    <div className="flex flex-col h-full bg-canvas">
       {/* 1) App bar */}
       <AppBar title="발급 서류 선택" />
 

@@ -12,7 +12,7 @@ export default function IssueVerifyPage() {
   const canSubmit = form.name && form.id && form.phone && form.code && form.agreed
 
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title="본인 확인" />
       <main className="flex-1 px-5 py-4 space-y-4 overflow-y-auto">
         <p className="text-sm text-ink-secondary">본인 확인 후 서류 발급이 진행됩니다</p>

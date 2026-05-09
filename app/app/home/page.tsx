@@ -29,7 +29,7 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar wordmark showBack={false} />
 
       <main className="flex-1 px-5 pt-4 pb-8 space-y-5">

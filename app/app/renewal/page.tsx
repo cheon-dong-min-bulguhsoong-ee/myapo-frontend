@@ -14,7 +14,7 @@ const steps = [
 export default function RenewalPage() {
   const router = useRouter()
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title="재발급 안내" />
       <main className="flex-1 px-5 py-6 space-y-4">
         <div className="flex items-center gap-3 mb-2">

@@ -14,7 +14,7 @@ const deliveryStages = [
 export default function DeliveryPage() {
   const router = useRouter()
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title="해외 제출 현황" />
       <main className="flex-1 px-5 py-6 space-y-6">
         <div className="bg-paper rounded-2xl border border-hairline p-5" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>

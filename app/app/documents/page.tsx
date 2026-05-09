@@ -86,7 +86,7 @@ export default function DocumentsPage() {
   const filtered = mockDocuments.filter(d => d.status === tab)
 
   return (
-    <div className="flex flex-col min-h-dvh" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppBar title="내 문서" />
       <div style={{ borderBottom: '1px solid var(--color-hairline)' }}>
         <Tab size="large" onChange={(idx) => setTab(idx === 0 ? 'available' : 'expired')}>

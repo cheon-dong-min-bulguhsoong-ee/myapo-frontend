@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 export default function IssueCompletePage() {
   const router = useRouter()
   return (
-    <div className="flex flex-col min-h-dvh items-center justify-center px-5 text-center bg-primary" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col min-h-full items-center justify-center px-5 text-center bg-primary" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <CheckCircle size={72} className="text-white mb-4" />
       <h1 className="text-2xl font-bold text-white mb-3">모든 서명이 완료됐어요</h1>
       <p className="text-base text-white/80 mb-10">
