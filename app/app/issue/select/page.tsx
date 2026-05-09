@@ -34,6 +34,7 @@ export default function IssueSelectPage() {
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title="발급 서류 선택" />
       <PageHeader
+        size="hero"
         title="어떤 서류를 발급할까요?"
         subtitle="여러 개를 함께 신청할 수 있어요"
       />
