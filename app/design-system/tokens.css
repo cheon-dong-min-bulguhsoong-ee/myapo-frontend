@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Claude Design System · Tokens
+   Toss-inspired palette, spacing, radii, shadows.
+   Load this FIRST, before typography.css and components.css.
+   ========================================================================== */
+
+:root {
+  /* ───────── Ink (grayscale) ────────────────────────────────────────────
+     Used in 60-30-10 rule: white (60) · ink/text (30) · blue accent (10)
+     ──────────────────────────────────────────────────────────────────── */
+  --ink:     #191F28;   /* gray-900 — primary text */
+  --ink-2:   #4E5968;   /* gray-700 — secondary text */
+  --ink-3:   #6B7684;   /* gray-600 — tertiary / captions */
+  --ink-4:   #8B95A1;   /* gray-500 — muted / meta */
+  --ink-5:   #B0B8C1;   /* gray-400 — disabled / strike-through */
+  --line:    #E5E8EB;   /* gray-200 — dividers */
+  --line-2:  #F2F4F6;   /* gray-100 — subtle dividers */
+  --bg:      #FFFFFF;   /* canvas */
+  --bg-soft: #F9FAFB;   /* soft card fill */
+  --bg-2:    #F2F4F6;   /* chip / tag fill */
+
+  /* ───────── Brand accents ──────────────────────────────────────────────
+     Toss Blue is the single primary. Use sparingly (~10% of surface).
+     ──────────────────────────────────────────────────────────────────── */
+  --blue:      #3182F6;   /* Toss Blue 500 — PRIMARY */
+  --blue-deep: #1B64DA;   /* Toss Blue 600 — hover/press, text on white */
+  --blue-soft: #E8F3FF;   /* Toss Blue 50 — soft fills */
+  --blue-ink:  #1B64DA;   /* alias — text on light backgrounds */
+  --blue-tint: #6DA8FF;   /* on-dark variant — text on ink/blue */
+
+  /* ───────── Semantic accents (use sparingly) ──────────────────────────
+     Only for state: success (GA), risk/strike, partial/warning.
+     Never for decoration.
+     ──────────────────────────────────────────────────────────────────── */
+  --green:      #25A768;  /* success / GA / live */
+  --green-soft: #E8F7EF;
+  --red:        #F04452;  /* risk / strike-through / danger */
+  --red-soft:   #FDE8EA;
+  --yellow:     #F1A31F;  /* partial / warning */
+  --yellow-soft:#FFF4DD;
+
+  /* ───────── Spacing scale ─────────────────────────────────────────────
+     Multiples of 4. Slide padding is 96×104, card padding 36–40.
+     ──────────────────────────────────────────────────────────────────── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 40px;
+  --sp-9: 48px;
+  --sp-10: 64px;
+  --sp-11: 80px;
+  --sp-12: 104px; /* slide horizontal padding */
+
+  /* ───────── Radii ─────────────────────────────────────────────────────
+     Pill for chips/buttons. Large radii on cards (20px is the signature).
+     ──────────────────────────────────────────────────────────────────── */
+  --r-xs:  6px;
+  --r-sm:  10px;
+  --r-md:  14px;
+  --r-lg:  20px;   /* signature card radius */
+  --r-xl:  24px;
+  --r-2xl: 28px;
+  --r-pill: 999px;
+
+  /* ───────── Shadows ───────────────────────────────────────────────────
+     Toss-style shadows are subtle. Avoid heavy drop shadows.
+     ──────────────────────────────────────────────────────────────────── */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  /* ───────── Motion ────────────────────────────────────────────────────
+     Toss easing — quick, decisive, slight overshoot feel via cubic-bezier.
+     ──────────────────────────────────────────────────────────────────── */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:    160ms;
+  --dur-base:    240ms;
+  --dur-slow:    420ms;
+}
+
+/* ───────── Background variants for sections ───────────────────────────── */
+.bg-soft { background: var(--bg-soft); color: var(--ink); }
+.bg-ink  { background: var(--ink);     color: #fff; }
+.bg-blue { background: var(--blue);    color: #fff; }

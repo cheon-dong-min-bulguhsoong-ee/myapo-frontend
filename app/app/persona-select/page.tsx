@@ -33,7 +33,7 @@ export default function PersonaSelectPage() {
             selected={selected === value}
             onClick={() => setSelected(value)}
           >
-            <p className={`font-bold text-[15px] ${selected === value ? 'text-primary' : 'text-ink'}`}>
+              <p className={`ds-body font-bold ${selected === value ? 'text-primary' : 'text-ink'}`}>
               {label}
             </p>
             <p className="text-sm text-ink-secondary mt-0.5">{sublabel}</p>

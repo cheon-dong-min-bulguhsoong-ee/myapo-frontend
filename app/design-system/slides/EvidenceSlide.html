@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Evidence Slide</title>
+<link rel="stylesheet" href="../tokens.css" />
+<link rel="stylesheet" href="../typography.css" />
+<link rel="stylesheet" href="../components.css" />
+<script src="../deck-stage.js"></script>
+<style>
+section.slide { background: var(--bg); color: var(--ink); padding: 96px 104px; display: flex; flex-direction: column; box-sizing: border-box; }
+.two-col { flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:48px; align-items:start; }
+</style>
+</head>
+<body>
+<deck-stage>
+<section class="slide">
+  <div class="frame-top">
+    <span class="tag"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 1 10 10h-10V2z"/><path d="M12 22a10 10 0 0 1-10-10h10v10z"/></svg></span><span>03 · Regulation</span></span>
+    <span class="num">09 / 12</span>
+  </div>
+  <h2 class="title">규제는 <span style="color:var(--blue)">해결 가능</span>하다.</h2>
+  <div class="two-col">
+    <div class="evidence">
+      <div class="lbl">법령 인용</div>
+      <div class="text"><strong>특정금융정보법 시행령 §10의2.</strong> 가상자산사업자가 아니면 영업을 할 수 없으며, 신원확인·실명확인·거래기록 보관이 의무다.</div>
+      <div class="risk">위반 시 형사처벌 5년 이하 · 5천만원 이하</div>
+    </div>
+    <div class="numbered-list">
+      <div class="item"><div class="n">01</div><div class="text"><strong>VASP 라이센스 확보.</strong> 자회사를 통해 금융위 신고 완료.</div></div>
+      <div class="item"><div class="n">02</div><div class="text"><strong>KYC는 이미 갖춰져 있다.</strong> Credential Bundle 자체가 실명·거주·소득을 증명.</div></div>
+      <div class="item"><div class="n">03</div><div class="text"><strong>거래기록은 XRPL이 제공.</strong> 트랜잭션 로그가 5년 보관 요건을 초과.</div></div>
+    </div>
+  </div>
+</section>
+</deck-stage>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Content Slide</title>
+<link rel="stylesheet" href="../tokens.css" />
+<link rel="stylesheet" href="../typography.css" />
+<link rel="stylesheet" href="../components.css" />
+<script src="../deck-stage.js"></script>
+<style>
+section.slide { background: var(--bg); color: var(--ink); padding: 96px 104px; display: flex; flex-direction: column; box-sizing: border-box; }
+.two-col { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; min-height: 0; }
+</style>
+</head>
+<body>
+<deck-stage>
+<section class="slide">
+  <div class="frame-top">
+    <span class="tag"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 1 10 10h-10V2z"/><path d="M12 22a10 10 0 0 1-10-10h10v10z"/></svg></span><span>01 · Problem</span></span>
+    <span class="num">02 / 12</span>
+  </div>
+  <div class="eyebrow">PROBLEM</div>
+  <h2 class="title">외국인 IT 노동자에게,<br/>국내 신용은 <span style="color:var(--blue)">존재하지 않는다</span>.</h2>
+  <div style="flex:1; display:flex; flex-direction:column; gap:32px;">
+    <div class="two-col">
+      <div class="card">
+        <div class="label">BEFORE</div>
+        <h4>거절의 이유</h4>
+        <p class="body-md">국내 크레딧 이력이 <strong>0</strong>. 월 <span class="num">6,000 USD</span> 수입도 증빙이 어려움.</p>
+        <ul class="bullets" style="margin-top:12px;">
+          <li>외국인 신용대출 상품 <span class="num">0개</span></li>
+          <li>비자·체류 증빙 수동 처리</li>
+          <li>승인까지 평균 <span class="num">21일</span></li>
+        </ul>
+      </div>
+      <div class="card ink">
+        <div class="label">AFTER</div>
+        <h4>Credential Bundle</h4>
+        <p class="body-md" style="color:rgba(255,255,255,0.82);">비자·소득·거주를 <strong>온체인 VC</strong>로 묶어 제출. 90초 내 승인.</p>
+        <div style="display:flex; gap:8px; margin-top:auto; flex-wrap:wrap;">
+          <span class="chip">온체인 증명</span>
+          <span class="chip green">90s 승인</span>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      <span>크레딧이 아니라 <strong>증명</strong>이 이 제품의 엔진이다.</span>
+      <span class="pill">TAKEAWAY</span>
+    </div>
+  </div>
+</section>
+</deck-stage>
+</body>
+</html>

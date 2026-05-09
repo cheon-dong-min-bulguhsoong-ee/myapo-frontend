@@ -19,20 +19,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body style={{ display: 'flex', justifyContent: 'center', height: '100dvh', background: '#E5E8EB' }}>
+      <body className="app-body">
         <AuthProvider>
           <PersonaProvider>
-            <div
-              style={{
-                width: '100%',
-                maxWidth: 430,
-                height: '100dvh',
-                background: 'var(--color-canvas)',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>{children}</div>
+            <div className="app-frame">
+              <div className="app-scroll">{children}</div>
               <BottomHomeBar />
             </div>
           </PersonaProvider>

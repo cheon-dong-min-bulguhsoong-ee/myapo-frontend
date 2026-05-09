@@ -23,11 +23,8 @@ export default function RenewalPage() {
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
         <Card>
           <div className="flex items-center gap-3">
-            <div
-              className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: '#FFF8E6' }}
-            >
-              <RefreshCw size={22} strokeWidth={2} style={{ color: '#FFB020' }} />
+            <div className="ds-icon-box ds-tone-yellow shrink-0 w-12 h-12 flex items-center justify-center">
+              <RefreshCw size={22} strokeWidth={2} />
             </div>
             <div>
               <p className="font-bold text-ink">유효기간이 곧 만료돼요</p>

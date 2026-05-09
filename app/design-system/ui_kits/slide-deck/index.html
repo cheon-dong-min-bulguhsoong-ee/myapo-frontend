@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>UI Kit · Slide Deck · Claude Design System</title>
+<link rel="stylesheet" href="../../tokens.css" />
+<link rel="stylesheet" href="../../typography.css" />
+<link rel="stylesheet" href="../../components.css" />
+<link rel="stylesheet" href="../../colors_and_type.css" />
+<script src="../../deck-stage.js"></script>
+<style>
+  section.slide {
+    background: var(--bg); color: var(--ink);
+    padding: 96px 104px;
+    display: flex; flex-direction: column;
+    box-sizing: border-box;
+  }
+  section.slide.bg-soft { background: var(--bg-soft); }
+  section.slide.bg-ink  { background: var(--ink);  color: #fff; }
+  section.slide.bg-blue { background: var(--blue); color: #fff; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="SlideChrome.jsx"></script>
+<script type="text/babel" src="SlideVariants.jsx"></script>
+<script type="text/babel">
+const Deck = () => (
+  <deck-stage>
+    <CoverSlide
+      section="Credential Bundle · Pitch"
+      index={1} total={5}
+      eyebrow="v1.0"
+      title={<>외국인 IT 노동자를 위한<br/><span className="em">첫 번째 신용대출</span>.</>}
+      kicker="크레딧 스코어가 아니라, 온체인 증명으로. XRPL Credential Bundle이 해결한다."
+    />
+    <ContentSlide
+      section="01 · Problem"
+      index={2} total={5}
+      eyebrow="PROBLEM"
+      title="외국인 IT 노동자에게,<br/>국내 신용은 <span style='color:var(--blue)'>존재하지 않는다</span>."
+    >
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+        <div className="card">
+          <div className="label">BEFORE</div>
+          <h4>거절의 이유</h4>
+          <p className="body-md">국내 크레딧 이력이 <strong>0</strong>. 월 6,000 USD 수입도 증빙이 어려움. 전통 은행 심사에서 자동 탈락.</p>
+          <ul className="bullets" style={{ marginTop: 12 }}>
+            <li>외국인 대출 상품 <span className="num">0개</span></li>
+            <li>비자·체류 증빙 수동 처리</li>
+            <li>승인까지 <span className="num">평균 21일</span></li>
+          </ul>
+        </div>
+        <div className="card ink">
+          <div className="label">AFTER</div>
+          <h4>Credential Bundle</h4>
+          <p className="body-md" style={{ color: 'rgba(255,255,255,0.82)' }}>비자·소득·거주를 <strong>온체인 VC</strong>로 묶어 제출. 90초 내 승인.</p>
+          <div style={{ display: 'flex', gap: 8, marginTop: 'auto', flexWrap: 'wrap' }}>
+            <span className="chip">온체인 증명</span>
+            <span className="chip green">90s 승인</span>
+          </div>
+        </div>
+      </div>
+      <div className="callout">
+        <span>크레딧이 아니라 <strong>증명</strong>이 이 제품의 엔진이다.</span>
+        <span className="pill">TAKEAWAY</span>
+      </div>
+    </ContentSlide>
+    <SectionBreakSlide
+      bg="ink" section="Chapter 02" index={3} total={5}
+      chapter="CHAPTER · 02"
+      statement={'이제 <span class="em">진짜 문제</span>를<br/>이야기할 차례.'}
+    />
+    <BigNumberSlide
+      section="02 · Market" index={4} total={5}
+      eyebrow="MARKET SIZE"
+      number="0"
+      title="금융 제품 수"
+      caption="외국인 IT 노동자가 접근 가능한 국내 <strong>무담보 신용대출</strong> 상품."
+    />
+    <EvidenceSlide
+      section="03 · Regulation" index={5} total={5}
+      title="규제는 <span style='color:var(--blue)'>해결 가능</span>하다."
+      lbl="법령 인용"
+      text="<strong>특정금융정보법 시행령 §10의2.</strong> 가상자산사업자가 아니면 영업을 할 수 없으며, 신원확인·실명확인·거래기록 보관이 의무다."
+      risk="위반 시 형사처벌 5년 이하 · 5천만원 이하"
+      defense={[
+        '<strong>VASP 라이센스 확보.</strong> 자회사를 통해 금융위 신고 완료.',
+        '<strong>KYC는 이미 갖춰져 있다.</strong> Credential Bundle 자체가 실명·거주·소득을 증명.',
+        '<strong>거래기록은 XRPL이 제공.</strong> 트랜잭션 로그가 5년 보관 요건을 초과.',
+      ]}
+    />
+  </deck-stage>
+);
+ReactDOM.createRoot(document.getElementById('root')).render(<Deck />);
+</script>
+</body>
+</html>

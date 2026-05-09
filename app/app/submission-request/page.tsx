@@ -24,7 +24,7 @@ export default function SubmissionRequestPage() {
             selected={selected === inst.id}
             onClick={() => setSelected(inst.id)}
           >
-            <p className={`font-bold text-[15px] ${selected === inst.id ? 'text-primary' : 'text-ink'}`}>
+            <p className={`ds-body font-bold ${selected === inst.id ? 'text-primary' : 'text-ink'}`}>
               {inst.name}
             </p>
             <p className="text-sm text-ink-secondary mt-0.5">{inst.country}</p>

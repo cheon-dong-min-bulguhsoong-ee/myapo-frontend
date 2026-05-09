@@ -1,14 +1,24 @@
 interface PageHeaderProps {
   title: string
   subtitle?: string
+  eyebrow?: string
 }
 
-export function PageHeader({ title, subtitle }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, eyebrow }: PageHeaderProps) {
   return (
-    <header className="shrink-0 px-5 pt-6 pb-4 bg-canvas">
-      <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink leading-[1.3]">{title}</h1>
+    <header className="shrink-0 px-5 pt-7 pb-5 bg-canvas">
+      {eyebrow && (
+        <p className="ds-overline text-primary mb-2">
+          {eyebrow}
+        </p>
+      )}
+      <h1 className="ds-page-title">
+        {title}
+      </h1>
       {subtitle && (
-        <p className="text-[15px] font-medium text-ink-secondary mt-2 leading-[1.4]">{subtitle}</p>
+        <p className="ds-body text-ink-secondary mt-2.5 text-pretty">
+          {subtitle}
+        </p>
       )}
     </header>
   )

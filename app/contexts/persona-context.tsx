@@ -1,5 +1,5 @@
 'use client'
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react'
 
 type Persona = 'korean' | 'foreign' | null
 
@@ -11,12 +11,11 @@ interface PersonaContextType {
 const PersonaContext = createContext<PersonaContextType>({ persona: null, setPersona: () => {} })
 
 export function PersonaProvider({ children }: { children: ReactNode }) {
-  const [persona, setPersonaState] = useState<Persona>(null)
-
-  useEffect(() => {
+  const [persona, setPersonaState] = useState<Persona>(() => {
+    if (typeof window === 'undefined') return null
     const saved = localStorage.getItem('myapo_persona')
-    if (saved === 'korean' || saved === 'foreign') setPersonaState(saved)
-  }, [])
+    return saved === 'korean' || saved === 'foreign' ? saved : null
+  })
 
   const setPersona = (p: Persona) => {
     if (p) localStorage.setItem('myapo_persona', p)

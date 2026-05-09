@@ -19,39 +19,34 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-const ICON_MAP: Record<string, { Icon: LucideIcon; tint: string; bg: string }> = {
-  납세증명서: { Icon: ScrollText, tint: '#3182F6', bg: '#EBF3FE' },
-  가족관계증명서: { Icon: Users, tint: '#00C48C', bg: '#E6FAF5' },
-  주민등록등본: { Icon: Home, tint: '#FFB020', bg: '#FFF8E6' },
-  졸업증명서: { Icon: GraduationCap, tint: '#7C5CFC', bg: '#EFEAFE' },
-  재직증명서: { Icon: Briefcase, tint: '#18BFFF', bg: '#E6F9FF' },
-  범죄경력회보서: { Icon: ShieldAlert, tint: '#F04452', bg: '#FEE7E9' },
+type IconTone = 'blue' | 'green' | 'yellow' | 'purple' | 'info' | 'red' | 'neutral'
+
+const ICON_MAP: Record<string, { Icon: LucideIcon; tone: IconTone }> = {
+  납세증명서: { Icon: ScrollText, tone: 'blue' },
+  가족관계증명서: { Icon: Users, tone: 'green' },
+  주민등록등본: { Icon: Home, tone: 'yellow' },
+  졸업증명서: { Icon: GraduationCap, tone: 'purple' },
+  재직증명서: { Icon: Briefcase, tone: 'info' },
+  범죄경력회보서: { Icon: ShieldAlert, tone: 'red' },
 }
 
 function getIcon(type: string) {
-  return ICON_MAP[type] ?? { Icon: FileText, tint: '#8B95A1', bg: '#F2F4F6' }
+  return ICON_MAP[type] ?? { Icon: FileText, tone: 'neutral' as IconTone }
 }
 
 function DocumentCard({ doc, onClick }: { doc: Document; onClick: () => void }) {
-  const { Icon, tint, bg } = getIcon(doc.type)
+  const { Icon, tone } = getIcon(doc.type)
   const expired = doc.status === 'expired'
+  const iconTone = expired ? 'neutral' : tone
 
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-paper rounded-2xl p-4 active:bg-canvas transition-colors"
-      style={{
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        border: '1px solid var(--color-hairline)',
-        opacity: expired ? 0.55 : 1,
-      }}
+      className={`ds-card w-full text-left p-4 active:bg-canvas transition-colors ${expired ? 'opacity-55' : ''}`}
     >
       <div className="flex items-start gap-3">
-        <div
-          className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
-          style={{ backgroundColor: expired ? '#F2F4F6' : bg }}
-        >
-          <Icon size={22} strokeWidth={1.8} style={{ color: expired ? '#8B95A1' : tint } as React.CSSProperties} />
+        <div className={`ds-icon-box ds-tone-${iconTone} shrink-0 w-12 h-12 flex items-center justify-center`}>
+          <Icon size={22} strokeWidth={1.8} />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -90,23 +85,23 @@ export default function DocumentsPage() {
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title="내 문서" />
       <PageHeader title="내 증명서" subtitle="발급된 문서와 만료된 문서를 확인하세요" />
-      <div className="shrink-0" style={{ borderBottom: '1px solid var(--color-hairline)' }}>
+      <div className="ds-divider-bottom shrink-0">
         <div className="grid grid-cols-2 px-5">
           <button
             type="button"
             onClick={() => setTab('available')}
-            className={`relative min-h-12 text-[15px] font-bold ${tab === 'available' ? 'text-primary' : 'text-ink-secondary'}`}
+            className={`ds-tab ${tab === 'available' ? 'text-primary' : 'text-ink-secondary'}`}
           >
-            유효한 문서 <span style={{ color: tab === 'available' ? '#3182F6' : '#8B95A1', marginLeft: 4 }}>{availableCount}</span>
-            {tab === 'available' && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary" />}
+            유효한 문서 <span className={`ds-tab-count ${tab === 'available' ? 'text-primary' : 'text-ink-muted'}`}>{availableCount}</span>
+            {tab === 'available' && <span className="ds-tab-indicator" />}
           </button>
           <button
             type="button"
             onClick={() => setTab('expired')}
-            className={`relative min-h-12 text-[15px] font-bold ${tab === 'expired' ? 'text-primary' : 'text-ink-secondary'}`}
+            className={`ds-tab ${tab === 'expired' ? 'text-primary' : 'text-ink-secondary'}`}
           >
-            만료된 문서 <span style={{ color: tab === 'expired' ? '#3182F6' : '#8B95A1', marginLeft: 4 }}>{expiredCount}</span>
-            {tab === 'expired' && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary" />}
+            만료된 문서 <span className={`ds-tab-count ${tab === 'expired' ? 'text-primary' : 'text-ink-muted'}`}>{expiredCount}</span>
+            {tab === 'expired' && <span className="ds-tab-indicator" />}
           </button>
         </div>
       </div>

@@ -10,9 +10,8 @@ export function SelectableCard({ selected, children, className = '', ...props }:
   return (
     <button
       type="button"
-      className={`w-full text-left p-4 rounded-2xl border transition-colors active:bg-canvas
-        ${selected ? 'border-primary bg-primary-soft' : 'border-hairline bg-paper'} ${className}`}
-      style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+      className={`ds-card w-full text-left p-4 transition-colors active:bg-canvas
+        ${selected ? 'ds-card-selected' : ''} ${className}`}
       {...props}
     >
       {children}

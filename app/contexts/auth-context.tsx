@@ -1,5 +1,5 @@
 'use client'
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react'
 
 interface AuthContextType {
   isLoggedIn: boolean
@@ -14,11 +14,9 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  useEffect(() => {
-    setIsLoggedIn(localStorage.getItem('myapo_auth') === 'true')
-  }, [])
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () => typeof window !== 'undefined' && localStorage.getItem('myapo_auth') === 'true'
+  )
 
   const login = () => {
     localStorage.setItem('myapo_auth', 'true')

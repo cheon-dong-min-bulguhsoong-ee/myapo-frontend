@@ -32,11 +32,10 @@ export default function IssueSelectPage() {
           return (
             <section
               key={cat.id}
-              className="bg-paper rounded-2xl overflow-hidden border border-hairline"
-              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+              className="ds-card overflow-hidden"
             >
               <header className="px-5 py-4 border-b border-hairline flex justify-between items-center">
-                <h2 className="text-base font-bold text-ink tracking-[-0.01em] leading-snug">
+                <h2 className="ds-headline">
                   {cat.label}
                 </h2>
                 {catSelectedCount > 0 && (
@@ -49,9 +48,9 @@ export default function IssueSelectPage() {
                 {cat.items.map((item, idx) => {
                   const checked = selected.includes(item)
                   return (
-                    <li key={item} style={idx > 0 ? { borderTop: '1px solid var(--color-hairline)' } : undefined}>
+                    <li key={item} className={idx > 0 ? 'ds-divider-top' : ''}>
                       <label
-                        className={`flex items-center gap-3.5 px-5 py-4 min-h-[56px] cursor-pointer transition-colors active:bg-canvas ${
+                        className={`flex items-center gap-3.5 px-5 py-4 min-h-14 cursor-pointer transition-colors active:bg-canvas ${
                           checked ? 'bg-primary-soft' : ''
                         }`}
                       >
@@ -59,10 +58,10 @@ export default function IssueSelectPage() {
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggle(item)}
-                          className="h-[22px] w-[22px] shrink-0 accent-primary"
+                          className="h-5 w-5 shrink-0 accent-primary"
                         />
                         <span
-                          className={`flex-1 text-[15px] leading-normal ${
+                          className={`ds-body flex-1 ${
                             checked ? 'font-semibold text-primary' : 'font-medium text-ink'
                           }`}
                         >

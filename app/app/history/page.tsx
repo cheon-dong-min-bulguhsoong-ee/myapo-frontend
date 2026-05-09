@@ -30,7 +30,7 @@ export default function HistoryPage() {
             <Card key={app.id} clickable onClick={() => router.push(`/history/${app.id}`)}>
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <span className="block text-base font-bold text-ink tracking-[-0.01em] leading-snug">
+                  <span className="ds-headline block">
                     {app.documentType}
                   </span>
                   <p className="text-sm font-semibold text-primary mt-1">

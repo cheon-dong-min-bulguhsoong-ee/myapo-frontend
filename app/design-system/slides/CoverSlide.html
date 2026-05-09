@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Cover Slide</title>
+<link rel="stylesheet" href="../tokens.css" />
+<link rel="stylesheet" href="../typography.css" />
+<link rel="stylesheet" href="../components.css" />
+<script src="../deck-stage.js"></script>
+<style>
+section.slide { background: var(--bg); color: var(--ink); padding: 96px 104px; display: flex; flex-direction: column; box-sizing: border-box; justify-content: space-between; }
+.kicker { font-size: 28px; color: var(--ink-3); margin-top: 40px; max-width: 1200px; line-height: 1.5; font-weight: 500; }
+.meta { display: flex; justify-content: space-between; align-items: flex-end; font-size: 20px; color: var(--ink-4); padding-top: 32px; border-top: 1px solid var(--line); }
+.meta strong { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<deck-stage>
+<section class="slide">
+  <div class="frame-top">
+    <span class="tag"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 1 10 10h-10V2z"/><path d="M12 22a10 10 0 0 1-10-10h10v10z"/></svg></span><span>Credential Bundle · Pitch</span></span>
+    <span class="num">01 / 12</span>
+  </div>
+  <div>
+    <div class="display-cover">외국인 IT 노동자를 위한<br/><span class="em">첫 번째 신용대출</span>.</div>
+    <div class="kicker">크레딧 스코어가 아니라, 온체인 증명으로. XRPL Credential Bundle이 해결한다.</div>
+  </div>
+  <div class="meta">
+    <span><strong>Credential Finance · 2026</strong> · Series A</span>
+    <span class="num">v1.0</span>
+  </div>
+</section>
+</deck-stage>
+</body>
+</html>

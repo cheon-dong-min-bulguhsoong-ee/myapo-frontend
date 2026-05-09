@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Slide Templates · Claude Design System</title>
+<link rel="stylesheet" href="../tokens.css" />
+<link rel="stylesheet" href="../typography.css" />
+<link rel="stylesheet" href="../components.css" />
+<script src="../deck-stage.js"></script>
+<style>
+  /* Slide layout — 1920×1080 canvas. deck-stage handles the scaling. */
+  section.slide {
+    background: var(--bg);
+    color: var(--ink);
+    padding: 96px 104px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+  section.slide.bg-soft { background: var(--bg-soft); }
+  section.slide.bg-ink  { background: var(--ink);  color: #fff; }
+  section.slide.bg-blue { background: var(--blue); color: #fff; }
+
+  /* Cover-specific spacing */
+  .cover { justify-content: space-between; }
+  .cover .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 20px;
+    color: var(--ink-4);
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .cover .meta strong { color: var(--ink); font-weight: 600; }
+  .cover .kicker {
+    font-size: 28px;
+    color: var(--ink-3);
+    margin-top: 40px;
+    max-width: 1100px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  /* Section-break layout — single giant statement */
+  .section-break {
+    justify-content: center;
+  }
+  .section-break .num-tag {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 600;
+    margin-bottom: 28px;
+  }
+  .bg-ink .section-break .num-tag { color: var(--blue-tint); }
+  .bg-blue .section-break .num-tag { color: rgba(255,255,255,0.8); }
+  .section-break .statement {
+    font-size: 120px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    max-width: 1600px;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .bg-ink .section-break .statement,
+  .bg-blue .section-break .statement { color: #fff; }
+  .section-break .statement .em { color: var(--blue); }
+  .bg-ink .section-break .statement .em { color: var(--blue-tint); }
+
+  /* Content-slide body area */
+  .content-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-height: 0;
+  }
+  .two-col {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: stretch;
+    min-height: 0;
+  }
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+<!-- ==============================================================
+     TEMPLATE 1 · COVER
+     Use for slide 1 of every deck. Big title, kicker, meta line.
+     ============================================================== -->
+<section class="slide cover" data-screen-label="01 Cover">
+  <div class="frame-top">
+    <span class="tag">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2a10 10 0 0 1 10 10h-10V2z"/>
+          <path d="M12 22a10 10 0 0 1-10-10h10v10z"/>
+        </svg>
+      </span>
+      <span>Brand · Project</span>
+    </span>
+    <span class="num">01 / NN</span>
+  </div>
+
+  <div>
+    <div class="display-cover">
+      거대한 <span class="em">한 문장</span>의<br/>주장을 여기에.
+    </div>
+    <div class="kicker">
+      부가 설명 한두 줄. 제목이 던진 질문에 대한 간결한 답을 선제공합니다.
+      본문 크기의 글로 너무 많은 정보를 담지 마세요.
+    </div>
+  </div>
+
+  <div class="meta">
+    <span><strong>팀 · 발표자</strong> · 2025</span>
+    <span class="num">v1.0</span>
+  </div>
+</section>
+
+<!-- ==============================================================
+     TEMPLATE 2 · CONTENT
+     Default workhorse slide. Frame top · H2 · body area.
+     ============================================================== -->
+<section class="slide" data-screen-label="02 Content">
+  <div class="frame-top">
+    <span class="tag">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2a10 10 0 0 1 10 10h-10V2z"/>
+          <path d="M12 22a10 10 0 0 1-10-10h10v10z"/>
+        </svg>
+      </span>
+      <span>섹션 이름</span>
+    </span>
+    <span class="num">02 / NN</span>
+  </div>
+
+  <div class="eyebrow">EYEBROW · 선택</div>
+  <h2 class="title">본문 슬라이드의<br/>헤드라인은 여기에.</h2>
+
+  <div class="content-body">
+    <div class="two-col">
+      <div class="card">
+        <div class="label">LEFT PANEL</div>
+        <h4>카드 제목</h4>
+        <p class="body-md">
+          본문 텍스트. <strong>강조</strong>가 필요한 부분은 ink 색상으로 처리합니다.
+          한 카드에는 하나의 아이디어만 담는 것이 원칙입니다.
+        </p>
+        <ul class="bullets">
+          <li>포인트 1 — 짧고 명확하게</li>
+          <li>포인트 2 — 포인트 1과 대구되게</li>
+          <li>포인트 3 — 결론에 가까운 것</li>
+        </ul>
+      </div>
+
+      <div class="card ink">
+        <div class="label">RIGHT PANEL · 강조</div>
+        <h4>ink 배경의 카드</h4>
+        <p class="body-md">
+          대비가 필요할 때. 본문 슬라이드 안에서 하나의 카드만 ink로 두는 것이
+          좋습니다. 모든 것이 강조되면 아무것도 강조되지 않습니다.
+        </p>
+        <div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="chip">기본 chip</span>
+          <span class="chip green">success</span>
+          <span class="chip yellow">partial</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span>이 슬라이드의 한 줄 요약 — 청중이 기억해야 할 것.</span>
+      <span class="pill">TAKEAWAY</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==============================================================
+     TEMPLATE 3 · SECTION BREAK
+     Full-bleed statement. Use between chapters.
+     Variants: default (white) · .bg-soft · .bg-ink · .bg-blue
+     ============================================================== -->
+<section class="slide bg-ink" data-screen-label="03 Section break">
+  <div class="frame-top">
+    <span class="tag">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2a10 10 0 0 1 10 10h-10V2z"/>
+          <path d="M12 22a10 10 0 0 1-10-10h10v10z"/>
+        </svg>
+      </span>
+      <span>Chapter 2</span>
+    </span>
+    <span class="num">03 / NN</span>
+  </div>
+
+  <div class="section-break">
+    <div class="num-tag">CHAPTER · 02</div>
+    <h1 class="statement">
+      이제 <span class="em">진짜 문제</span>를<br/>이야기할 차례.
+    </h1>
+  </div>
+</section>
+
+</deck-stage>
+
+</body>
+</html>

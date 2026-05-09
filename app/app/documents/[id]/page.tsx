@@ -22,11 +22,8 @@ export default function DocumentDetailPage() {
       <main className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
         <Card>
           <div className="flex items-center gap-3">
-            <div
-              className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: '#EBF3FE' }}
-            >
-              <FileText size={22} strokeWidth={2} style={{ color: '#3182F6' }} />
+            <div className="ds-icon-box ds-tone-blue shrink-0 w-12 h-12 flex items-center justify-center">
+              <FileText size={22} strokeWidth={2} />
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="font-bold text-ink">{doc.type}</h2>
@@ -38,7 +35,7 @@ export default function DocumentDetailPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-sm mt-4 pt-4" style={{ borderTop: '1px solid var(--color-hairline)' }}>
+          <div className="ds-divider-top grid grid-cols-2 gap-3 text-sm mt-4 pt-4">
             <div>
               <p className="text-ink-muted text-xs">발급일</p>
               <p className="font-medium text-ink mt-0.5">{doc.issuedAt}</p>
@@ -54,10 +51,7 @@ export default function DocumentDetailPage() {
           </div>
         </Card>
 
-        <div
-          className="bg-paper rounded-2xl border border-hairline h-48 flex items-center justify-center"
-          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
-        >
+        <div className="ds-card h-48 flex items-center justify-center">
           <p className="text-sm text-ink-muted">PDF 미리보기</p>
         </div>
       </main>

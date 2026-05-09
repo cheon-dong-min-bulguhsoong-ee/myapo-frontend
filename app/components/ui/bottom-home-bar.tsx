@@ -13,17 +13,13 @@ export function BottomHomeBar() {
   return (
     <button
       onClick={() => router.push('/home')}
-      className="shrink-0 w-full flex flex-col items-center justify-center gap-0.5 active:bg-canvas transition-colors"
-      style={{
-        height: 'calc(56px + env(safe-area-inset-bottom))',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        borderTop: '1px solid var(--color-hairline)',
-        backgroundColor: 'var(--color-paper)',
-      }}
       aria-label="홈으로 이동"
+      className="bottom-home-bar press shrink-0 w-full flex flex-col items-center justify-center gap-0.5 transition-colors active:bg-canvas"
     >
-      <Home size={22} strokeWidth={2} className="text-ink-muted" />
-      <span className="text-[11px] font-semibold text-ink-muted leading-none mt-0.5">홈</span>
+      <Home size={22} strokeWidth={2.2} className="text-ink-secondary" />
+      <span className="ds-small-strong text-ink-secondary mt-0.5">
+        홈
+      </span>
     </button>
   )
 }

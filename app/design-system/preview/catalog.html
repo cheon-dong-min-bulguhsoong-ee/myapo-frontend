@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280" />
+<title>Claude Design System</title>
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="typography.css" />
+<link rel="stylesheet" href="components.css" />
+<style>
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 96px 64px 160px;
+  }
+
+  /* ── Page header ─────────────────────────────────────────── */
+  .hero {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: start;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 64px;
+  }
+  .hero .mark {
+    width: 72px; height: 72px;
+    background: var(--blue);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .hero h1 {
+    font-size: 80px; font-weight: 700;
+    letter-spacing: -0.04em; line-height: 1; margin: 0 0 14px;
+  }
+  .hero h1 .em { color: var(--blue); }
+  .hero .sub {
+    font-size: 22px; line-height: 1.55;
+    color: var(--ink-3); font-weight: 500;
+    max-width: 780px; margin: 0;
+  }
+  .hero .meta {
+    display: flex; gap: 12px; margin-top: 24px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13px; color: var(--ink-4); font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .hero .meta span:not(:first-child)::before {
+    content: "·"; margin-right: 12px; color: var(--ink-5);
+  }
+
+  /* ── Section ─────────────────────────────────────────────── */
+  section.group {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  section.group:last-child { border-bottom: 0; }
+
+  .group-head {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+    margin-bottom: 40px;
+  }
+  .group-head .nav {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .group-head .nav .num { color: var(--ink-4); margin-right: 10px; font-weight: 500; }
+  .group-head h2 {
+    font-size: 52px; font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.1; margin: 0 0 12px;
+  }
+  .group-head .desc {
+    font-size: 19px; line-height: 1.6; color: var(--ink-3);
+    font-weight: 500; max-width: 680px;
+  }
+  .group-head .desc strong { color: var(--ink); font-weight: 700; }
+
+  /* ── Sub-card grid ───────────────────────────────────────── */
+  .grid {
+    display: grid;
+    gap: 16px;
+  }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  /* Swatch */
+  .swatch {
+    background: var(--bg-soft);
+    border-radius: 14px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .swatch .fill {
+    height: 120px;
+    display: block;
+  }
+  .swatch .meta {
+    padding: 14px 16px 16px;
+  }
+  .swatch .name {
+    font-size: 16px; font-weight: 700;
+    letter-spacing: -0.01em; color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .swatch .hex {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    color: var(--ink-4);
+    letter-spacing: 0.02em;
+  }
+  .swatch .token {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11px; font-weight: 500;
+    color: var(--ink-5);
+    margin-top: 2px;
+  }
+
+  /* Type specimen rows */
+  .specimen {
+    padding: 28px 0;
+    border-bottom: 1px dashed var(--line);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 32px;
+    align-items: baseline;
+  }
+  .specimen:last-child { border-bottom: 0; }
+  .specimen .tag {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    font-weight: 600;
+  }
+  .specimen .tag .px {
+    display: block; margin-top: 6px;
+    color: var(--ink-3); font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Demo tile for components */
+  .tile {
+    background: var(--bg-soft);
+    border-radius: 18px;
+    padding: 32px;
+    border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .tile .tile-label {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    font-weight: 600;
+  }
+  .tile .tile-demo {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    border: 1px solid var(--line-2);
+  }
+  .tile.wide { grid-column: span 2; }
+
+  .usage-note {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .usage-note strong { color: var(--ink); font-weight: 700; }
+
+  code.token-name {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bg-2);
+    color: var(--blue-ink);
+    padding: 2px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  /* Spacing ruler */
+  .ruler {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 24px 0;
+  }
+  .ruler .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .ruler .step .bar {
+    background: var(--blue);
+    width: 16px;
+    border-radius: 4px;
+  }
+  .ruler .step .lbl {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11px;
+    color: var(--ink-4);
+    font-weight: 600;
+  }
+
+  /* Radius demo */
+  .radius-demo {
+    display: flex; flex-direction: column; gap: 8px; align-items: center;
+  }
+  .radius-demo .rr {
+    width: 88px; height: 88px;
+    background: var(--blue);
+  }
+  .radius-demo .lbl {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; color: var(--ink-4); font-weight: 600;
+  }
+  .radius-demo .lbl strong { color: var(--ink); display: block; font-size: 13px; }
+
+  /* Principle list */
+  .principles {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+  .principle {
+    padding: 28px;
+    background: var(--bg-soft);
+    border-radius: 18px;
+  }
+  .principle .n {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 24px;
+    color: var(--blue);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .principle h4 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+  }
+  .principle p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-3);
+    margin: 0;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="mark">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a10 10 0 0 1 10 10h-10V2z"/>
+        <path d="M12 22a10 10 0 0 1-10-10h10v10z"/>
+      </svg>
+    </div>
+    <div>
+      <h1><span class="em">Claude</span> Design System</h1>
+      <p class="sub">
+        슬라이드덱, 프론트엔드, 와이어프레임에서 공통으로 쓰는 시각 언어.
+        Toss에서 영감을 얻은 팔레트·타이포그래피·컴포넌트의 모음.
+      </p>
+      <div class="meta">
+        <span>v1.0</span>
+        <span>Pretendard × Work Sans</span>
+        <span>60-30-10 Rule</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════ 01 · PRINCIPLES ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">01</span>Principles</div>
+      <div>
+        <h2>원칙</h2>
+        <p class="desc">
+          모든 결정의 기준. 아름다운 것보다 <strong>분명한 것</strong>을,
+          많은 것보다 <strong>절제된 것</strong>을 우선합니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="principles">
+      <div class="principle">
+        <div class="n">01</div>
+        <h4>60 · 30 · 10</h4>
+        <p>흰 배경 60%, ink 텍스트 30%, 파랑 강조 10%. 모든 것이 강조되면 아무것도 강조되지 않습니다.</p>
+      </div>
+      <div class="principle">
+        <div class="n">02</div>
+        <h4>Big type, tight</h4>
+        <p>타이틀은 크게, letter-spacing은 -0.035em으로 조입니다. 작은 UI 텍스트보다 큰 타이틀이 인상을 결정합니다.</p>
+      </div>
+      <div class="principle">
+        <div class="n">03</div>
+        <h4>Numbers heavier</h4>
+        <p>숫자와 영문은 Work Sans, 한글보다 한 단계 무겁게. .num · .en 클래스를 씌우기만 하면 됩니다.</p>
+      </div>
+      <div class="principle">
+        <div class="n">04</div>
+        <h4>Pill before rectangle</h4>
+        <p>칩·버튼은 pill(999px). 카드는 20px radius. 각진 것보다 둥근 것이 Toss의 DNA입니다.</p>
+      </div>
+      <div class="principle">
+        <div class="n">05</div>
+        <h4>Soft over shadow</h4>
+        <p>그림자 대신 bg-soft(#F9FAFB)로 면을 나눕니다. 시각적 노이즈가 줄어듭니다.</p>
+      </div>
+      <div class="principle">
+        <div class="n">06</div>
+        <h4>Ask before adding</h4>
+        <p>빈 공간을 채우려 더미를 넣지 않습니다. 한 섹션에 하나의 아이디어, 한 카드에 하나의 주장.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 02 · COLOR ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">02</span>Color</div>
+      <div>
+        <h2>컬러</h2>
+        <p class="desc">
+          <strong>Toss Blue</strong> 하나만 primary로. grayscale 7단계로 거의 모든 위계를 표현합니다.
+          green/yellow/red는 <strong>상태 표현 전용</strong>으로 장식에 쓰지 않습니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- Ink -->
+    <h4 style="font-size:16px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-4); margin:0 0 16px;">Ink · Grayscale</h4>
+    <div class="grid cols-4" style="margin-bottom: 40px;">
+      <div class="swatch"><span class="fill" style="background:#191F28"></span><div class="meta"><div class="name" style="color:#fff; background:#191F28; margin:-14px -16px 10px; padding:14px 16px;">ink</div><div class="hex">#191F28</div><div class="token">--ink</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#4E5968"></span><div class="meta"><div class="name">ink-2</div><div class="hex">#4E5968</div><div class="token">--ink-2</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#6B7684"></span><div class="meta"><div class="name">ink-3</div><div class="hex">#6B7684</div><div class="token">--ink-3</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#8B95A1"></span><div class="meta"><div class="name">ink-4</div><div class="hex">#8B95A1</div><div class="token">--ink-4</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#B0B8C1"></span><div class="meta"><div class="name">ink-5</div><div class="hex">#B0B8C1</div><div class="token">--ink-5</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#E5E8EB"></span><div class="meta"><div class="name">line</div><div class="hex">#E5E8EB</div><div class="token">--line</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#F2F4F6"></span><div class="meta"><div class="name">bg-2</div><div class="hex">#F2F4F6</div><div class="token">--bg-2</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#F9FAFB"></span><div class="meta"><div class="name">bg-soft</div><div class="hex">#F9FAFB</div><div class="token">--bg-soft</div></div></div>
+    </div>
+
+    <!-- Brand -->
+    <h4 style="font-size:16px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-4); margin:0 0 16px;">Brand · Toss Blue</h4>
+    <div class="grid cols-4" style="margin-bottom: 40px;">
+      <div class="swatch"><span class="fill" style="background:#1B64DA"></span><div class="meta"><div class="name">blue-deep</div><div class="hex">#1B64DA</div><div class="token">--blue-deep</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#3182F6"></span><div class="meta"><div class="name" style="color:#fff; background:#3182F6; margin:-14px -16px 10px; padding:14px 16px;">blue ⭐ primary</div><div class="hex">#3182F6</div><div class="token">--blue</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#6DA8FF"></span><div class="meta"><div class="name">blue-tint</div><div class="hex">#6DA8FF</div><div class="token">--blue-tint</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#E8F3FF"></span><div class="meta"><div class="name">blue-soft</div><div class="hex">#E8F3FF</div><div class="token">--blue-soft</div></div></div>
+    </div>
+
+    <!-- Semantic -->
+    <h4 style="font-size:16px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-4); margin:0 0 16px;">Semantic · 상태 전용</h4>
+    <div class="grid cols-3">
+      <div class="swatch"><span class="fill" style="background:#25A768"></span><div class="meta"><div class="name" style="color:#25A768">Success / GA</div><div class="hex">#25A768</div><div class="token">--green</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#F1A31F"></span><div class="meta"><div class="name" style="color:#F1A31F">Partial / Warning</div><div class="hex">#F1A31F</div><div class="token">--yellow</div></div></div>
+      <div class="swatch"><span class="fill" style="background:#F04452"></span><div class="meta"><div class="name" style="color:#F04452">Risk / Strike</div><div class="hex">#F04452</div><div class="token">--red</div></div></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 03 · TYPOGRAPHY ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">03</span>Typography</div>
+      <div>
+        <h2>타이포그래피</h2>
+        <p class="desc">
+          한글은 <strong>Pretendard Variable</strong>, 영문·숫자는 <strong>Work Sans</strong>로
+          한 단계 더 무겁게. 큰 타이틀에는 타이트한 letter-spacing(-0.035em)을 줍니다.
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <div class="specimen">
+        <div class="tag">display-cover<span class="px">152 / 700 / -0.045em</span></div>
+        <div class="display-cover" style="font-size:96px;">거대한 <span class="em">한 문장</span></div>
+      </div>
+      <div class="specimen">
+        <div class="tag">display-quote<span class="px">128 / 700 / -0.04em</span></div>
+        <div class="display-quote" style="font-size:80px;">그래서 <span class="em">우리의 답</span>은</div>
+      </div>
+      <div class="specimen">
+        <div class="tag">h1 · title<span class="px">104 / 700 / -0.035em</span></div>
+        <h1 class="title" style="font-size:72px;">슬라이드의 헤드라인</h1>
+      </div>
+      <div class="specimen">
+        <div class="tag">h2 · title<span class="px">72 / 700 / -0.03em</span></div>
+        <h2 class="title" style="font-size:56px; margin:0;">본문 슬라이드 제목</h2>
+      </div>
+      <div class="specimen">
+        <div class="tag">h4<span class="px">36 / 700 / -0.025em</span></div>
+        <h4>카드 안 부제</h4>
+      </div>
+      <div class="specimen">
+        <div class="tag">h3 · subtitle<span class="px">30 / 500 / -0.015em</span></div>
+        <h3 class="subtitle">부제 한 줄 — 본문 슬라이드에서 타이틀 아래에 놓입니다.</h3>
+      </div>
+      <div class="specimen">
+        <div class="tag">body-md<span class="px">22 / 500 / -0.005em</span></div>
+        <p class="body-md">본문 중간 크기. 카드 안 설명에 적절합니다. <strong>강조</strong>는 ink 색으로.</p>
+      </div>
+      <div class="specimen">
+        <div class="tag">body-sm<span class="px">19 / 500</span></div>
+        <p class="body-sm">작은 본문. 메타 설명, 서브 텍스트에 사용합니다.</p>
+      </div>
+      <div class="specimen">
+        <div class="tag">eyebrow<span class="px">22 / 600 / blue</span></div>
+        <div class="eyebrow">EYEBROW · 섹션 식별자</div>
+      </div>
+      <div class="specimen">
+        <div class="tag">label<span class="px">14 / 600 / uppercase</span></div>
+        <div class="label">SECTION LABEL</div>
+      </div>
+      <div class="specimen">
+        <div class="tag">.num / .en<span class="px">Work Sans · 600</span></div>
+        <div style="font-size:52px; font-weight:700; letter-spacing:-0.02em;">
+          <span class="num">2026</span> · <span class="en">XRPL Credentials</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 04 · SPACING & RADII ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">04</span>Spacing &amp; Radii</div>
+      <div>
+        <h2>간격 · 라운드</h2>
+        <p class="desc">
+          <strong>4의 배수</strong> 스케일. 슬라이드 패딩 96×104, 카드 패딩 36–40, 라운드 20px이 시그니처.
+        </p>
+      </div>
+    </div>
+
+    <!-- Spacing ruler -->
+    <div class="tile" style="margin-bottom:24px;">
+      <div class="tile-label">SPACING SCALE</div>
+      <div class="ruler">
+        <div class="step"><span class="bar" style="height:4px"></span><span class="lbl">4</span></div>
+        <div class="step"><span class="bar" style="height:8px"></span><span class="lbl">8</span></div>
+        <div class="step"><span class="bar" style="height:12px"></span><span class="lbl">12</span></div>
+        <div class="step"><span class="bar" style="height:16px"></span><span class="lbl">16</span></div>
+        <div class="step"><span class="bar" style="height:20px"></span><span class="lbl">20</span></div>
+        <div class="step"><span class="bar" style="height:24px"></span><span class="lbl">24</span></div>
+        <div class="step"><span class="bar" style="height:32px"></span><span class="lbl">32</span></div>
+        <div class="step"><span class="bar" style="height:40px"></span><span class="lbl">40</span></div>
+        <div class="step"><span class="bar" style="height:48px"></span><span class="lbl">48</span></div>
+        <div class="step"><span class="bar" style="height:64px"></span><span class="lbl">64</span></div>
+        <div class="step"><span class="bar" style="height:80px"></span><span class="lbl">80</span></div>
+        <div class="step"><span class="bar" style="height:104px"></span><span class="lbl">104</span></div>
+      </div>
+      <p class="usage-note">
+        토큰: <code class="token-name">--sp-1</code> ~ <code class="token-name">--sp-12</code>.
+        슬라이드의 좌우 패딩은 <code class="token-name">104px</code>, 상하 <code class="token-name">96px</code>가 기본입니다.
+      </p>
+    </div>
+
+    <!-- Radius -->
+    <div class="tile">
+      <div class="tile-label">RADIUS SCALE</div>
+      <div style="display:flex; gap:36px; align-items:flex-end; padding:12px 0;">
+        <div class="radius-demo"><div class="rr" style="border-radius:6px"></div><div class="lbl"><strong>6</strong> r-xs</div></div>
+        <div class="radius-demo"><div class="rr" style="border-radius:10px"></div><div class="lbl"><strong>10</strong> r-sm</div></div>
+        <div class="radius-demo"><div class="rr" style="border-radius:14px"></div><div class="lbl"><strong>14</strong> r-md</div></div>
+        <div class="radius-demo"><div class="rr" style="border-radius:20px"></div><div class="lbl"><strong>20</strong> r-lg ⭐</div></div>
+        <div class="radius-demo"><div class="rr" style="border-radius:24px"></div><div class="lbl"><strong>24</strong> r-xl</div></div>
+        <div class="radius-demo"><div class="rr" style="border-radius:999px"></div><div class="lbl"><strong>pill</strong> r-pill</div></div>
+      </div>
+      <p class="usage-note">
+        <strong>r-lg (20px)</strong>가 카드의 기본 radius. 칩·버튼은 항상 pill.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════ 05 · COMPONENTS ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">05</span>Components</div>
+      <div>
+        <h2>컴포넌트</h2>
+        <p class="desc">
+          시스템이 제공하는 기본 블록. 새로 만들기 전에 <strong>이걸 조합할 수 없는지</strong> 먼저 확인하세요.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+
+      <!-- Chips -->
+      <div class="tile">
+        <div class="tile-label">CHIP · PILL LABEL</div>
+        <div class="tile-demo">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="chip">Primary</span>
+            <span class="chip green">Success · GA</span>
+            <span class="chip yellow">Partial</span>
+            <span class="chip red">Risk</span>
+            <span class="chip gray">Neutral</span>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="chip sm">sm</span>
+            <span class="chip">default</span>
+            <span class="chip lg">lg</span>
+          </div>
+        </div>
+        <p class="usage-note"><code class="token-name">.chip</code> · <code class="token-name">.chip.green</code> · <code class="token-name">.chip.sm</code></p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="tile">
+        <div class="tile-label">BUTTON · PILL</div>
+        <div class="tile-demo">
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn primary">Primary action</button>
+            <button class="btn secondary">Secondary</button>
+            <button class="btn ghost">Ghost</button>
+          </div>
+        </div>
+        <p class="usage-note"><code class="token-name">.btn.primary</code> — 페이지당 <strong>1개</strong>가 원칙.</p>
+      </div>
+
+      <!-- Card -->
+      <div class="tile">
+        <div class="tile-label">CARD · SOFT</div>
+        <div class="card" style="padding:24px;">
+          <div class="label">LABEL</div>
+          <h4 style="font-size:24px;">카드 제목</h4>
+          <p class="body-sm">기본 soft card. <strong>강조</strong>는 ink 색으로.</p>
+        </div>
+        <p class="usage-note"><code class="token-name">.card</code> · bg-soft · radius 20 · padding 40.</p>
+      </div>
+
+      <!-- Card · ink -->
+      <div class="tile">
+        <div class="tile-label">CARD · INK (강조)</div>
+        <div class="card ink" style="padding:24px;">
+          <div class="label">LABEL</div>
+          <h4 style="font-size:24px;">대비가 필요할 때</h4>
+          <p class="body-sm" style="color:rgba(255,255,255,0.75);">본문 슬라이드 안에서 한 카드만 ink로.</p>
+        </div>
+        <p class="usage-note"><code class="token-name">.card.ink</code> · 하나의 슬라이드에 <strong>1개</strong>만.</p>
+      </div>
+
+      <!-- Callout -->
+      <div class="tile wide">
+        <div class="tile-label">CALLOUT · 한 줄 요약</div>
+        <div class="callout">
+          <span>이 슬라이드의 한 줄 요약 — 청중이 기억해야 할 단 하나.</span>
+          <span class="pill">TAKEAWAY</span>
+        </div>
+        <p class="usage-note"><code class="token-name">.callout</code> — 슬라이드 하단에 takeaway를 놓을 때.</p>
+      </div>
+
+      <!-- Bullets -->
+      <div class="tile">
+        <div class="tile-label">BULLETS · BLUE DOT</div>
+        <ul class="bullets">
+          <li>짧고 명확한 포인트 한 줄</li>
+          <li>앞 포인트와 대구되는 두 번째</li>
+          <li>결론에 가까운 세 번째</li>
+        </ul>
+        <p class="usage-note"><code class="token-name">.bullets</code> — dash/star 대신 점.</p>
+      </div>
+
+      <!-- Numbered list -->
+      <div class="tile">
+        <div class="tile-label">NUMBERED LIST</div>
+        <div class="numbered-list">
+          <div class="item">
+            <div class="n">01</div>
+            <div class="text"><strong>첫 번째 이유.</strong> 뒷받침 문장 한 줄.</div>
+          </div>
+          <div class="item">
+            <div class="n">02</div>
+            <div class="text"><strong>두 번째 이유.</strong> 뒷받침 문장 한 줄.</div>
+          </div>
+        </div>
+        <p class="usage-note"><code class="token-name">.numbered-list</code> — Work Sans 큰 숫자 + 본문.</p>
+      </div>
+
+      <!-- Persona -->
+      <div class="tile wide">
+        <div class="tile-label">PERSONA CARD</div>
+        <div class="persona">
+          <div class="name">
+            <div class="n">김유진 · 29</div>
+            <div class="visa">E-7 · 3y</div>
+          </div>
+          <div class="fact">외국계 IT 재직 5년차. <strong>월 6,000 USD</strong> 수입이 있지만 국내 크레딧 이력이 0이라 신용대출이 거절됨.</div>
+          <div class="need">
+            <div class="label">NEED</div>
+            <div class="text">월세 보증금을 위한 즉시 실행 가능한 소액 대출</div>
+            <div class="outcome">현재: 지인 대여 / 목표: 90초 내 승인</div>
+          </div>
+        </div>
+        <p class="usage-note"><code class="token-name">.persona</code> — name · fact · need의 3단 구성.</p>
+      </div>
+
+      <!-- Evidence -->
+      <div class="tile wide">
+        <div class="tile-label">EVIDENCE · 법·인용·증빙</div>
+        <div class="evidence">
+          <div class="lbl">법령 인용</div>
+          <div class="text">
+            <strong>특정금융정보법 시행령 §10의2.</strong> 가상자산사업자가 아니면 영업을 할 수 없으며,
+            신원확인·실명확인·거래기록 보관이 의무다.
+          </div>
+          <div class="risk">위반 시 형사처벌 5년 이하 · 5천만원 이하</div>
+        </div>
+        <p class="usage-note"><code class="token-name">.evidence</code> — 좌측 blue 바 + soft 배경.</p>
+      </div>
+
+      <!-- Comparison table -->
+      <div class="tile wide">
+        <div class="tile-label">COMPARISON TABLE</div>
+        <div class="comp-table">
+          <div class="comp-row comp-head">
+            <div>Competitor</div>
+            <div>Approach</div>
+            <div class="comp-cell-head">On-chain?</div>
+          </div>
+          <div class="comp-row">
+            <div class="comp-name">전통 은행 <span class="tagy">Legacy</span></div>
+            <div class="comp-desc">국내 크레딧 스코어 기반 심사. <strong>외국인 거의 불가.</strong></div>
+            <div class="comp-cell no">✕</div>
+          </div>
+          <div class="comp-row">
+            <div class="comp-name">DeFi 대출 <span class="tagy">Crypto</span></div>
+            <div class="comp-desc">담보형. <strong>크레딧 역사 무의미.</strong></div>
+            <div class="comp-cell partial">△</div>
+          </div>
+          <div class="comp-row us">
+            <div class="comp-name">Us <span class="tagy">XRPL</span></div>
+            <div class="comp-desc"><strong>Credential Bundle</strong>로 소득·체류를 온체인 증명.</div>
+            <div class="comp-cell yes">✓</div>
+          </div>
+        </div>
+        <p class="usage-note"><code class="token-name">.comp-table</code> · <code class="token-name">.comp-row.us</code>로 자사 행 강조.</p>
+      </div>
+
+      <!-- Why-card -->
+      <div class="tile">
+        <div class="tile-label">WHY-CARD (지지 근거)</div>
+        <div class="why-card">
+          <div class="idx">01 / 07</div>
+          <h3 style="font-size:26px;">Built-in credential primitive</h3>
+          <p class="body" style="font-size:16px;">XRPL은 W3C Verifiable Credentials를 <strong>프로토콜 레벨</strong>에서 지원합니다.</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-label">WHY-CARD · INK</div>
+        <div class="why-card ink">
+          <div class="idx">02 / 07</div>
+          <h3 style="font-size:26px;">0.00001 XRP / tx</h3>
+          <p class="body" style="font-size:16px; color:rgba(255,255,255,0.8);">Ethereum 대비 <strong>6,000배</strong> 저렴, 평균 3–5초 정산.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════ 06 · SLIDE FRAME ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">06</span>Slide Frame</div>
+      <div>
+        <h2>슬라이드 프레임</h2>
+        <p class="desc">
+          덱의 모든 슬라이드가 공유하는 상단 바. <strong>brand mark + 섹션 이름 + 번호</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="tile wide" style="padding:0; background:#fff; overflow:hidden;">
+      <div style="padding:32px 40px; background:#fff;">
+        <div class="frame-top">
+          <span class="tag">
+            <span class="brand-mark">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2a10 10 0 0 1 10 10h-10V2z"/>
+                <path d="M12 22a10 10 0 0 1-10-10h10v10z"/>
+              </svg>
+            </span>
+            <span>섹션 · 챕터 이름</span>
+          </span>
+          <span class="num">04 / 24</span>
+        </div>
+        <div style="padding: 16px 0 8px;">
+          <div class="eyebrow">EYEBROW</div>
+          <h2 class="title" style="font-size:48px; margin-bottom:20px;">슬라이드의 헤드라인</h2>
+          <p class="body" style="font-size:20px;">본문이 여기부터 시작됩니다. 프레임은 간결하게.</p>
+        </div>
+      </div>
+      <div style="background:var(--ink); color:#fff; padding:32px 40px;">
+        <div class="frame-top">
+          <span class="tag">
+            <span class="brand-mark">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2a10 10 0 0 1 10 10h-10V2z"/>
+                <path d="M12 22a10 10 0 0 1-10-10h10v10z"/>
+              </svg>
+            </span>
+            <span>Chapter · ink 버전</span>
+          </span>
+          <span class="num">12 / 24</span>
+        </div>
+        <div style="padding:16px 0 8px;">
+          <div class="eyebrow" style="color:var(--blue-tint);">EYEBROW</div>
+          <h2 class="title" style="font-size:48px; margin-bottom:20px; color:#fff;">ink 섹션의 헤드라인</h2>
+        </div>
+      </div>
+    </div>
+
+    <p class="usage-note" style="margin-top:16px;">
+      <code class="token-name">.frame-top</code> — <code class="token-name">.brand-mark</code> (24×24 SVG) + label + <code class="token-name">.num</code>.
+      부모에 <code class="token-name">.bg-ink</code> / <code class="token-name">.bg-blue</code> 클래스가 붙으면 자동으로 색이 뒤집힙니다.
+    </p>
+  </section>
+
+  <!-- ══════════ 07 · LAYOUTS ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">07</span>Layouts</div>
+      <div>
+        <h2>레이아웃 시그니처</h2>
+        <p class="desc">
+          시스템 안에서 이미 증명된 구조. 새 슬라이드를 디자인할 때 이 중 하나로 시작하세요.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+
+      <div class="tile">
+        <div class="tile-label">A · BIG NUMBER</div>
+        <div style="background:#fff; padding:24px; border-radius:12px; border:1px solid var(--line-2);">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;">
+            <div style="font-family:'Work Sans'; font-size:180px; line-height:0.85; font-weight:600; color:var(--blue); letter-spacing:-0.06em;">0</div>
+            <div>
+              <div style="font-size:24px; font-weight:700; letter-spacing:-0.025em; margin-bottom:8px;">금융 제품 수</div>
+              <div style="font-size:14px; color:var(--ink-3); line-height:1.5;">외국인 IT 노동자가 접근 가능한 국내 신용대출 상품.</div>
+            </div>
+          </div>
+        </div>
+        <p class="usage-note">한 슬라이드 하나의 압도적인 숫자. 임팩트가 필요할 때.</p>
+      </div>
+
+      <div class="tile">
+        <div class="tile-label">B · STRIKE-REVEAL</div>
+        <div style="background:#fff; padding:24px; border-radius:12px; border:1px solid var(--line-2);">
+          <div style="font-size:36px; line-height:1.04; font-weight:700; letter-spacing:-0.04em;">
+            <span class="strike" style="text-decoration:line-through; text-decoration-thickness:4px; color:var(--ink-5); text-decoration-color:var(--ink-5);">신용이 없어서</span><br/>
+            <span style="color:var(--blue);">증명이 없어서</span>
+          </div>
+        </div>
+        <p class="usage-note">통념을 지우고 재정의. 섹션 마감에 효과적.</p>
+      </div>
+
+      <div class="tile">
+        <div class="tile-label">C · 3-COLUMN CARDS</div>
+        <div style="background:#fff; padding:16px; border-radius:12px; border:1px solid var(--line-2); display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div style="background:var(--bg-soft); border-radius:10px; padding:14px;"><div style="font-size:10px; color:var(--blue); letter-spacing:0.08em; font-weight:600; margin-bottom:6px;">01</div><div style="font-size:13px; font-weight:700;">첫 번째</div></div>
+          <div style="background:var(--ink); color:#fff; border-radius:10px; padding:14px;"><div style="font-size:10px; color:var(--blue-tint); letter-spacing:0.08em; font-weight:600; margin-bottom:6px;">02</div><div style="font-size:13px; font-weight:700;">두 번째 · 강조</div></div>
+          <div style="background:var(--bg-soft); border-radius:10px; padding:14px;"><div style="font-size:10px; color:var(--blue); letter-spacing:0.08em; font-weight:600; margin-bottom:6px;">03</div><div style="font-size:13px; font-weight:700;">세 번째</div></div>
+        </div>
+        <p class="usage-note">3단계 프로세스, 3-layer 구조, 페르소나 3명 등.</p>
+      </div>
+
+      <div class="tile">
+        <div class="tile-label">D · EVIDENCE + DEFENSE</div>
+        <div style="background:#fff; padding:16px; border-radius:12px; border:1px solid var(--line-2); display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="background:var(--bg-soft); border-left:3px solid var(--blue); border-radius:8px; padding:14px;">
+            <div style="font-size:10px; color:var(--blue); letter-spacing:0.08em; font-weight:600; margin-bottom:6px;">LAW</div>
+            <div style="font-size:13px; font-weight:600; line-height:1.4;">리스크/제약 조건의 인용문.</div>
+          </div>
+          <div>
+            <div style="padding:8px 0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:24px 1fr; gap:8px;"><div style="font-family:'Work Sans'; font-size:14px; color:var(--blue); font-weight:600;">01</div><div style="font-size:11px; color:var(--ink-2); line-height:1.4;">방어 논리 1</div></div>
+            <div style="padding:8px 0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:24px 1fr; gap:8px;"><div style="font-family:'Work Sans'; font-size:14px; color:var(--blue); font-weight:600;">02</div><div style="font-size:11px; color:var(--ink-2); line-height:1.4;">방어 논리 2</div></div>
+            <div style="padding:8px 0; display:grid; grid-template-columns:24px 1fr; gap:8px;"><div style="font-family:'Work Sans'; font-size:14px; color:var(--blue); font-weight:600;">03</div><div style="font-size:11px; color:var(--ink-2); line-height:1.4;">방어 논리 3</div></div>
+          </div>
+        </div>
+        <p class="usage-note">우려(왼쪽) → 대응(오른쪽 번호). 규제·리스크 슬라이드에 최적.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════ 08 · FILE MAP ══════════ -->
+  <section class="group">
+    <div class="group-head">
+      <div class="nav"><span class="num">08</span>Files</div>
+      <div>
+        <h2>파일 구조</h2>
+        <p class="desc">
+          새 프로젝트에서는 <code class="token-name">tokens.css</code> · <code class="token-name">typography.css</code> · <code class="token-name">components.css</code>를
+          순서대로 import하면 시스템이 준비됩니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="tile wide" style="font-family:'Work Sans', monospace; font-size:14px; line-height:1.9;">
+<pre style="margin:0; white-space:pre-wrap; color:var(--ink-2);">design-system/
+├── <strong style="color:var(--blue-ink);">tokens.css</strong>          색상 · 간격 · 라운드 · 모션 변수
+├── <strong style="color:var(--blue-ink);">typography.css</strong>      Pretendard + Work Sans 세팅, 타입 스케일
+├── <strong style="color:var(--blue-ink);">components.css</strong>      chip · button · card · persona · comp-table · 등
+├── <strong style="color:var(--blue-ink);">deck-stage.js</strong>       슬라이드덱 쉘 (1920×1080 자동 스케일)
+├── <strong style="color:var(--blue-ink);">index.html</strong>          이 카탈로그
+├── templates/
+│   └── <strong style="color:var(--blue-ink);">slide-templates.html</strong>  cover · content · section-break 3종
+└── <strong style="color:var(--blue-ink);">README.md</strong>           사용법 · 레시피</pre>
+    </div>
+
+    <div class="callout" style="margin-top:24px;">
+      <span>새 HTML 파일 상단에 <strong>3줄</strong>만 넣으면 시스템이 적용됩니다.</span>
+      <span class="pill">QUICK START</span>
+    </div>
+    <div class="tile wide" style="margin-top:16px; font-family:'Work Sans', monospace; font-size:13px;">
+<pre style="margin:0; white-space:pre-wrap; color:var(--ink-2); line-height:1.7;">&lt;link rel="stylesheet" href="design-system/tokens.css" /&gt;
+&lt;link rel="stylesheet" href="design-system/typography.css" /&gt;
+&lt;link rel="stylesheet" href="design-system/components.css" /&gt;
+&lt;script src="design-system/deck-stage.js"&gt;&lt;/script&gt;  <span style="color:var(--ink-4);">&lt;!-- 슬라이드덱인 경우만 --&gt;</span></pre>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>

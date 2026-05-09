@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Section Break Slide</title>
+<link rel="stylesheet" href="../tokens.css" />
+<link rel="stylesheet" href="../typography.css" />
+<link rel="stylesheet" href="../components.css" />
+<script src="../deck-stage.js"></script>
+<style>
+section.slide { background: var(--ink); color: #fff; padding: 96px 104px; display: flex; flex-direction: column; box-sizing: border-box; }
+.bg-ink .frame-top { color: rgba(255,255,255,0.55); }
+.bg-ink .frame-top .num { color: rgba(255,255,255,0.5); }
+.bg-ink .brand-mark { color: #fff; }
+.break { flex:1; display:flex; flex-direction:column; justify-content:center; }
+.numtag { font-family:'Work Sans', sans-serif; font-size:18px; letter-spacing:0.1em; text-transform:uppercase; color:var(--blue-tint); font-weight:600; margin-bottom:28px; }
+.statement { font-size:120px; line-height:1.05; font-weight:700; letter-spacing:-0.04em; color:#fff; max-width:1600px; margin:0; text-wrap:balance; }
+.statement .em { color: var(--blue-tint); }
+</style>
+</head>
+<body>
+<deck-stage>
+<section class="slide bg-ink">
+  <div class="frame-top">
+    <span class="tag"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 1 10 10h-10V2z"/><path d="M12 22a10 10 0 0 1-10-10h10v10z"/></svg></span><span>Chapter 02</span></span>
+    <span class="num">05 / 12</span>
+  </div>
+  <div class="break">
+    <div class="numtag">CHAPTER · 02</div>
+    <h1 class="statement">이제 <span class="em">진짜 문제</span>를<br/>이야기할 차례.</h1>
+  </div>
+</section>
+</deck-stage>
+</body>
+</html>

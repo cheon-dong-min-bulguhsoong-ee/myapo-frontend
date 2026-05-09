@@ -1,0 +1,132 @@
+/* ==========================================================================
+   Claude Design System · Colors & Type
+   Semantic alias layer over tokens.css + typography.css.
+   Load AFTER tokens.css + typography.css. Gives agents familiar names
+   (fg1, bg1, serif-display, h1, etc.) that map onto the Toss-inspired
+   palette and Pretendard × Work Sans pairing.
+   ========================================================================== */
+
+:root {
+  /* ───────── Semantic foreground / background ─────────────────────────── */
+  --fg1: var(--ink);      /* primary text — #191F28 */
+  --fg2: var(--ink-2);    /* secondary — #4E5968 */
+  --fg3: var(--ink-3);    /* tertiary / caption — #6B7684 */
+  --fg4: var(--ink-4);    /* muted / meta — #8B95A1 */
+  --fg5: var(--ink-5);    /* disabled / strike — #B0B8C1 */
+
+  --bg1: var(--bg);       /* page canvas — #FFFFFF */
+  --bg2: var(--bg-soft);  /* soft card — #F9FAFB */
+  --bg3: var(--bg-2);     /* chip fill — #F2F4F6 */
+  --border: var(--line);  /* dividers — #E5E8EB */
+  --border-soft: var(--line-2);
+
+  /* ───────── Semantic accent ─────────────────────────────────────────── */
+  --accent: var(--blue);            /* Toss Blue #3182F6 — single brand */
+  --accent-hover: var(--blue-deep); /* #1B64DA */
+  --accent-soft: var(--blue-soft);  /* #E8F3FF */
+  --accent-on-dark: var(--blue-tint); /* #6DA8FF */
+
+  /* ───────── Status (never decoration) ───────────────────────────────── */
+  --success: var(--green);
+  --success-soft: var(--green-soft);
+  --warn: var(--yellow);
+  --warn-soft: var(--yellow-soft);
+  --danger: var(--red);
+  --danger-soft: var(--red-soft);
+
+  /* ───────── Typography families ─────────────────────────────────────── */
+  --font-kr: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font-en: 'Work Sans', 'Pretendard Variable', system-ui, sans-serif;
+  --font-display: var(--font-kr);       /* headlines default to KR */
+  --font-body: var(--font-kr);
+  --font-num: var(--font-en);           /* numbers + Latin */
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ───────── Type scale (raw sizes) ──────────────────────────────────── */
+  --t-display-cover: 152px;
+  --t-display-quote: 128px;
+  --t-display-bignum: 640px;
+  --t-h1: 104px;
+  --t-h2: 72px;
+  --t-h3: 30px;
+  --t-h4: 36px;
+  --t-body: 30px;
+  --t-body-md: 22px;
+  --t-body-sm: 19px;
+  --t-eyebrow: 22px;
+  --t-label: 14px;
+
+  /* ───────── Tracking ────────────────────────────────────────────────── */
+  --track-display: -0.045em;
+  --track-title: -0.035em;
+  --track-h2: -0.03em;
+  --track-subtitle: -0.015em;
+  --track-body: -0.005em;
+  --track-num: -0.01em;
+  --track-label: 0.06em;
+}
+
+/* ───────── Semantic element defaults ────────────────────────────────────
+   Ensures bare h1/h2/p look right even without utility classes.
+   ──────────────────────────────────────────────────────────────────────── */
+h1 {
+  font-family: var(--font-display);
+  font-size: var(--t-h1);
+  line-height: 1.08;
+  letter-spacing: var(--track-title);
+  font-weight: 700;
+  color: var(--fg1);
+  margin: 0;
+  text-wrap: balance;
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: var(--t-h2);
+  line-height: 1.1;
+  letter-spacing: var(--track-h2);
+  font-weight: 700;
+  color: var(--fg1);
+  margin: 0 0 44px 0;
+  text-wrap: balance;
+}
+h3 {
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  line-height: 1.45;
+  letter-spacing: var(--track-subtitle);
+  font-weight: 500;
+  color: var(--fg2);
+  margin: 0;
+}
+h4 {
+  font-family: var(--font-display);
+  font-size: var(--t-h4);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--fg1);
+  margin: 0;
+}
+p {
+  font-family: var(--font-body);
+  font-size: var(--t-body-md);
+  line-height: 1.55;
+  color: var(--fg2);
+  margin: 0;
+  text-wrap: pretty;
+}
+a { color: var(--accent-hover); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, kbd, pre {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+code {
+  background: var(--bg3);
+  color: var(--accent-hover);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+hr { border: 0; border-top: 1px solid var(--border); margin: 48px 0; }

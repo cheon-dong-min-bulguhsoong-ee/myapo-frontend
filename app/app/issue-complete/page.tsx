@@ -16,10 +16,7 @@ export default function IssueCompletePage() {
         </p>
       </main>
 
-      <footer
-        className="shrink-0 px-5 pt-3"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
-      >
+      <footer className="page-footer shrink-0 px-5 pt-3 border-transparent">
         <Button fullWidth className="!bg-white !text-primary font-bold" onClick={() => router.push('/documents')}>
           내 문서 보기
         </Button>

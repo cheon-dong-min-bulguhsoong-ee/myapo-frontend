@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Big Number Slide</title>
+<link rel="stylesheet" href="../tokens.css" />
+<link rel="stylesheet" href="../typography.css" />
+<link rel="stylesheet" href="../components.css" />
+<script src="../deck-stage.js"></script>
+<style>
+section.slide { background: var(--bg); color: var(--ink); padding: 96px 104px; display: flex; flex-direction: column; box-sizing: border-box; }
+.bignum-layout { flex:1; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+</style>
+</head>
+<body>
+<deck-stage>
+<section class="slide">
+  <div class="frame-top">
+    <span class="tag"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 1 10 10h-10V2z"/><path d="M12 22a10 10 0 0 1-10-10h10v10z"/></svg></span><span>02 · Market</span></span>
+    <span class="num">07 / 12</span>
+  </div>
+  <div class="eyebrow">MARKET SIZE</div>
+  <div class="bignum-layout">
+    <div class="display-bignum" style="font-size:520px;">0</div>
+    <div>
+      <h2 style="font-size:72px; line-height:1.1; font-weight:700; letter-spacing:-0.03em; margin:0 0 32px;">금융 제품 수</h2>
+      <p style="font-size:28px; color:var(--ink-3); line-height:1.5; max-width:640px; font-weight:500;">외국인 IT 노동자가 접근 가능한 국내 <strong style="color:var(--ink); font-weight:700;">무담보 신용대출</strong> 상품.</p>
+    </div>
+  </div>
+</section>
+</deck-stage>
+</body>
+</html>

@@ -1,0 +1,476 @@
+/* ==========================================================================
+   Claude Design System · Components
+   Chips, buttons, cards, persona, comparison table, slide frame.
+   Load AFTER tokens.css and typography.css.
+   ========================================================================== */
+
+/* ───────── Chip (pill) ──────────────────────────────────────────────────
+   Signature Toss element. Small pill for status, tags, callouts.
+   Variants: default (blue), .green, .gray, .red, .yellow.
+   ──────────────────────────────────────────────────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--blue-soft);
+  color: var(--blue-ink);
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  letter-spacing: -0.005em;
+  line-height: 1;
+}
+.chip.green  { background: var(--green-soft);  color: var(--green); }
+.chip.gray   { background: var(--bg-2);        color: var(--ink-3); }
+.chip.red    { background: var(--red-soft);    color: var(--red); }
+.chip.yellow { background: var(--yellow-soft); color: var(--yellow); }
+
+.chip.sm { padding: 6px 10px; font-size: 14px; }
+.chip.lg { padding: 10px 18px; font-size: 20px; }
+
+/* ───────── Button ───────────────────────────────────────────────────────
+   Pill-shaped, confident. Use primary sparingly.
+   ──────────────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 28px;
+  border-radius: var(--r-pill);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  border: 0;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
+  font-family: inherit;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn.primary {
+  background: var(--blue);
+  color: #fff;
+}
+.btn.primary:hover { background: var(--blue-deep); }
+
+.btn.secondary {
+  background: var(--bg-2);
+  color: var(--ink);
+}
+.btn.secondary:hover { background: var(--line); }
+
+.btn.ghost {
+  background: transparent;
+  color: var(--ink);
+  padding: 14px 20px;
+}
+.btn.ghost:hover { background: var(--bg-soft); }
+
+.btn.sm { padding: 10px 18px; font-size: 16px; }
+.btn.lg { padding: 20px 36px; font-size: 22px; }
+
+/* ───────── Card ─────────────────────────────────────────────────────────
+   Soft-filled block with generous padding + 20px radius.
+   ──────────────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-soft);
+  border-radius: var(--r-lg);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.card.ink  { background: var(--ink);  color: #fff; }
+.card.blue { background: var(--blue); color: #fff; }
+.card.outline {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+.card.pad-sm { padding: 24px; }
+.card.pad-lg { padding: 56px; }
+
+/* ───────── Slide frame (deck top bar) ──────────────────────────────────
+   The tiny brand-mark + label + number bar at the top of each slide.
+   ──────────────────────────────────────────────────────────────────────── */
+.frame-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 22px;
+  color: var(--ink-3);
+  letter-spacing: -0.005em;
+  margin-bottom: 44px;
+  font-weight: 500;
+}
+.bg-ink  .frame-top { color: rgba(255,255,255,0.55); }
+.bg-blue .frame-top { color: rgba(255,255,255,0.8); }
+
+.frame-top .tag { display: inline-flex; align-items: center; gap: 12px; }
+
+.brand-mark {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  flex-shrink: 0;
+  color: var(--blue);
+}
+.brand-mark svg { width: 100%; height: 100%; display: block; }
+.bg-ink  .brand-mark,
+.bg-blue .brand-mark { color: #fff; }
+
+.frame-top .num {
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--ink-4);
+}
+.bg-ink  .frame-top .num { color: rgba(255,255,255,0.5); }
+.bg-blue .frame-top .num { color: rgba(255,255,255,0.7); }
+
+/* ───────── Persona card ─────────────────────────────────────────────────
+   3-region card: name/visa chip · fact paragraph · need block.
+   ──────────────────────────────────────────────────────────────────────── */
+.persona {
+  background: var(--bg-soft);
+  border-radius: var(--r-lg);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.persona .name {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.persona .name .n {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.persona .name .visa {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 15px;
+  color: var(--blue-ink);
+  background: var(--blue-soft);
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.persona .fact {
+  font-size: 22px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  font-weight: 500;
+}
+.persona .fact strong { font-weight: 700; color: var(--ink); }
+.persona .need {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.persona .need .label {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.persona .need .text {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--blue-ink);
+  line-height: 1.35;
+}
+.persona .need .outcome {
+  font-size: 18px;
+  color: var(--ink-3);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* ───────── Comparison table (lean list style) ──────────────────────────
+   Rows of competitor / description / yes-no cell. Highlighted "us" row.
+   ──────────────────────────────────────────────────────────────────────── */
+.comp-table { display: flex; flex-direction: column; }
+.comp-row {
+  display: grid;
+  grid-template-columns: 280px 1fr 110px;
+  gap: 28px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.comp-row.comp-head {
+  border-bottom: 2px solid var(--ink);
+  padding: 8px 0 14px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+}
+.comp-row.comp-head .comp-cell-head {
+  text-align: center;
+  color: var(--blue);
+}
+.comp-name {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.comp-name .tagy {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: var(--bg-2);
+  color: var(--ink-3);
+  border-radius: var(--r-xs);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.comp-desc {
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.comp-desc strong { color: var(--ink); font-weight: 700; }
+.comp-cell {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  font-family: 'Work Sans', sans-serif;
+}
+.comp-cell.no      { color: var(--ink-5); }
+.comp-cell.partial { color: var(--yellow); }
+.comp-cell.yes     { color: var(--blue); }
+
+.comp-row.us {
+  background: var(--ink);
+  color: #fff;
+  margin: 10px -24px 0;
+  padding: 20px 24px;
+  border-bottom: 0;
+  border-radius: var(--r-md);
+}
+.comp-row.us .comp-name { color: #fff; }
+.comp-row.us .tagy { background: var(--blue); color: #fff; font-weight: 700; }
+.comp-row.us .comp-desc { color: rgba(255,255,255,0.8); }
+.comp-row.us .comp-desc strong { color: #fff; }
+.comp-row.us .comp-cell.yes { color: var(--blue-tint); }
+
+/* ───────── Defense / numbered list ─────────────────────────────────────
+   Numbered row list. Large Work Sans numeral + rich text.
+   ──────────────────────────────────────────────────────────────────────── */
+.numbered-list { display: flex; flex-direction: column; }
+.numbered-list .item {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 20px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line);
+}
+.numbered-list .item:last-child { border-bottom: 0; }
+.numbered-list .item .n {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.numbered-list .item .text {
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.numbered-list .item .text strong { color: var(--ink); font-weight: 700; }
+
+/* ───────── Callout band ────────────────────────────────────────────────
+   Blue-soft strip for takeaway / summary sentence.
+   ──────────────────────────────────────────────────────────────────────── */
+.callout {
+  padding: 20px 28px;
+  background: var(--blue-soft);
+  color: var(--blue-ink);
+  border-radius: var(--r-md);
+  font-size: 20px;
+  line-height: 1.5;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+.callout .pill {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 7px 14px;
+  background: var(--blue);
+  color: #fff;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+/* ───────── Law quote / evidence block ──────────────────────────────────
+   Soft card with left blue rule. For legal text, citations, quotes.
+   ──────────────────────────────────────────────────────────────────────── */
+.evidence {
+  background: var(--bg-soft);
+  border-radius: var(--r-lg);
+  padding: 40px;
+  border-left: 6px solid var(--blue);
+}
+.evidence .lbl {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+.evidence .text {
+  font-size: 26px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 24px;
+  letter-spacing: -0.015em;
+}
+.evidence .text strong { color: var(--blue); }
+.evidence .risk {
+  font-size: 22px;
+  color: var(--red);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.evidence .risk::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--red);
+}
+
+/* ───────── Why-card (insight block for numbered sections) ──────────────
+   Used for "Why X · N of M" style panels.
+   ──────────────────────────────────────────────────────────────────────── */
+.why-card {
+  background: var(--bg-soft);
+  border-radius: var(--r-lg);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.why-card.ink { background: var(--ink); color: #fff; }
+.why-card .idx {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.why-card.ink .idx { color: var(--blue-tint); }
+.why-card h3 {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0;
+}
+.why-card .body {
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.why-card.ink .body { color: rgba(255,255,255,0.8); }
+.why-card .body strong { color: var(--ink); font-weight: 700; }
+.why-card.ink .body strong { color: #fff; }
+
+/* ───────── Bullet list (blue dot) ──────────────────────────────────────
+   Small dot markers. Denser than a body paragraph.
+   ──────────────────────────────────────────────────────────────────────── */
+.bullets {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bullets li {
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  padding-left: 22px;
+  position: relative;
+  font-weight: 500;
+}
+.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--blue);
+}
+.bg-ink .bullets li { color: rgba(255,255,255,0.82); }
+.bg-ink .bullets li::before { background: var(--blue-tint); }
+
+/* ───────── Big-number layout ────────────────────────────────────────────
+   Two-column: huge numeral (left) · caption + list (right).
+   ──────────────────────────────────────────────────────────────────────── */
+.bignum-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.bignum-layout .side h2 {
+  font-size: 64px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 32px 0;
+}
+.bignum-layout .side .caption {
+  font-size: 26px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  max-width: 640px;
+  font-weight: 500;
+}
+.bignum-layout .side .caption strong {
+  color: var(--ink);
+  font-weight: 700;
+}

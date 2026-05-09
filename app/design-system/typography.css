@@ -1,0 +1,175 @@
+/* ==========================================================================
+   Claude Design System · Typography
+   · KR: Pretendard Variable
+   · EN / numbers: Work Sans (one weight heavier than KR — Toss TPS rule)
+   · Big type is the signature. Tight letter-spacing on titles (-0.035em).
+   Load AFTER tokens.css.
+   ========================================================================== */
+
+/* Web fonts are imported first from app/globals.css before token/component rules. */
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+               'Helvetica Neue', sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01" 1, "cv11" 1;
+}
+
+/* ───────── Numbers / English ──────────────────────────────────────────────
+   Use .num or .en on any inline element containing numbers or Latin.
+   This swaps to Work Sans with tabular numerals enabled.
+   ──────────────────────────────────────────────────────────────────────── */
+.num, .en {
+  font-family: 'Work Sans', 'Pretendard Variable', system-ui, sans-serif;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  letter-spacing: -0.01em;
+}
+.num { font-weight: 600; }
+
+/* ───────── Display scale ──────────────────────────────────────────────────
+   Use these for slides and hero sections. Big type is the signature.
+   ──────────────────────────────────────────────────────────────────────── */
+.display-cover {
+  /* Cover title — the biggest type you'll use */
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 152px;
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  margin: 0;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.display-cover .em { color: var(--blue); }
+
+.display-quote {
+  /* Pull quote — slide-sized statement */
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 128px;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  text-wrap: balance;
+  margin: 0;
+}
+.display-quote .em { color: var(--blue); }
+.display-quote .strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 8px;
+  color: var(--ink-5);
+  text-decoration-color: var(--ink-5);
+}
+
+.display-bignum {
+  /* The "big number" moment — a single numeral */
+  font-family: 'Work Sans', sans-serif;
+  font-size: 640px;
+  line-height: 0.85;
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  color: var(--blue);
+}
+
+/* ───────── Headings ───────────────────────────────────────────────────── */
+h1.title, .h1 {
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  margin: 0;
+  text-wrap: balance;
+  line-height: 1.08;
+  font-size: 104px;
+  color: var(--ink);
+}
+
+h2.title, .h2 {
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 44px 0;
+  text-wrap: balance;
+  line-height: 1.1;
+  font-size: 72px;
+  color: var(--ink);
+}
+
+h3.subtitle, .h3 {
+  font-size: 30px;
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink-2);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+h4, .h4 {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--ink);
+}
+
+/* ───────── Body ───────────────────────────────────────────────────────── */
+p.body, .body {
+  font-size: 30px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0;
+  text-wrap: pretty;
+  font-weight: 400;
+}
+.body-md {
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-weight: 500;
+  margin: 0;
+}
+.body-sm, .small {
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ───────── Eyebrow / label ────────────────────────────────────────────── */
+.eyebrow {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: -0.005em;
+  margin-bottom: 20px;
+}
+
+.label {
+  /* Small uppercase caption — use sparingly, for section labels */
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+}
+
+/* ───────── On-dark overrides ──────────────────────────────────────────── */
+.bg-ink h1.title, .bg-ink h2.title, .bg-ink .h1, .bg-ink .h2, .bg-ink h4,
+.bg-blue h1.title, .bg-blue h2.title, .bg-blue .h1, .bg-blue .h2, .bg-blue h4 {
+  color: #fff;
+}
+.bg-ink  .subtitle, .bg-ink  .body, .bg-ink  p.body  { color: rgba(255,255,255,0.75); }
+.bg-blue .subtitle, .bg-blue .body, .bg-blue p.body { color: rgba(255,255,255,0.9); }
+.bg-ink  .eyebrow { color: var(--blue-tint); }
+.bg-blue .eyebrow { color: rgba(255,255,255,0.88); }
+.bg-ink  .label, .bg-blue .label { color: rgba(255,255,255,0.5); }

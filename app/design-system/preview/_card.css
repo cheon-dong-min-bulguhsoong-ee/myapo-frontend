@@ -1,0 +1,42 @@
+/* Preview card shared styles — imports system then sizes to 700×auto */
+@import url("../tokens.css");
+@import url("../typography.css");
+@import url("../components.css");
+@import url("../colors_and_type.css");
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  color: var(--ink);
+  width: 700px;
+  box-sizing: border-box;
+}
+.wrap {
+  padding: 24px 28px;
+  box-sizing: border-box;
+  width: 700px;
+}
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.col { display: flex; flex-direction: column; gap: 10px; }
+.cap {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.sw {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+}
+.sw .fill { height: 56px; display: block; }
+.sw .info { padding: 8px 10px 10px; }
+.sw .nm { font-size: 12px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+.sw .hx { font-family: 'Work Sans', sans-serif; font-size: 10px; font-weight: 500; color: var(--ink-4); letter-spacing: 0.02em; margin-top: 2px; }
