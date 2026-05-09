@@ -153,3 +153,30 @@ export const documentCategories = [
     items: ['범죄경력회보서', '신원조회서'],
   },
 ]
+
+// A-01 wireframe doc list — flat, with issuer monogram + use-case + issuer code.
+// Used by /issue/select via <DocCard>.
+export type IssuerCode =
+  | 'KR-NTS' | 'KR-법원' | 'KR-MOIS' | 'KR-병무청' | 'KR-경찰청' | 'KR-학교' | 'KR-건보'
+
+export interface IssuableDocument {
+  id: string
+  name: string
+  englishName?: string
+  use: string
+  issuerCode: IssuerCode
+  issuerIcon: string
+}
+
+export const mockIssuableDocuments: IssuableDocument[] = [
+  { id: 'fam',    name: '가족관계증명서 (영문)',       englishName: 'Family Relationship Cert.', use: '미국 이민국 결혼 증빙',       issuerCode: 'KR-법원',    issuerIcon: '법원' },
+  { id: 'res',    name: '주민등록등본 (영문)',         englishName: 'Residence Cert.',           use: '거주증명 · 비자 보조',       issuerCode: 'KR-MOIS',    issuerIcon: 'MOIS' },
+  { id: 'tax',    name: '납세증명서 (영문)',           englishName: 'Tax Payment Cert.',         use: '미국 영사관 비자 재정증명',   issuerCode: 'KR-NTS',     issuerIcon: 'NTS' },
+  { id: 'income', name: '소득금액증명원 (영문)',       englishName: 'Income Cert.',              use: '비자 · 이민',                 issuerCode: 'KR-NTS',     issuerIcon: 'NTS' },
+  { id: 'biz',    name: '사업자등록증명원',             englishName: 'Business Reg. Cert.',       use: '해외 법인 설립',              issuerCode: 'KR-NTS',     issuerIcon: 'NTS' },
+  { id: 'land',   name: '부동산등기부등본',             englishName: 'Property Reg. Extract',     use: '자산증명',                    issuerCode: 'KR-법원',    issuerIcon: '법원' },
+  { id: 'mil',    name: '병적증명서',                   englishName: 'Military Service Record',   use: '비자 · 이민 보조',            issuerCode: 'KR-병무청',  issuerIcon: '병무' },
+  { id: 'drv',    name: '운전경력증명서',               englishName: 'Driving History Cert.',     use: '해외 면허 변환',              issuerCode: 'KR-경찰청',  issuerIcon: '경찰' },
+  { id: 'edu',    name: '학력증명서 (영문)',           englishName: 'Academic Cert.',            use: '해외 취업 · 유학',           issuerCode: 'KR-학교',    issuerIcon: '학교' },
+  { id: 'health', name: '건강보험료납부확인서 (영문)', englishName: 'Health Insurance Cert.',    use: '해외 비자 · 건강보험 증빙',  issuerCode: 'KR-건보',    issuerIcon: '건보' },
+]
