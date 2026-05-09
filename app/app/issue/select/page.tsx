@@ -10,16 +10,32 @@ import { mockIssuableDocuments } from '@/lib/mock-data'
 
 export default function IssueSelectPage() {
   const router = useRouter()
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
-  const selectedDoc = mockIssuableDocuments.find(d => d.id === selectedId) ?? null
+  const toggle = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+
+  const selectedCount = selectedIds.size
+  const onlyDoc = selectedCount === 1
+    ? mockIssuableDocuments.find(d => selectedIds.has(d.id)) ?? null
+    : null
+
+  const ctaLabel =
+    selectedCount === 0 ? '서류를 선택해 주세요'
+    : onlyDoc          ? `${onlyDoc.name} 발급 신청할게요`
+    :                    `${selectedCount}개 서류 발급 신청할게요`
 
   return (
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title="발급 서류 선택" />
       <PageHeader
         title="어떤 서류를 발급할까요?"
-        subtitle="해외 기관 제출용 · 한국 정부 발급"
+        subtitle="여러 개를 함께 신청할 수 있어요"
       />
 
       <main className="flex-1 overflow-y-auto px-5 pb-4">
@@ -32,8 +48,8 @@ export default function IssueSelectPage() {
               englishName={doc.englishName}
               use={doc.use}
               issuerCode={doc.issuerCode}
-              selected={selectedId === doc.id}
-              onClick={() => setSelectedId(doc.id)}
+              selected={selectedIds.has(doc.id)}
+              onClick={() => toggle(doc.id)}
             />
           ))}
         </div>
@@ -46,10 +62,10 @@ export default function IssueSelectPage() {
       <PageFooter>
         <Button
           fullWidth
-          disabled={!selectedDoc}
+          disabled={selectedCount === 0}
           onClick={() => router.push('/issue/verify')}
         >
-          {selectedDoc ? `${selectedDoc.name} 발급 신청할게요` : '서류를 선택해 주세요'}
+          {ctaLabel}
         </Button>
         <p className="text-[11px] text-ink-muted text-center mt-1">
           PIPA §17 동의 포함 · 사용자 디바이스 한정 보관
