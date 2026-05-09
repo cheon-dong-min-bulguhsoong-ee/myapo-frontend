@@ -9,9 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@emotion/react": "^11",
-    "@emotion/styled": "^11",
-    "@toss/tds-mobile": "^2",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
     "react": "18.3.1",

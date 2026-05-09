@@ -1,6 +1,6 @@
 'use client'
 import { LucideIcon } from 'lucide-react'
-import { Result } from '@toss/tds-mobile'
+import { Button } from './button'
 
 interface EmptyStateProps {
   icon: LucideIcon
@@ -12,17 +12,17 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon: Icon, title, description, ctaLabel, onCta }: EmptyStateProps) {
   return (
-    <Result
-      figure={<Icon size={64} strokeWidth={1} style={{ color: 'var(--adaptiveGrey400, #8B95A1)' }} />}
-      title={title}
-      description={description}
-      button={
-        ctaLabel && onCta ? (
-          <Result.Button color="light" variant="fill" size="large" onClick={onCta}>
+    <div className="flex h-full min-h-64 flex-col items-center justify-center px-6 py-10 text-center">
+      <Icon size={64} strokeWidth={1} className="mb-5 text-ink-muted" />
+      <h2 className="text-[19px] font-bold leading-snug text-ink">{title}</h2>
+      {description && <p className="mt-2 text-[14px] leading-relaxed text-ink-secondary">{description}</p>}
+      {ctaLabel && onCta && (
+        <div className="mt-6">
+          <Button variant="secondary" onClick={onCta}>
             {ctaLabel}
-          </Result.Button>
-        ) : undefined
-      }
-    />
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }

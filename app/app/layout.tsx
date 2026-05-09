@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { PersonaProvider } from '@/contexts/persona-context'
 import { AuthProvider } from '@/contexts/auth-context'
-import { TDSProviders } from '@/components/tds-providers'
 import { BottomHomeBar } from '@/components/ui/bottom-home-bar'
 
 export const metadata: Metadata = {
@@ -21,25 +20,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body style={{ display: 'flex', justifyContent: 'center', height: '100dvh', background: '#E5E8EB' }}>
-        <TDSProviders>
-          <AuthProvider>
-            <PersonaProvider>
-              <div
-                style={{
-                  width: '100%',
-                  maxWidth: 430,
-                  height: '100dvh',
-                  background: 'var(--color-canvas)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>{children}</div>
-                <BottomHomeBar />
-              </div>
-            </PersonaProvider>
-          </AuthProvider>
-        </TDSProviders>
+        <AuthProvider>
+          <PersonaProvider>
+            <div
+              style={{
+                width: '100%',
+                maxWidth: 430,
+                height: '100dvh',
+                background: 'var(--color-canvas)',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>{children}</div>
+              <BottomHomeBar />
+            </div>
+          </PersonaProvider>
+        </AuthProvider>
       </body>
     </html>
   )

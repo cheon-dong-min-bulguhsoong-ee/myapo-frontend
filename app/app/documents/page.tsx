@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Tab } from '@toss/tds-mobile'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -92,14 +91,24 @@ export default function DocumentsPage() {
       <AppBar title="내 문서" />
       <PageHeader title="내 증명서" subtitle="발급된 문서와 만료된 문서를 확인하세요" />
       <div className="shrink-0" style={{ borderBottom: '1px solid var(--color-hairline)' }}>
-        <Tab size="large" onChange={(idx) => setTab(idx === 0 ? 'available' : 'expired')}>
-          <Tab.Item selected={tab === 'available'}>
+        <div className="grid grid-cols-2 px-5">
+          <button
+            type="button"
+            onClick={() => setTab('available')}
+            className={`relative min-h-12 text-[15px] font-bold ${tab === 'available' ? 'text-primary' : 'text-ink-secondary'}`}
+          >
             유효한 문서 <span style={{ color: tab === 'available' ? '#3182F6' : '#8B95A1', marginLeft: 4 }}>{availableCount}</span>
-          </Tab.Item>
-          <Tab.Item selected={tab === 'expired'}>
+            {tab === 'available' && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('expired')}
+            className={`relative min-h-12 text-[15px] font-bold ${tab === 'expired' ? 'text-primary' : 'text-ink-secondary'}`}
+          >
             만료된 문서 <span style={{ color: tab === 'expired' ? '#3182F6' : '#8B95A1', marginLeft: 4 }}>{expiredCount}</span>
-          </Tab.Item>
-        </Tab>
+            {tab === 'expired' && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary" />}
+          </button>
+        </div>
       </div>
       <main className="flex-1 overflow-y-auto px-5 py-4 pb-6 space-y-3">
         {filtered.length === 0 ? (

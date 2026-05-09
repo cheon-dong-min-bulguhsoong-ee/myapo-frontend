@@ -1,5 +1,4 @@
 'use client'
-import { SegmentedControl as TDSSegmentedControl } from '@toss/tds-mobile'
 
 interface Option {
   value: string
@@ -15,19 +14,20 @@ interface SegmentedControlProps {
 
 export function SegmentedControl({ options, value, onChange }: SegmentedControlProps) {
   return (
-    <TDSSegmentedControl size="large" value={value} onChange={onChange}>
+    <div className="grid gap-1 rounded-xl bg-canvas p-1" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
       {options.map((opt) => (
-        <TDSSegmentedControl.Item key={opt.value} value={opt.value}>
-          {opt.sublabel ? (
-            <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span>{opt.label}</span>
-              <span style={{ fontSize: 12, opacity: 0.7 }}>{opt.sublabel}</span>
-            </span>
-          ) : (
-            opt.label
-          )}
-        </TDSSegmentedControl.Item>
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className={`flex min-h-11 flex-col items-center justify-center rounded-lg px-2 text-[14px] font-bold transition-colors ${
+            value === opt.value ? 'bg-paper text-primary shadow-sm' : 'text-ink-secondary active:bg-paper'
+          }`}
+        >
+          <span>{opt.label}</span>
+          {opt.sublabel && <span className="mt-0.5 text-xs font-medium opacity-70">{opt.sublabel}</span>}
+        </button>
       ))}
-    </TDSSegmentedControl>
+    </div>
   )
 }

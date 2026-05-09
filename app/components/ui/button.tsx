@@ -1,5 +1,4 @@
 'use client'
-import { Button as TDSButton, TextButton } from '@toss/tds-mobile'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
@@ -17,26 +16,32 @@ export function Button({
 }: ButtonProps) {
   if (variant === 'text-link') {
     return (
-      <TextButton {...(props as React.ComponentProps<typeof TextButton>)} size="medium">
+      <button
+        {...props}
+        className={`inline-flex min-h-10 items-center justify-center rounded-md px-1 text-[15px] font-semibold text-primary transition-colors active:opacity-70 disabled:cursor-not-allowed disabled:text-ink-muted ${
+          className ?? ''
+        }`}
+      >
         {children}
-      </TextButton>
+      </button>
     )
   }
 
-  const color = variant === 'danger' ? 'danger' : variant === 'secondary' ? 'light' : 'primary'
-  const size = variant === 'secondary' ? 'large' : 'xlarge'
-  const display = fullWidth ? 'block' : 'inline'
+  const variantClass =
+    variant === 'danger'
+      ? 'bg-danger text-white active:bg-danger-deep'
+      : variant === 'secondary'
+        ? 'bg-primary-soft text-primary active:bg-hairline'
+        : 'bg-primary text-white active:opacity-90'
 
   return (
-    <TDSButton
-      {...(props as React.ComponentProps<typeof TDSButton>)}
-      color={color}
-      variant="fill"
-      size={size}
-      display={display}
-      className={className}
+    <button
+      {...props}
+      className={`inline-flex min-h-14 items-center justify-center rounded-xl px-5 text-[16px] font-bold transition-colors disabled:cursor-not-allowed disabled:bg-hairline disabled:text-ink-muted ${
+        fullWidth ? 'w-full' : ''
+      } ${variantClass} ${className ?? ''}`}
     >
       {children}
-    </TDSButton>
+    </button>
   )
 }

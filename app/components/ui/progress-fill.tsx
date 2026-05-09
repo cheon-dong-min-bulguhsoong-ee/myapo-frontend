@@ -1,10 +1,15 @@
 'use client'
-import { ProgressBar } from '@toss/tds-mobile'
 
 interface ProgressFillProps {
   value: number // 0-100
 }
 
 export function ProgressFill({ value }: ProgressFillProps) {
-  return <ProgressBar progress={Math.max(0, Math.min(1, value / 100))} size="light" />
+  const progress = Math.max(0, Math.min(100, value))
+
+  return (
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-hairline" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+      <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} />
+    </div>
+  )
 }

@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Checkbox } from '@toss/tds-mobile'
 import { AppBar } from '@/components/ui/app-bar'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
@@ -56,7 +55,12 @@ export default function IssueSelectPage() {
                           checked ? 'bg-primary-soft' : ''
                         }`}
                       >
-                        <Checkbox.Line checked={checked} onCheckedChange={() => toggle(item)} size={22} />
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggle(item)}
+                          className="h-[22px] w-[22px] shrink-0 accent-primary"
+                        />
                         <span
                           className={`flex-1 text-[15px] leading-normal ${
                             checked ? 'font-semibold text-primary' : 'font-medium text-ink'

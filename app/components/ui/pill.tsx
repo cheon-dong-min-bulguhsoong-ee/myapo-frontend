@@ -1,5 +1,4 @@
 'use client'
-import { Badge } from '@toss/tds-mobile'
 
 type PillVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
 
@@ -8,18 +7,18 @@ interface PillProps {
   children: React.ReactNode
 }
 
-const colorMap: Record<PillVariant, 'green' | 'yellow' | 'red' | 'blue' | 'elephant'> = {
-  success: 'green',
-  warning: 'yellow',
-  danger: 'red',
-  info: 'blue',
-  neutral: 'elephant',
+const colorMap: Record<PillVariant, string> = {
+  success: 'bg-success-soft text-success',
+  warning: 'bg-warning-soft text-warning',
+  danger: 'bg-danger-soft text-danger',
+  info: 'bg-info-soft text-info',
+  neutral: 'bg-canvas text-ink-secondary',
 }
 
 export function Pill({ variant = 'neutral', children }: PillProps) {
   return (
-    <Badge size="small" variant="weak" color={colorMap[variant]}>
+    <span className={`inline-flex h-6 items-center rounded-md px-2 text-xs font-bold ${colorMap[variant]}`}>
       {children}
-    </Badge>
+    </span>
   )
 }
