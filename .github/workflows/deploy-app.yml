@@ -15,7 +15,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 20
 
     steps:
@@ -29,49 +29,16 @@ jobs:
             -t "${IMAGE_NAME}:latest" \
             ./app
 
-      - name: Export Docker image
+      - name: Restart container
         run: |
-          mkdir -p deploy
-          docker save "${IMAGE_NAME}:${GITHUB_SHA}" | gzip > deploy/app-image.tar.gz
+          docker rm -f "${CONTAINER_NAME}" 2>/dev/null || true
 
-      - name: Copy image to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          source: "deploy/app-image.tar.gz"
-          target: "/tmp/myapo-frontend-${{ github.sha }}"
-          strip_components: 1
+          docker run -d \
+            --name "${CONTAINER_NAME}" \
+            --restart unless-stopped \
+            -p "${APP_PORT}:${APP_PORT}" \
+            -e PORT="${APP_PORT}" \
+            -e HOSTNAME="0.0.0.0" \
+            "${IMAGE_NAME}:${GITHUB_SHA}"
 
-      - name: Restart container on server
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          APP_PORT: ${{ env.APP_PORT }}
-          CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
-          IMAGE_TAG: ${{ github.sha }}
-          DEPLOY_DIR: "/tmp/myapo-frontend-${{ github.sha }}"
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          envs: APP_PORT,CONTAINER_NAME,IMAGE_NAME,IMAGE_TAG,DEPLOY_DIR
-          script_stop: true
-          script: |
-            docker load -i "${DEPLOY_DIR}/app-image.tar.gz"
-
-            docker rm -f "${CONTAINER_NAME}" 2>/dev/null || true
-
-            docker run -d \
-              --name "${CONTAINER_NAME}" \
-              --restart unless-stopped \
-              -p "${APP_PORT}:${APP_PORT}" \
-              -e PORT="${APP_PORT}" \
-              -e HOSTNAME="0.0.0.0" \
-              "${IMAGE_NAME}:${IMAGE_TAG}"
-
-            rm -rf "${DEPLOY_DIR}"
-            docker image prune -f
+          docker image prune -f

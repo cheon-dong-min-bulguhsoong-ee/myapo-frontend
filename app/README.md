@@ -27,19 +27,13 @@ docker run --rm -p 10000:10000 myapo-frontend
 
 ## GitHub Actions Deployment
 
-Pushes to `main` automatically build the Docker image and restart the app container on the server.
-
-Required repository secrets:
-
-- `SSH_HOST`: server hostname or IP address
-- `SSH_USER`: SSH user with Docker permission
-- `SSH_PRIVATE_KEY`: private key for that SSH user
-- `SSH_PORT`: SSH port, optional; defaults to `22`
+Pushes to `main` automatically build the Docker image and restart the app container on the self-hosted runner server.
 
 Server requirements:
 
+- GitHub Actions self-hosted runner registered for this repository
 - Docker installed
-- SSH user can run `docker` without an interactive password
+- Runner user can run `docker` without an interactive password
 - Inbound port `10000` is open
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
