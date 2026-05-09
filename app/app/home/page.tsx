@@ -34,16 +34,7 @@ export default function HomePage() {
       <AppBar wordmark showBack={false} />
 
       <main className="flex-1 px-5 pt-6 pb-8 flex flex-col">
-        <header>
-          <h1 className="text-[26px] font-bold leading-[1.2] tracking-[-0.035em] text-ink">
-            안녕하세요
-          </h1>
-          <p className="ds-body text-ink-secondary mt-2 text-pretty">
-            해외 제출용 공공문서를<br />간편하게 발급하세요
-          </p>
-        </header>
-
-        <div className="grid grid-cols-2 gap-3 mt-8">
+        <div className="grid grid-cols-2 gap-3">
           {menuItems.map(({ icon, label, sublabel, count, href, tone }) => (
             <button
               key={href}
