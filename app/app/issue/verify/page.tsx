@@ -18,7 +18,7 @@ export default function IssueVerifyPage() {
   return (
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title="본인 확인" />
-      <PageHeader title="본인 정보를 확인할게요" subtitle="발급을 위해 본인 명의 인증이 필요해요" />
+      <PageHeader size="hero" title="본인 정보를 확인할게요" subtitle="발급을 위해 본인 명의 인증이 필요해요" />
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-4">
         <TextField
@@ -65,7 +65,7 @@ export default function IssueVerifyPage() {
           >
             {form.agreed && <span className="text-white text-xs font-bold">✓</span>}
           </div>
-          <p className="text-sm text-ink-secondary leading-relaxed">
+          <p className="text-base text-ink-secondary leading-relaxed">
             개인정보보호법 제17조에 따른 개인정보 제3자 제공에 동의합니다
           </p>
         </button>
