@@ -370,3 +370,40 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
   color: var(--ink-4);
   cursor: not-allowed;
 }
+
+.btn.inverted {
+  background: #fff;
+  color: var(--blue);
+}
+
+.btn.inverted:hover {
+  background: var(--blue-soft);
+}
+
+/* Pill / status badge variants used in AppBar (Testnet, Mock, Pre-Check Only)
+   and on expired credential cards (Revoked). Driven by chip + variant class. */
+.chip.testnet  { background: #E2F7FF; color: #0A7B9E; }
+.chip.mock     { background: #FFF4DE; color: #9A6500; }
+.chip.precheck { background: var(--blue-soft); color: var(--blue-deep); }
+.chip.revoked  { background: var(--red-soft); color: #9F2A37; }
+
+/* Callout — inline notification banner used across A-02 / A-03 / A-06 / login.
+   Tone selects bg + border; structure is: icon (top-aligned) + title/desc stack. */
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.callout.info    { background: var(--blue-soft);   border-color: var(--blue); }
+.callout.success { background: var(--green-soft);  border-color: var(--green); }
+.callout.warning { background: var(--yellow-soft); border-color: var(--yellow); }
+.callout.danger  { background: var(--red-soft);    border-color: var(--red); }
+
+.callout.info    > svg, .callout.info    > div[role="status"] { color: var(--blue); }
+.callout.success > svg, .callout.success > div[role="status"] { color: var(--green); }
+.callout.warning > svg, .callout.warning > div[role="status"] { color: var(--yellow); }
+.callout.danger  > svg, .callout.danger  > div[role="status"] { color: var(--red); }

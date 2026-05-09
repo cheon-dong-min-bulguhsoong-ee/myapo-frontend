@@ -2,7 +2,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
-  variant?: 'primary' | 'danger' | 'secondary' | 'ghost' | 'text-link'
+  variant?: 'primary' | 'danger' | 'secondary' | 'ghost' | 'inverted' | 'text-link'
   children: ReactNode
   fullWidth?: boolean
 }
@@ -34,7 +34,9 @@ export function Button({
         ? 'secondary'
         : variant === 'ghost'
           ? 'ghost'
-          : 'primary'
+          : variant === 'inverted'
+            ? 'inverted'
+            : 'primary'
 
   return (
     <button
