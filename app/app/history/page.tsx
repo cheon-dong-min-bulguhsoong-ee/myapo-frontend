@@ -30,10 +30,10 @@ export default function HistoryPage() {
             <Card key={app.id} clickable onClick={() => router.push(`/history/${app.id}`)}>
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <span className="block text-[17px] font-bold text-ink tracking-[-0.01em] leading-snug">
+                  <span className="block text-base font-bold text-ink tracking-[-0.01em] leading-snug">
                     {app.documentType}
                   </span>
-                  <p className="text-[14px] font-semibold text-primary mt-1">
+                  <p className="text-sm font-semibold text-primary mt-1">
                     {app.stageName}
                   </p>
                 </div>
@@ -43,10 +43,10 @@ export default function HistoryPage() {
               <div className="mt-4">
                 <ProgressFill value={(app.stage / app.totalStages) * 100} />
                 <div className="flex justify-between items-center mt-2.5">
-                  <p className="text-[13px] font-medium text-ink-secondary">
+                  <p className="text-xs font-medium text-ink-secondary">
                     {app.stage === app.totalStages ? '완료됨' : '진행 중'}
                   </p>
-                  <p className="text-[13px] font-medium text-ink-muted">
+                  <p className="text-xs font-medium text-ink-muted">
                     {app.stage}/{app.totalStages} 단계
                   </p>
                 </div>

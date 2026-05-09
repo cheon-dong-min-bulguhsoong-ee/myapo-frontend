@@ -20,7 +20,7 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`flex min-h-11 flex-col items-center justify-center rounded-lg px-2 text-[14px] font-bold transition-colors ${
+          className={`flex min-h-11 flex-col items-center justify-center rounded-lg px-2 text-sm font-bold transition-colors ${
             value === opt.value ? 'bg-paper text-primary shadow-sm' : 'text-ink-secondary active:bg-paper'
           }`}
         >

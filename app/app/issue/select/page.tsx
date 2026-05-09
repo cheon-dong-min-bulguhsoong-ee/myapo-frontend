@@ -36,11 +36,11 @@ export default function IssueSelectPage() {
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
             >
               <header className="px-5 py-4 border-b border-hairline flex justify-between items-center">
-                <h2 className="text-[17px] font-bold text-ink tracking-[-0.01em] leading-snug">
+                <h2 className="text-base font-bold text-ink tracking-[-0.01em] leading-snug">
                   {cat.label}
                 </h2>
                 {catSelectedCount > 0 && (
-                  <span className="text-[13px] font-semibold text-primary">
+                  <span className="text-xs font-semibold text-primary">
                     {catSelectedCount}개 선택됨
                   </span>
                 )}

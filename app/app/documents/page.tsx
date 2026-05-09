@@ -110,7 +110,7 @@ export default function DocumentsPage() {
           </button>
         </div>
       </div>
-      <main className="flex-1 overflow-y-auto px-5 py-4 pb-6 space-y-3">
+      <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
         {filtered.length === 0 ? (
           <EmptyState
             icon={Folder}

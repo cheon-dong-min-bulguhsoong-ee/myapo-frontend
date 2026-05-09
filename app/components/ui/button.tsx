@@ -37,7 +37,7 @@ export function Button({
   return (
     <button
       {...props}
-      className={`inline-flex min-h-14 items-center justify-center rounded-xl px-5 text-[16px] font-bold transition-colors disabled:cursor-not-allowed disabled:bg-hairline disabled:text-ink-muted ${
+      className={`inline-flex min-h-14 items-center justify-center rounded-xl px-5 text-base font-bold transition-colors disabled:cursor-not-allowed disabled:bg-hairline disabled:text-ink-muted ${
         fullWidth ? 'w-full' : ''
       } ${variantClass} ${className ?? ''}`}
     >

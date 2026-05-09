@@ -15,7 +15,7 @@ export default function HistoryDetailPage() {
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title={app.documentType} />
 
-      <main className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
+      <main className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
         <Card>
           <p className="text-xs text-ink-muted mb-1">현재 단계</p>
           <p className="font-bold text-ink text-base">{app.stageName}</p>

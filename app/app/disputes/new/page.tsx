@@ -26,7 +26,7 @@ export default function DisputeNewPage() {
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-6">
         <section className="space-y-2">
-          <p className="text-[14px] font-semibold text-ink px-1">문제 발생 단계</p>
+          <p className="text-sm font-semibold text-ink px-1">문제 발생 단계</p>
           <div className="grid grid-cols-2 gap-2">
             {stages.map(s => (
               <SelectableCard key={s} selected={stage === s} onClick={() => setStage(s)} className="!p-3">
@@ -39,7 +39,7 @@ export default function DisputeNewPage() {
         </section>
 
         <section className="space-y-2">
-          <p className="text-[14px] font-semibold text-ink px-1">이의 사유</p>
+          <p className="text-sm font-semibold text-ink px-1">이의 사유</p>
           <div className="space-y-2">
             {reasons.map(r => (
               <SelectableCard key={r} selected={reason === r} onClick={() => setReason(r)} className="!p-3">
