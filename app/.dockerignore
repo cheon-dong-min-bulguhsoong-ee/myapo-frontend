@@ -1,0 +1,14 @@
+.git
+.next
+node_modules
+
+.env
+.env*
+
+.claude
+.omc
+.test.md.swp
+
+Dockerfile
+README.md
+docs
