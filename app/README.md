@@ -22,7 +22,7 @@ Build and run the production app with Bun:
 
 ```bash
 docker build -t myapo-frontend ./app
-docker run --rm -p 3000:3000 myapo-frontend
+docker run --rm -p 10000:10000 myapo-frontend
 ```
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
