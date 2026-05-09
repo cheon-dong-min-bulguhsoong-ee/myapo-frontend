@@ -72,4 +72,31 @@ Credentials live on **XRPL Testnet** (Pre-Check Only mode). Mobile-only frontend
 - `docs/` — system of record (this file's domain)
 - `node_modules/next/dist/docs/` — Next.js 15 reference (read before writing route code)
 
+## Commit + push harness
+
+**Auto-commit-and-push directive.** After every meaningful change (UI tweak, route edit,
+component update, dependency change, doc update, decision logged), the agent **must**:
+
+1. Stage only the files actually changed in this turn (avoid `git add -A` to keep
+   `.claude/`, `.omc/`, `*.swp`, and other local-only files out).
+2. Create one commit that captures the user-visible delta:
+   - Subject ≤ 70 chars, imperative mood ("Add", "Fix", "Refactor", "Migrate", "Tweak").
+   - Body explains *why*, not what.
+   - Always include the `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` trailer.
+3. Push to `origin/main` immediately after commit. Branch protection / hooks failures
+   are not bypassed (no `--no-verify`, no `--force`).
+4. If a commit ends up empty (no real change), skip — never create no-op commits.
+5. If the user says "don't commit yet" / "wait" / "rollback", honor that and pause the
+   harness until they re-enable it.
+
+**One change → one commit → one push.** Don't batch unrelated changes across commits.
+
+**Repo root** = `fe/` (one directory above this `app/` package). Run git from `fe/app/`
+or `fe/`; paths in commands must be cwd-relative. `app/issue/select/page.tsx` from
+`fe/app/` cwd is the *Next.js route* file, not the package root.
+
+**Allowed without confirmation**: docs, app routes, components, styles, package.json
+deps, design tokens. **Confirm first**: branch operations (`checkout`, `reset`),
+force push, merging, dropping migrations, rewriting history.
+
 <!-- END:agents-toc -->
