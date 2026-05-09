@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
+import { IconBox } from '@/components/ui/icon-box'
 import { FilePlus, Wallet, ClipboardList, Scale, ArrowRight, Sparkles } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { mockDocuments, mockApplications, mockDisputes } from '@/lib/mock-data'
@@ -53,15 +54,13 @@ export default function HomePage() {
         </button>
 
         <div className="ds-card overflow-hidden">
-          {menuItems.map(({ icon: Icon, label, sublabel, count, href, tone }, idx) => (
+          {menuItems.map(({ icon, label, sublabel, count, href, tone }, idx) => (
             <button
               key={href}
               onClick={() => router.push(href)}
               className={`w-full flex items-center gap-4 px-4 py-4 active:bg-canvas text-left transition-colors ${idx > 0 ? 'ds-divider-top' : ''}`}
             >
-              <div className={`ds-icon-box ds-tone-${tone} shrink-0 w-11 h-11 flex items-center justify-center`}>
-                <Icon size={22} strokeWidth={2} />
-              </div>
+              <IconBox icon={icon} tone={tone} size="md" />
               <div className="flex-1 min-w-0">
                 <div className="ds-body font-bold text-ink">{label}</div>
                 <div className="text-xs text-ink-muted mt-0.5">{sublabel}</div>

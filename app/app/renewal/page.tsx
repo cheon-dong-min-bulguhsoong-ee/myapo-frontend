@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { PageHeader } from '@/components/ui/page-header'
 import { PageFooter } from '@/components/ui/page-footer'
+import { Callout } from '@/components/ui/callout'
+import { IconBox } from '@/components/ui/icon-box'
 import { RefreshCw } from 'lucide-react'
 
 const steps = [
@@ -21,26 +23,19 @@ export default function RenewalPage() {
       <PageHeader title="문서 재발급 안내" subtitle="간단한 3단계로 재발급됩니다" />
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="ds-icon-box ds-tone-yellow shrink-0 w-12 h-12 flex items-center justify-center">
-              <RefreshCw size={22} strokeWidth={2} />
-            </div>
-            <div>
-              <p className="font-bold text-ink">유효기간이 곧 만료돼요</p>
-              <p className="text-sm text-ink-secondary mt-0.5">기존 정보로 재발급할 수 있어요</p>
-            </div>
-          </div>
-        </Card>
+        <Callout
+          tone="warning"
+          icon={RefreshCw}
+          title="유효기간이 곧 만료돼요"
+          description="기존 정보로 재발급할 수 있어요"
+        />
 
         {steps.map((s, i) => (
           <Card key={i}>
             <div className="flex gap-3 items-start">
-              <span
-                className="shrink-0 w-7 h-7 rounded-full bg-primary-soft text-primary text-sm font-bold flex items-center justify-center"
-              >
-                {i + 1}
-              </span>
+              <IconBox tone="blue" size="sm">
+                <span className="text-sm font-bold">{i + 1}</span>
+              </IconBox>
               <div>
                 <p className="font-semibold text-ink">{s.title}</p>
                 <p className="text-sm text-ink-secondary mt-0.5">{s.desc}</p>

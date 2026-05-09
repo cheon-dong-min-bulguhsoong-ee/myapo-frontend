@@ -1,12 +1,13 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 interface AppBarProps {
   title?: string
   showBack?: boolean
   onBack?: () => void
-  action?: React.ReactNode
+  action?: ReactNode
   wordmark?: boolean
 }
 

@@ -58,7 +58,7 @@ A page renders these via a discriminated union on the data hook:
 ```tsx
 const view = useMyDocs()       // returns { state: 'active' | 'loading' | …, data?, error? }
 return (
-  <AppShell header={<AppBar title="내 문서" badges={['testnet']}/>} footer={<BottomHomeBar/>}>
+  <AppShell header={<AppBar title="내 문서"/>} footer={<BottomHomeBar/>}>
     {view.state === 'loading' && <DocumentsTabList.Loading />}
     {view.state === 'empty'   && <DocumentsTabList.Empty />}
     {view.state === 'error'   && <ErrorState onRetry={view.retry}/>}
@@ -118,7 +118,7 @@ AppShell
 
 ```
 AppShell
-├─ AppBar wordmark badges={['testnet','mock','precheck']}
+├─ AppBar wordmark
 └─ main:
    ├─ PageHeader size="hero" title="안녕하세요" eyebrow="MyApo"
    └─ Grid 2×2:
@@ -143,7 +143,7 @@ need to put it in `components/ui/`. Keep in `components/home/menu-tile.tsx`.
 
 ```
 AppShell
-├─ AppBar title="서류 발급 신청" badges={['testnet','precheck']}
+├─ AppBar title="서류 발급 신청"
 └─ main (px-5 py-3):
    ├─ PageHeader size="compact"
    │     title="어떤 한국 서류를 발급받을까요?"
@@ -220,7 +220,7 @@ hack on `Button`. Add `variant="inverted"` to `Button` first.
 
 ```
 AppShell
-├─ AppBar title="발급 내역" badges={['testnet']}
+├─ AppBar title="발급 내역"
 └─ main:
    └─ active: stack of <Card clickable> per pending application:
       ├─ Pill variant="info" "번역 중 (1/3)"
@@ -269,7 +269,7 @@ AppShell
 
 ```
 AppShell
-├─ AppBar title="내 문서" badges={['testnet']}
+├─ AppBar title="내 문서"
 └─ main:
    ├─ TabBar value={tab} onChange={setTab}
    │       options=[{value:'available',label:'사용 가능',count:2}, {value:'expired',label:'만료됨',count:1}]
@@ -329,7 +329,7 @@ AppShell
 
 ```
 AppShell
-├─ AppBar title="제출 기관 선택" badges={['testnet']}
+├─ AppBar title="제출 기관 선택"
 └─ main:
    ├─ PageHeader size="compact" title="어디로 제출할까요?" subtitle="문서를 받을 해외 기관을 선택해 주세요"
    ├─ Callout tone="info" icon=Info "받은 요청 3건 중 선택" (when applicable)
@@ -357,7 +357,7 @@ BottomSheet open={openConfirm} title="이 기관에 보낼까요?"
 
 ```
 AppShell
-├─ AppBar title="해외 제출 현황" badges={['testnet']}
+├─ AppBar title="해외 제출 현황"
 └─ main:
    ├─ Callout tone="info" icon=Send title="현재 전송 중이에요" description="기관 접수까지 영업일 기준 1~3일 소요"
    ├─ Card:
@@ -455,7 +455,7 @@ component, never re-build inline:
 
 | Affordance | Screens | Component |
 |---|---|---|
-| Status badge stack (Testnet/Mock/Pre-Check) | A-01, A-03, A-04, A-05, A-06, S-04, /history | `<AppBar badges>` |
+| Status badge stack (Testnet/Mock/Pre-Check) | (rejected by user 2026-05-10 — see `feedback_appbar_badges.md` memory) | ⚫ no AppBar badge stack; if surfacing demo state is needed, render as page-level eyebrow above `PageHeader`, never in navbar |
 | Loading callout w/ spinner | A-02, A-03, A-04 incoming | `<Callout tone="info" icon="spinner">` |
 | Expired/warning banner | A-03 expired tab, A-07, doc-detail D-7 | `<Callout tone="warning">` |
 | Error retry pattern | every screen `error` state | `<ErrorState>` |
@@ -475,7 +475,7 @@ export default function Page() {
   const view = useScreenData()        // returns discriminated union state
   return (
     <AppShell
-      header={<AppBar title="…" badges={[…]}/>}
+      header={<AppBar title="…"/>}
       footer={view.state === 'active' ? <PageFooter>…</PageFooter> : <BottomHomeBar/>}
     >
       {match(view)

@@ -17,7 +17,7 @@ export default function IssueCompletePage() {
       </main>
 
       <footer className="page-footer shrink-0 px-5 pt-3 border-transparent">
-        <Button fullWidth className="!bg-white !text-primary font-bold" onClick={() => router.push('/documents')}>
+        <Button fullWidth variant="inverted" onClick={() => router.push('/documents')}>
           내 문서 보기
         </Button>
       </footer>

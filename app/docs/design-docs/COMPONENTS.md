@@ -63,28 +63,31 @@ Adds `safe-page-bottom` to the footer slot.
 **Wireframe ref.** Implicit on every screen (the "phone" border of `mobile-frame`).
 **Migration.** Wrap every page in `<AppShell>`. Removes ~6 lines of boilerplate per page.
 
-### 1.2 `AppBar` 🟡
+### 1.2 `AppBar` 🟢
 
-**File.** `components/ui/app-bar.tsx` (exists, extend)
-**Gap.** Wireframe puts a **status-badge stack** in the right slot
-(`Testnet` · `Mock` · `Pre-Check Only` chips). Current AppBar only takes a
-single `action` ReactNode.
+**File.** `components/ui/app-bar.tsx` (exists)
+**Status.** OK as-is. Wireframe shows `Testnet` / `Mock` / `Pre-Check Only`
+chips in the right slot of every screen — **explicitly rejected by user
+2026-05-10** ("navbar에 뱃지 다 필요없어"). The 360-px mobile bar is too cramped
+and demo-only labels feel out of place in production-flavored UI.
 
 ```ts
 interface AppBarProps {
   title?: string
   wordmark?: boolean              // shows "MyApo" instead of title
   showBack?: boolean              // default true except on home/login
-  badges?: AppBarBadge[]          // NEW — replaces today's freeform action slot
-  action?: ReactNode              // kept for non-badge cases
+  action?: ReactNode              // free slot for genuinely useful glyphs
 }
-type AppBarBadge = 'testnet' | 'mock' | 'precheck'
 ```
 
 **Visual.** `padding: 10px 20px 8px`, sticky top, `bg-paper/90 backdrop-blur-md`,
-1-px hairline bottom. Title 17 px / 700.
-**Wireframe ref.** Every screen, lines 33–38 of A-01/02/03/…
-**Render rule.** When both `badges` and `action` are passed, badges win — never both.
+1-px hairline bottom. Title 16 px / 700 (`ds-headline`).
+**Status display.** If a screen genuinely needs to surface `Testnet/Mock/Pre-Check Only`,
+render it in a **page-level eyebrow** (above `PageHeader`) or a dedicated debug
+overlay — never in the navbar.
+**Pill variants** `testnet | mock | precheck | revoked` exist on `Pill` for
+those non-navbar surfaces; the `revoked` variant is specifically for expired
+credential cards.
 
 ### 1.3 `PageHeader` 🟡
 
@@ -451,7 +454,7 @@ guide for `<Card>` rows containing numbered `<IconBox tone="blue">`.
 | Component | File path | Wireframe ref | Status |
 |---|---|---|---|
 | AppShell | `components/ui/app-shell.tsx` | implicit (`mobile-frame`) | 🔴 |
-| AppBar | `components/ui/app-bar.tsx` | every screen | 🟡 add `badges` |
+| AppBar | `components/ui/app-bar.tsx` | every screen | 🟢 (no badges per user 2026-05-10) |
 | PageHeader | `components/ui/page-header.tsx` | every screen prompt | 🟡 add `size` |
 | PageFooter | `components/ui/page-footer.tsx` | `mobile-cta` | 🟢 |
 | BottomHomeBar | `components/ui/bottom-home-bar.tsx` | `mobile-nav` | 🟢 |
@@ -475,7 +478,7 @@ guide for `<Card>` rows containing numbered `<IconBox tone="blue">`.
 | SegmentedControl | `components/ui/segmented-control.tsx` | persona-select | 🟢 |
 | SelectableCard | `components/ui/selectable-card.tsx` | A-04 institution row | 🟢 — keep, use for `RequestList` |
 
-**Gap headcount.** 9 missing (🔴), 4 to refactor (🟡), 11 OK (🟢), 1 dead (⚫).
+**Gap headcount.** 9 missing (🔴), 3 to refactor (🟡), 12 OK (🟢), 1 dead (⚫).
 
 ---
 

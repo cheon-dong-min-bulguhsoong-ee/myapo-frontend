@@ -39,7 +39,7 @@ then organisms, then page-by-page swap. Late phases never reach into early files
 
 ```
 P1  Atoms gap         (Spinner, Pill variants, Button inverted, Callout, IconBox)
-P2  Layout chrome     (AppShell + AppBar badges + PageHeader compact/hero split)
+P2  Layout chrome     (AppShell + PageHeader compact/hero split — no AppBar badges, user-rejected)
 P3  Doc primitives    (DocCard, DocGrid, ProgressBar rename, ErrorState)
 P4  Sheet/Tab         (BottomSheet, TabBar)
 P5  Pages — write     (issue-select, persona, login, home, renewal, issue-complete)
@@ -84,16 +84,15 @@ zero cross-file blast radius.
 
 ### Phase 2 — Layout chrome
 
-**Why next.** AppShell becomes the canonical wrapper. AppBar's `badges` prop is
-referenced on 7+ screens. Without it, every screen needs a `badges` slot via a
-custom `action` ReactNode.
+**Why next.** AppShell becomes the canonical wrapper. The Testnet/Mock/Pre-Check
+status pills the wireframe shows in the navbar were rejected by user on 2026-05-10
+("navbar에 뱃지 다 필요없어") — see `feedback_appbar_badges.md` in user memory.
+AppBar stays as-is; the only chrome change in this phase is `PageHeader`.
 
 **Tasks.**
 1. Create `components/ui/app-shell.tsx` per `COMPONENTS.md` §1.1. Re-uses
    existing `.app-frame` + `.app-scroll` classes — no new CSS.
-2. Refactor `AppBar` to accept `badges?: ('testnet'|'mock'|'precheck')[]`. Keep
-   the `action` slot for backward compat; assert at most one is supplied.
-3. Refactor `PageHeader` to accept `size?: 'compact'|'hero'`. Default `compact`.
+2. Refactor `PageHeader` to accept `size?: 'compact'|'hero'`. Default `compact`.
    Existing pages keep their look only if they explicitly pass `size="hero"`.
    **One-time scan** — every existing `<PageHeader>` callsite. Most should switch
    to `compact`; only `/login`, `/persona-select`, `/issue-complete` keep `hero`.
@@ -278,7 +277,7 @@ These need a human decision; they're not gating Phase 0/1 but block Phase 5+:
 | Q1 | Do we need `RadioGroup` and `FileUpload` in `components/ui/`? | Build local first, promote on 3rd caller. |
 | Q2 | Should the bottom-sheet animate on open by default, or feature-flag? | Animate by default; respects `prefers-reduced-motion`. |
 | Q3 | When persona = foreigner, do we keep `englishName` only or stack KR/EN? | Per decision 2026-05-10: **single-language English** post S-02. |
-| Q4 | Are status badges sticky on scroll, or do they flow with the AppBar? | Sticky — they ride with the AppBar header. |
+| Q4 | ~~Are status badges sticky on scroll, or do they flow with the AppBar?~~ | **Resolved 2026-05-10** — user rejected AppBar badges entirely; question moot. |
 | Q5 | Skeleton row count for a loading list — 3 fixed or proportional to viewport? | 3 fixed. Match wireframe. |
 
 ---

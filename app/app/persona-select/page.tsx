@@ -21,7 +21,7 @@ export default function PersonaSelectPage() {
   return (
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title="언어 선택" showBack={false} />
-      <PageHeader title="어떤 분이신가요?" subtitle="서비스 언어가 자동으로 설정됩니다" />
+      <PageHeader size="hero" title="어떤 분이신가요?" subtitle="서비스 언어가 자동으로 설정됩니다" />
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
         {([
