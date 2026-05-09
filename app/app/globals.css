@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3182F6;
+  --color-primary-soft: #EBF3FE;
+  --color-canvas: #F9FAFB;
+  --color-paper: #FFFFFF;
+  --color-hairline: #E5E8EB;
+  --color-ink: #191F28;
+  --color-ink-secondary: #4E5968;
+  --color-ink-muted: #8B95A1;
+  --color-success: #00C48C;
+  --color-success-soft: #E6FAF5;
+  --color-warning: #FFB020;
+  --color-warning-soft: #FFF8E6;
+  --color-danger: #F04452;
+  --color-danger-soft: #FEE7E9;
+  --color-danger-deep: #B0202C;
+  --color-info: #18BFFF;
+  --color-info-soft: #E6F9FF;
+  --font-sans: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Safe area helpers */
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Pulse animation for active step-dot */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+/* Shimmer animation for skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #E5E8EB 25%, #F9FAFB 50%, #E5E8EB 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
