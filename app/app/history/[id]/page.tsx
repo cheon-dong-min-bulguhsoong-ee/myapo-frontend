@@ -2,7 +2,7 @@
 import { useParams } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
 import { Card } from '@/components/ui/card'
-import { StepDot } from '@/components/ui/step-dot'
+import { StepTimeline } from '@/components/ui/step-timeline'
 import { mockApplications } from '@/lib/mock-data'
 
 export default function HistoryDetailPage() {
@@ -24,9 +24,7 @@ export default function HistoryDetailPage() {
 
         <Card>
           <h3 className="font-bold text-sm text-ink mb-4">진행 현황</h3>
-          {app.stages.map((stage, i) => (
-            <StepDot key={i} status={stage.status} label={stage.label} isLast={i === app.stages.length - 1} />
-          ))}
+          <StepTimeline stages={app.stages} />
         </Card>
       </main>
     </div>

@@ -4,12 +4,7 @@ import { AppBar } from '@/components/ui/app-bar'
 import { Card } from '@/components/ui/card'
 import { Pill } from '@/components/ui/pill'
 import { mockDisputes } from '@/lib/mock-data'
-
-const statusMap = {
-  received: { label: '접수됨', variant: 'warning' as const },
-  reviewing: { label: '검토중', variant: 'info' as const },
-  closed: { label: '처리완료', variant: 'success' as const },
-}
+import { disputeStatusMap } from '@/lib/dispute-status'
 
 export default function DisputeDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -25,7 +20,7 @@ export default function DisputeDetailPage() {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="font-bold text-ink">{d.documentType}</span>
-              <Pill variant={statusMap[d.status].variant}>{statusMap[d.status].label}</Pill>
+              <Pill variant={disputeStatusMap[d.status].variant}>{disputeStatusMap[d.status].label}</Pill>
             </div>
             <p className="text-sm text-ink-secondary">발생 단계: {d.stage}</p>
             <p className="text-sm text-ink-secondary">사유: {d.reason}</p>

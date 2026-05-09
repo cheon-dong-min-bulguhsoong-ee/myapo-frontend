@@ -8,13 +8,8 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { PageHeader } from '@/components/ui/page-header'
 import { PageFooter } from '@/components/ui/page-footer'
 import { mockDisputes } from '@/lib/mock-data'
+import { disputeStatusMap } from '@/lib/dispute-status'
 import { AlertCircle, ChevronRight } from 'lucide-react'
-
-const statusMap = {
-  received: { label: '접수됨', variant: 'warning' as const },
-  reviewing: { label: '검토중', variant: 'info' as const },
-  closed: { label: '처리완료', variant: 'success' as const },
-}
 
 export default function DisputesPage() {
   const router = useRouter()
@@ -34,7 +29,7 @@ export default function DisputesPage() {
                 <div className="space-y-1.5">
                   <span className="font-bold text-ink">{d.documentType}</span>
                   <div className="flex gap-2 items-center">
-                    <Pill variant={statusMap[d.status].variant}>{statusMap[d.status].label}</Pill>
+                    <Pill variant={disputeStatusMap[d.status].variant}>{disputeStatusMap[d.status].label}</Pill>
                     <span className="text-xs text-ink-muted">{d.stage} 단계</span>
                   </div>
                   <p className="text-xs text-ink-muted">{d.createdAt}</p>

@@ -5,12 +5,14 @@ import { AppBar } from '@/components/ui/app-bar'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
 import { PageFooter } from '@/components/ui/page-footer'
+import { TextField } from '@/components/ui/text-field'
 
 export default function IssueVerifyPage() {
   const router = useRouter()
   const [form, setForm] = useState({ name: '', id: '', phone: '', code: '', agreed: false })
   const [codeSent, setCodeSent] = useState(false)
 
+  const update = (key: keyof typeof form, value: string) => setForm(f => ({ ...f, [key]: value }))
   const canSubmit = form.name && form.id && form.phone && form.code && form.agreed
 
   return (
@@ -19,47 +21,37 @@ export default function IssueVerifyPage() {
       <PageHeader title="본인 정보를 확인할게요" subtitle="발급을 위해 본인 명의 인증이 필요해요" />
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-4">
-        {[
-          { key: 'name', label: '이름', placeholder: '홍길동' },
-          { key: 'id', label: '주민등록번호 앞 6자리', placeholder: '000000' },
-        ].map(({ key, label, placeholder }) => (
-          <div key={key}>
-            <p className="text-sm font-semibold text-ink mb-1.5">{label}</p>
-            <input
-              value={form[key as keyof typeof form] as string}
-              onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-              placeholder={placeholder}
-              className="w-full h-[52px] px-4 rounded-2xl border border-hairline bg-paper text-sm focus:outline-none focus:border-primary"
-            />
-          </div>
-        ))}
-
-        <div>
-          <p className="text-sm font-semibold text-ink mb-1.5">휴대폰 번호</p>
-          <div className="flex gap-2">
-            <input
-              value={form.phone}
-              onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-              placeholder="010-0000-0000"
-              className="flex-1 h-[52px] px-4 rounded-2xl border border-hairline bg-paper text-sm focus:outline-none focus:border-primary"
-            />
+        <TextField
+          label="이름"
+          value={form.name}
+          onChange={e => update('name', e.target.value)}
+          placeholder="홍길동"
+        />
+        <TextField
+          label="주민등록번호 앞 6자리"
+          value={form.id}
+          onChange={e => update('id', e.target.value)}
+          placeholder="000000"
+        />
+        <TextField
+          label="휴대폰 번호"
+          value={form.phone}
+          onChange={e => update('phone', e.target.value)}
+          placeholder="010-0000-0000"
+          trailing={
             <Button variant="secondary" className="px-4 whitespace-nowrap" onClick={() => setCodeSent(true)}>
               {codeSent ? '재전송' : '인증번호 발송'}
             </Button>
-          </div>
-        </div>
-
+          }
+        />
         {codeSent && (
-          <div>
-            <p className="text-sm font-semibold text-ink mb-1.5">인증번호</p>
-            <input
-              value={form.code}
-              onChange={e => setForm(f => ({ ...f, code: e.target.value }))}
-              placeholder="6자리 입력"
-              maxLength={6}
-              className="w-full h-[52px] px-4 rounded-2xl border border-hairline bg-paper text-sm focus:outline-none focus:border-primary"
-            />
-          </div>
+          <TextField
+            label="인증번호"
+            value={form.code}
+            onChange={e => update('code', e.target.value)}
+            placeholder="6자리 입력"
+            maxLength={6}
+          />
         )}
 
         <button

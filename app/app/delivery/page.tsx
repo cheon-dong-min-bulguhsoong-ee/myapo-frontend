@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
-import { StepDot } from '@/components/ui/step-dot'
+import { StepTimeline } from '@/components/ui/step-timeline'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { PageHeader } from '@/components/ui/page-header'
@@ -30,9 +30,7 @@ export default function DeliveryPage() {
 
         <Card>
           <h3 className="font-bold text-sm text-ink mb-4">전송 단계</h3>
-          {deliveryStages.map((s, i) => (
-            <StepDot key={i} status={s.status} label={s.label} isLast={i === deliveryStages.length - 1} />
-          ))}
+          <StepTimeline stages={deliveryStages} />
         </Card>
       </main>
 

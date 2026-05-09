@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
 import { PageFooter } from '@/components/ui/page-footer'
 import { SelectableCard } from '@/components/ui/selectable-card'
+import { TextArea } from '@/components/ui/text-area'
 
 const stages = ['발급 신청', '번역·공증', '아포스티유', '발급 완료']
 const reasons = ['번역 오류', '서류 분실', '처리 지연', '기관 반려', '기타']
@@ -50,16 +51,13 @@ export default function DisputeNewPage() {
           </div>
         </section>
 
-        <section className="space-y-2">
-          <p className="text-[14px] font-semibold text-ink px-1">상세 내용</p>
-          <textarea
-            value={detail}
-            onChange={e => setDetail(e.target.value)}
-            placeholder="불편하셨던 내용을 자세히 설명해 주세요 (10자 이상)"
-            className="w-full h-32 p-3 rounded-2xl border border-hairline bg-paper text-sm text-ink resize-none focus:outline-none focus:border-primary"
-          />
-          <p className="text-xs text-ink-muted px-1">{detail.length}자</p>
-        </section>
+        <TextArea
+          label="상세 내용"
+          value={detail}
+          onChange={e => setDetail(e.target.value)}
+          placeholder="불편하셨던 내용을 자세히 설명해 주세요 (10자 이상)"
+          showCount
+        />
       </main>
 
       <PageFooter>
