@@ -45,4 +45,7 @@
 - **2026-05-10** · 폐기: "S-03 bottom-nav 없음" (2026-05-10 항목) — 깊은 플로우에서 홈 복귀 비용 과다. 대체 = `bottom-home-bar` (단일 홈 버튼) 모든 서브 화면 노출, S-03 자체는 노출 안 함
 - **2026-05-10** · `bottom-home-bar` 컴포넌트 DESIGN.md 등록 — 56px + safe-area, 중앙 home 아이콘 + "홈" 라벨, tap → S-03 + 플로우 스택 초기화
 - **2026-05-10** · `@toss/tds-mobile` 도입 — React 19 → 18.3.1 다운그레이드, Emotion 추가, `ThemeProvider`로 layout 래핑. `tds-mobile-ait`(Toss Mini App SDK)는 **미사용** — 외부 Next 앱이라 토스 호스트 브릿지 의미 없음
-- **2026-05-10** · 자체 `components/ui/Button` 래퍼만 TDS Button으로 내부 교체, 12 라우트 자동 마이그레이션. 다른 자체 컴포넌트 (Card / Pill / AppBar / SegmentedControl / StepDot / ProgressFill / EmptyState / Skeleton) = 유지 — TDS 1:1 매핑 비용 대비 비주얼 임팩트 적음
+- **2026-05-10** · 자체 `components/ui/Button` 래퍼만 TDS Button으로 내부 교체, 12 라우트 자동 마이그레이션
+- **2026-05-10** · 추가 래퍼 교체: `Pill` → TDS `Badge`, `SegmentedControl` → TDS `SegmentedControl`, `ProgressFill` → TDS `ProgressBar`, `EmptyState` → TDS `Result`. 라우트 코드 무수정 (자체 래퍼 내부만 교체)
+- **2026-05-10** · 유지(TDS 미교체): `AppBar`(Top은 hero 패턴이라 부적합), `Card`(TDS에 generic Card 없음), `StepDot`(커스텀 numbered UI), `Skeleton`(3-line freeform이라 TDS Skeleton의 pattern enum 부적합)
+- **2026-05-10** · 본문 텍스트 TDS Paragraph 변환 = 미진행. Tailwind 기본 `text-*` 사이즈가 TDS typography (t1~t7/st1~st13)와 95% 동일하고 폰트(Pretendard) 동일해서 가시 델타 미미. 60+개 태그 변환 비용 vs 이득 합리화 안 됨
