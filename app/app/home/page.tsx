@@ -2,10 +2,11 @@
 import { useRouter } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
 import { FilePlus, Wallet, ClipboardList, Scale, ArrowRight, Sparkles } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { mockDocuments, mockApplications, mockDisputes } from '@/lib/mock-data'
 
 interface MenuItem {
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>
+  icon: LucideIcon
   label: string
   sublabel: string
   count: number

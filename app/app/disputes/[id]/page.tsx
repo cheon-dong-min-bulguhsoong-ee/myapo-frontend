@@ -17,9 +17,10 @@ export default function DisputeDetailPage() {
   if (!d) return <div className="p-5 text-ink-secondary">이의 신청을 찾을 수 없어요</div>
 
   return (
-    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col h-full bg-canvas">
       <AppBar title="이의 신청 상세" />
-      <main className="px-5 py-4 space-y-4">
+
+      <main className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
         <Card>
           <div className="space-y-2">
             <div className="flex justify-between items-center">
@@ -31,6 +32,7 @@ export default function DisputeDetailPage() {
             <p className="text-xs text-ink-muted">신청일 {d.createdAt}</p>
           </div>
         </Card>
+
         {d.operatorResponse && (
           <Card>
             <p className="text-xs font-semibold text-ink-muted mb-2">담당자 답변</p>

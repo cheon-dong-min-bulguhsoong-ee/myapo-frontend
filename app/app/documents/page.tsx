@@ -5,6 +5,7 @@ import { Tab } from '@toss/tds-mobile'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
 import { EmptyState } from '@/components/ui/empty-state'
+import { PageHeader } from '@/components/ui/page-header'
 import { mockDocuments, type Document } from '@/lib/mock-data'
 import {
   Folder,
@@ -17,8 +18,9 @@ import {
   ShieldAlert,
   FileText,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const ICON_MAP: Record<string, { Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>; tint: string; bg: string }> = {
+const ICON_MAP: Record<string, { Icon: LucideIcon; tint: string; bg: string }> = {
   납세증명서: { Icon: ScrollText, tint: '#3182F6', bg: '#EBF3FE' },
   가족관계증명서: { Icon: Users, tint: '#00C48C', bg: '#E6FAF5' },
   주민등록등본: { Icon: Home, tint: '#FFB020', bg: '#FFF8E6' },
@@ -86,9 +88,10 @@ export default function DocumentsPage() {
   const filtered = mockDocuments.filter(d => d.status === tab)
 
   return (
-    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col h-full bg-canvas">
       <AppBar title="내 문서" />
-      <div style={{ borderBottom: '1px solid var(--color-hairline)' }}>
+      <PageHeader title="내 증명서" subtitle="발급된 문서와 만료된 문서를 확인하세요" />
+      <div className="shrink-0" style={{ borderBottom: '1px solid var(--color-hairline)' }}>
         <Tab size="large" onChange={(idx) => setTab(idx === 0 ? 'available' : 'expired')}>
           <Tab.Item selected={tab === 'available'}>
             유효한 문서 <span style={{ color: tab === 'available' ? '#3182F6' : '#8B95A1', marginLeft: 4 }}>{availableCount}</span>
@@ -98,7 +101,7 @@ export default function DocumentsPage() {
           </Tab.Item>
         </Tab>
       </div>
-      <main className="flex-1 px-5 py-3 space-y-3">
+      <main className="flex-1 overflow-y-auto px-5 py-4 pb-6 space-y-3">
         {filtered.length === 0 ? (
           <EmptyState
             icon={Folder}

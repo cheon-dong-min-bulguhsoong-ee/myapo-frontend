@@ -17,7 +17,7 @@ export function Button({
 }: ButtonProps) {
   if (variant === 'text-link') {
     return (
-      <TextButton size="medium" {...(props as React.ComponentProps<typeof TextButton>)}>
+      <TextButton {...(props as React.ComponentProps<typeof TextButton>)} size="medium">
         {children}
       </TextButton>
     )
@@ -29,12 +29,12 @@ export function Button({
 
   return (
     <TDSButton
+      {...(props as React.ComponentProps<typeof TDSButton>)}
       color={color}
       variant="fill"
       size={size}
       display={display}
       className={className}
-      {...(props as React.ComponentProps<typeof TDSButton>)}
     >
       {children}
     </TDSButton>

@@ -3,6 +3,8 @@ import { useRouter } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { PageHeader } from '@/components/ui/page-header'
+import { PageFooter } from '@/components/ui/page-footer'
 import { RefreshCw } from 'lucide-react'
 
 const steps = [
@@ -14,22 +16,34 @@ const steps = [
 export default function RenewalPage() {
   const router = useRouter()
   return (
-    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col h-full bg-canvas">
       <AppBar title="재발급 안내" />
-      <main className="flex-1 px-5 py-6 space-y-4">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
-            <RefreshCw size={24} className="text-warning" />
+      <PageHeader title="문서 재발급 안내" subtitle="간단한 3단계로 재발급됩니다" />
+
+      <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
+        <Card>
+          <div className="flex items-center gap-3">
+            <div
+              className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: '#FFF8E6' }}
+            >
+              <RefreshCw size={22} strokeWidth={2} style={{ color: '#FFB020' }} />
+            </div>
+            <div>
+              <p className="font-bold text-ink">유효기간이 곧 만료돼요</p>
+              <p className="text-sm text-ink-secondary mt-0.5">기존 정보로 재발급할 수 있어요</p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-bold text-ink">문서 재발급 안내</h2>
-            <p className="text-sm text-ink-secondary">간단한 3단계로 재발급됩니다</p>
-          </div>
-        </div>
+        </Card>
+
         {steps.map((s, i) => (
           <Card key={i}>
             <div className="flex gap-3 items-start">
-              <span className="w-7 h-7 rounded-full bg-primary-soft text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">{i + 1}</span>
+              <span
+                className="shrink-0 w-7 h-7 rounded-full bg-primary-soft text-primary text-sm font-bold flex items-center justify-center"
+              >
+                {i + 1}
+              </span>
               <div>
                 <p className="font-semibold text-ink">{s.title}</p>
                 <p className="text-sm text-ink-secondary mt-0.5">{s.desc}</p>
@@ -38,10 +52,15 @@ export default function RenewalPage() {
           </Card>
         ))}
       </main>
-      <div className="px-5 pb-6 space-y-2">
-        <Button fullWidth onClick={() => router.push('/issue/select')}>재발급 신청하기</Button>
-        <Button fullWidth variant="secondary" onClick={() => router.push('/home')}>나중에 하기</Button>
-      </div>
+
+      <PageFooter>
+        <Button fullWidth onClick={() => router.push('/issue/select')}>
+          재발급 신청하기
+        </Button>
+        <Button fullWidth variant="secondary" onClick={() => router.push('/home')}>
+          나중에 하기
+        </Button>
+      </PageFooter>
     </div>
   )
 }

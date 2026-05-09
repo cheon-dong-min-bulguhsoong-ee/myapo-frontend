@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation'
 import { usePersona } from '@/contexts/persona-context'
 import { Button } from '@/components/ui/button'
 import { AppBar } from '@/components/ui/app-bar'
+import { PageHeader } from '@/components/ui/page-header'
+import { PageFooter } from '@/components/ui/page-footer'
+import { SelectableCard } from '@/components/ui/selectable-card'
 
 export default function PersonaSelectPage() {
   const [selected, setSelected] = useState<'korean' | 'foreign'>('korean')
@@ -16,33 +19,31 @@ export default function PersonaSelectPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col h-full bg-canvas">
       <AppBar title="언어 선택" showBack={false} />
-      <div className="flex-1 flex flex-col justify-center px-5 gap-6">
-        <div>
-          <h2 className="text-xl font-bold text-ink mb-1">어떤 분이신가요?</h2>
-          <p className="text-sm text-ink-secondary">서비스 언어가 설정됩니다</p>
-        </div>
-        <div className="space-y-3">
-          {([
-            { value: 'korean', label: '한국인', sublabel: 'Korean' },
-            { value: 'foreign', label: '외국인', sublabel: 'Foreigner' },
-          ] as const).map(({ value, label, sublabel }) => (
-            <button
-              key={value}
-              onClick={() => setSelected(value)}
-              className={`w-full p-4 rounded-xl border-2 text-left transition-colors
-                ${selected === value ? 'border-primary bg-primary-soft' : 'border-hairline bg-paper'}`}
-            >
-              <p className="font-bold text-ink">{label}</p>
-              <p className="text-sm text-ink-secondary">{sublabel}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="px-5 pb-6">
+      <PageHeader title="어떤 분이신가요?" subtitle="서비스 언어가 자동으로 설정됩니다" />
+
+      <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
+        {([
+          { value: 'korean', label: '한국인', sublabel: 'Korean' },
+          { value: 'foreign', label: '외국인', sublabel: 'Foreigner' },
+        ] as const).map(({ value, label, sublabel }) => (
+          <SelectableCard
+            key={value}
+            selected={selected === value}
+            onClick={() => setSelected(value)}
+          >
+            <p className={`font-bold text-[15px] ${selected === value ? 'text-primary' : 'text-ink'}`}>
+              {label}
+            </p>
+            <p className="text-sm text-ink-secondary mt-0.5">{sublabel}</p>
+          </SelectableCard>
+        ))}
+      </main>
+
+      <PageFooter>
         <Button fullWidth onClick={handleContinue}>계속하기</Button>
-      </div>
+      </PageFooter>
     </div>
   )
 }

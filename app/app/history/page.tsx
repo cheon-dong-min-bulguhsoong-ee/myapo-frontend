@@ -4,6 +4,7 @@ import { AppBar } from '@/components/ui/app-bar'
 import { Card } from '@/components/ui/card'
 import { ProgressFill } from '@/components/ui/progress-fill'
 import { EmptyState } from '@/components/ui/empty-state'
+import { PageHeader } from '@/components/ui/page-header'
 import { mockApplications } from '@/lib/mock-data'
 import { Clock, ChevronRight } from 'lucide-react'
 
@@ -11,20 +12,9 @@ export default function HistoryPage() {
   const router = useRouter()
 
   return (
-    <div
-      className="flex flex-col h-dvh bg-canvas"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-    >
+    <div className="flex flex-col h-full bg-canvas">
       <AppBar title="발급 내역" />
-
-      <header className="shrink-0 px-5 pt-6 pb-4 bg-canvas">
-        <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink leading-[1.3]">
-          진행 중인 문서
-        </h1>
-        <p className="text-[15px] font-medium text-ink-secondary mt-2 leading-[1.4]">
-          신청하신 서류의 발급 상황을 확인하세요.
-        </p>
-      </header>
+      <PageHeader title="진행 중인 문서" subtitle="신청하신 서류의 발급 상황을 확인하세요" />
 
       <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-4">
         {mockApplications.length === 0 ? (

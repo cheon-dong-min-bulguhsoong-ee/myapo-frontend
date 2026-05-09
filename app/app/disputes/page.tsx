@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/card'
 import { Pill } from '@/components/ui/pill'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { PageHeader } from '@/components/ui/page-header'
+import { PageFooter } from '@/components/ui/page-footer'
 import { mockDisputes } from '@/lib/mock-data'
 import { AlertCircle, ChevronRight } from 'lucide-react'
 
@@ -18,9 +20,11 @@ export default function DisputesPage() {
   const router = useRouter()
 
   return (
-    <div className="flex flex-col min-h-full" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="flex flex-col h-full bg-canvas">
       <AppBar title="이의 신청" />
-      <main className="flex-1 px-5 py-3 space-y-3">
+      <PageHeader title="이의 신청 내역" subtitle="신고하신 건의 처리 상태를 확인하세요" />
+
+      <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
         {mockDisputes.length === 0 ? (
           <EmptyState icon={AlertCircle} title="이의 신청 내역이 없어요" />
         ) : (
@@ -41,9 +45,12 @@ export default function DisputesPage() {
           ))
         )}
       </main>
-      <div className="px-5 pb-6">
-        <Button fullWidth variant="danger" onClick={() => router.push('/disputes/new')}>이의 신청하기</Button>
-      </div>
+
+      <PageFooter>
+        <Button fullWidth variant="danger" onClick={() => router.push('/disputes/new')}>
+          이의 신청하기
+        </Button>
+      </PageFooter>
     </div>
   )
 }

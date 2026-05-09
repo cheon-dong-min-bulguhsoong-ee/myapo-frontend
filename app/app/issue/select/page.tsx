@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { Checkbox } from '@toss/tds-mobile'
 import { AppBar } from '@/components/ui/app-bar'
 import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/ui/page-header'
+import { PageFooter } from '@/components/ui/page-footer'
 import { documentCategories } from '@/lib/mock-data'
 
 export default function IssueSelectPage() {
@@ -18,20 +20,12 @@ export default function IssueSelectPage() {
 
   return (
     <div className="flex flex-col h-full bg-canvas">
-      {/* 1) App bar */}
       <AppBar title="발급 서류 선택" />
+      <PageHeader
+        title="어떤 서류를 발급할까요?"
+        subtitle="필요한 항목만 체크하면 돼요. 여러 종류를 함께 신청할 수 있어요."
+      />
 
-      {/* 2) Header zone — title + subtitle */}
-      <header className="shrink-0 px-5 pt-6 pb-4 bg-canvas">
-        <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink leading-[1.3]">
-          어떤 서류를 발급할까요?
-        </h1>
-        <p className="text-[15px] font-medium text-ink-secondary mt-2 leading-[1.4]">
-          필요한 항목만 체크하면 돼요. 여러 종류를 함께 신청할 수 있어요.
-        </p>
-      </header>
-
-      {/* 3) Selection zone — scrollable category list */}
       <main className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
         {documentCategories.map(cat => {
           const catSelectedCount = cat.items.filter(i => selected.includes(i)).length
@@ -39,10 +33,8 @@ export default function IssueSelectPage() {
           return (
             <section
               key={cat.id}
-              className="bg-paper rounded-[12px] overflow-hidden border border-hairline"
-              style={{
-                boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06)',
-              }}
+              className="bg-paper rounded-2xl overflow-hidden border border-hairline"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
             >
               <header className="px-5 py-4 border-b border-hairline flex justify-between items-center">
                 <h2 className="text-[17px] font-bold text-ink tracking-[-0.01em] leading-snug">
@@ -54,11 +46,11 @@ export default function IssueSelectPage() {
                   </span>
                 )}
               </header>
-              <ul className="divide-y divide-hairline-soft">
-                {cat.items.map(item => {
+              <ul>
+                {cat.items.map((item, idx) => {
                   const checked = selected.includes(item)
                   return (
-                    <li key={item}>
+                    <li key={item} style={idx > 0 ? { borderTop: '1px solid var(--color-hairline)' } : undefined}>
                       <label
                         className={`flex items-center gap-3.5 px-5 py-4 min-h-[56px] cursor-pointer transition-colors active:bg-canvas ${
                           checked ? 'bg-primary-soft' : ''
@@ -82,14 +74,7 @@ export default function IssueSelectPage() {
         })}
       </main>
 
-      {/* 4) Footer zone — sticky CTA */}
-      <footer
-        className="shrink-0 px-5 pt-3 bg-paper"
-        style={{
-          paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
-          borderTop: '1px solid var(--color-hairline)',
-        }}
-      >
+      <PageFooter>
         <Button
           fullWidth
           disabled={selectedCount === 0}
@@ -97,7 +82,7 @@ export default function IssueSelectPage() {
         >
           {selectedCount > 0 ? `${selectedCount}개 서류 발급 신청하기` : '서류를 선택해 주세요'}
         </Button>
-      </footer>
+      </PageFooter>
     </div>
   )
 }
