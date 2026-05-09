@@ -42,7 +42,7 @@ function DocumentCard({ doc, onClick }: { doc: Document; onClick: () => void }) 
   return (
     <button
       onClick={onClick}
-      className={`ds-card w-full text-left p-4 active:bg-canvas transition-colors ${expired ? 'opacity-55' : ''}`}
+      className={`press card w-full text-left p-4 border border-hairline active:bg-hairline-soft transition-colors ${expired ? 'opacity-55' : ''}`}
     >
       <div className="flex items-start gap-3">
         <div className={`ds-icon-box ds-tone-${iconTone} shrink-0 w-12 h-12 flex items-center justify-center`}>
@@ -51,7 +51,7 @@ function DocumentCard({ doc, onClick }: { doc: Document; onClick: () => void }) 
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-bold text-ink truncate">{doc.type}</span>
+            <span className="ds-headline truncate">{doc.type}</span>
             {expired ? (
               <Pill variant="neutral">만료</Pill>
             ) : doc.isExpiringSoon ? (
@@ -60,8 +60,8 @@ function DocumentCard({ doc, onClick }: { doc: Document; onClick: () => void }) 
               <Pill variant="success">유효</Pill>
             )}
           </div>
-          <p className="text-xs text-ink-muted font-mono mb-2">{doc.credentialId}</p>
-          <div className="flex items-center gap-3 text-xs text-ink-secondary">
+          <p className="font-mono text-[12px] text-ink-muted mb-2">{doc.credentialId}</p>
+          <div className="flex items-center gap-2 text-[13px] text-ink-secondary">
             <span>발급 {doc.issuedAt}</span>
             <span className="text-ink-muted">·</span>
             <span>만료 {doc.expiresAt}</span>
@@ -84,7 +84,7 @@ export default function DocumentsPage() {
   return (
     <div className="flex flex-col h-full bg-canvas">
       <AppBar title="내 문서" />
-      <PageHeader title="내 증명서" subtitle="발급된 문서와 만료된 문서를 확인하세요" />
+      <PageHeader size="hero" title="내 증명서" subtitle="발급된 문서와 만료된 문서를 확인하세요" />
       <div className="ds-divider-bottom shrink-0">
         <div className="grid grid-cols-2 px-5">
           <button
@@ -92,7 +92,7 @@ export default function DocumentsPage() {
             onClick={() => setTab('available')}
             className={`ds-tab ${tab === 'available' ? 'text-primary' : 'text-ink-secondary'}`}
           >
-            유효한 문서 <span className={`ds-tab-count ${tab === 'available' ? 'text-primary' : 'text-ink-muted'}`}>{availableCount}</span>
+            사용 가능 <span className={`ds-tab-count ${tab === 'available' ? 'text-primary' : 'text-ink-muted'}`}>{availableCount}</span>
             {tab === 'available' && <span className="ds-tab-indicator" />}
           </button>
           <button
@@ -100,7 +100,7 @@ export default function DocumentsPage() {
             onClick={() => setTab('expired')}
             className={`ds-tab ${tab === 'expired' ? 'text-primary' : 'text-ink-secondary'}`}
           >
-            만료된 문서 <span className={`ds-tab-count ${tab === 'expired' ? 'text-primary' : 'text-ink-muted'}`}>{expiredCount}</span>
+            만료됨 <span className={`ds-tab-count ${tab === 'expired' ? 'text-primary' : 'text-ink-muted'}`}>{expiredCount}</span>
             {tab === 'expired' && <span className="ds-tab-indicator" />}
           </button>
         </div>
