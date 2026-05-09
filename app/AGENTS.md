@@ -34,6 +34,9 @@ Credentials live on **XRPL Testnet** (Pre-Check Only mode). Mobile-only frontend
 | Past design decisions + why | `docs/design-docs/index.md` |
 | Agent-first operating principles | `docs/design-docs/core-beliefs.md` |
 | Wireframes for screens A-01 → A-07 | `docs/design-docs/wireframes/` |
+| Component library spec (props, CSS, status) | `docs/design-docs/COMPONENTS.md` |
+| Screen × component composition map | `docs/design-docs/SCREENS.md` |
+| Wireframe-faithful refactor plan | `docs/design-docs/REFACTOR-PLAN.md` |
 | Product feature specs | `docs/product-specs/index.md` |
 | Active execution plans | `docs/exec-plans/active/` |
 | Known technical debt | `docs/exec-plans/tech-debt-tracker.md` |
