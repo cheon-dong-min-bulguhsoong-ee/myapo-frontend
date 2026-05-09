@@ -2,7 +2,7 @@
 import { Home } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
 
-const HIDE_ON = ['/', '/home', '/login', '/persona-select']
+const HIDE_ON = ['/', '/login', '/persona-select']
 
 export function BottomHomeBar() {
   const router = useRouter()
