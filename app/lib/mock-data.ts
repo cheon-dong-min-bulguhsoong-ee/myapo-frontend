@@ -168,6 +168,19 @@ export interface IssuableDocument {
   issuerIcon: string
 }
 
+export const documentTypeToIssuableId: Record<string, string> = {
+  '납세증명서': 'tax',
+  '가족관계증명서': 'fam',
+  '주민등록등본': 'res',
+  '소득금액증명원': 'income',
+  '사업자등록증명원': 'biz',
+  '부동산등기부등본': 'land',
+  '병적증명서': 'mil',
+  '운전경력증명서': 'drv',
+  '학력증명서': 'edu',
+  '건강보험료납부확인서': 'health',
+}
+
 export const mockIssuableDocuments: IssuableDocument[] = [
   { id: 'fam',    name: '가족관계증명서 (영문)',       englishName: 'Family Relationship Cert.', use: '미국 이민국 결혼 증빙',       issuerCode: 'KR-법원',    issuerIcon: '법원' },
   { id: 'res',    name: '주민등록등본 (영문)',         englishName: 'Residence Cert.',           use: '거주증명 · 비자 보조',       issuerCode: 'KR-MOIS',    issuerIcon: 'MOIS' },

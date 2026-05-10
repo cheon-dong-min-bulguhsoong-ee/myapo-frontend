@@ -1,75 +1,85 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Folder, ChevronRight, RotateCcw, History, CheckCircle } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
+import { SegmentedControl } from '@/components/ui/segmented-control'
 import { EmptyState } from '@/components/ui/empty-state'
-import { PageHeader } from '@/components/ui/page-header'
 import { mockDocuments, type Document } from '@/lib/mock-data'
-import {
-  Folder,
-  ChevronRight,
-  ScrollText,
-  Users,
-  Home,
-  GraduationCap,
-  Briefcase,
-  ShieldAlert,
-  FileText,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
 
-type IconTone = 'blue' | 'green' | 'yellow' | 'purple' | 'info' | 'red' | 'neutral'
-
-const ICON_MAP: Record<string, { Icon: LucideIcon; tone: IconTone }> = {
-  납세증명서: { Icon: ScrollText, tone: 'blue' },
-  가족관계증명서: { Icon: Users, tone: 'green' },
-  주민등록등본: { Icon: Home, tone: 'yellow' },
-  졸업증명서: { Icon: GraduationCap, tone: 'purple' },
-  재직증명서: { Icon: Briefcase, tone: 'info' },
-  범죄경력회보서: { Icon: ShieldAlert, tone: 'red' },
+const issuerLabels: Record<string, string> = {
+  납세증명서:    'KR-NTS · 한국 국세청',
+  가족관계증명서: 'KR-법원 · 한국 법원',
+  주민등록등본:   'KR-MOIS · 행정안전부',
+  졸업증명서:    'KR-학교 · 학사정보원',
+  재직증명서:    'KR-건보 · 건강보험공단',
+  범죄경력회보서: 'KR-경찰청 · 경찰청',
 }
 
-function getIcon(type: string) {
-  return ICON_MAP[type] ?? { Icon: FileText, tone: 'neutral' as IconTone }
+function daysUntil(dateStr: string): number {
+  const target = new Date(dateStr).getTime()
+  const today = new Date().setHours(0, 0, 0, 0)
+  return Math.round((target - today) / (1000 * 60 * 60 * 24))
 }
 
-function DocumentCard({ doc, onClick }: { doc: Document; onClick: () => void }) {
-  const { Icon, tone } = getIcon(doc.type)
+function ArrivedCallout({ name }: { name: string }) {
+  return (
+    <div
+      className="flex items-center gap-2 p-3 rounded-[8px]"
+      style={{ background: '#E6FAF3', border: '1px solid #00C48C' }}
+    >
+      <CheckCircle size={16} className="text-success flex-shrink-0" />
+      <div>
+        <div className="text-[15px] font-bold text-ink leading-snug">{name}가 지갑에 도착했어요</div>
+        <div className="text-[12px] leading-relaxed text-sub mt-0.5">총 3번의 서명을 완료해주셨어요</div>
+      </div>
+    </div>
+  )
+}
+
+function DocumentRow({ doc, onClick }: { doc: Document; onClick: () => void }) {
   const expired = doc.status === 'expired'
-  const iconTone = expired ? 'neutral' : tone
+  const issuerLabel = issuerLabels[doc.type] ?? '한국 정부'
+  const days = daysUntil(doc.expiresAt)
+
+  if (expired) {
+    return (
+      <button
+        onClick={onClick}
+        className="card press w-full text-left"
+        style={{
+          opacity: 0.7,
+          background: 'repeating-linear-gradient(45deg, #F9FAFB 0 8px, #F0F1F3 8px 16px)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <Pill variant="revoked" size="sm">Revoked · 자동 폐기됨</Pill>
+        </div>
+        <div className="text-[15px] font-bold text-ink line-through">{doc.type} (영문)</div>
+        <div className="text-[12px] text-muted line-through">{issuerLabel}</div>
+        <div className="text-[12px] text-muted mt-1">유효기간 {doc.expiresAt} 만료됨</div>
+      </button>
+    )
+  }
 
   return (
-    <button
-      onClick={onClick}
-      className={`press card w-full text-left p-4 border border-hairline active:bg-hairline-soft transition-colors ${expired ? 'opacity-55' : ''}`}
-    >
-      <div className="flex items-start gap-3">
-        <div className={`ds-icon-box ds-tone-${iconTone} shrink-0 w-12 h-12 flex items-center justify-center`}>
-          <Icon size={22} strokeWidth={1.8} />
+    <button onClick={onClick} className="card press w-full text-left">
+      <div className="flex items-center justify-between mb-2">
+        <Pill variant="testnet" size="sm">XLS-70 · Active</Pill>
+        <div className="flex items-center gap-1 text-muted">
+          <span className="p-1"><RotateCcw size={14} strokeWidth={2} /></span>
+          <span className="p-1"><History size={14} strokeWidth={2} /></span>
+          <ChevronRight size={16} strokeWidth={2} />
         </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="ds-headline truncate">{doc.type}</span>
-            {expired ? (
-              <Pill variant="neutral">만료</Pill>
-            ) : doc.isExpiringSoon ? (
-              <Pill variant="warning">D-7</Pill>
-            ) : (
-              <Pill variant="success">유효</Pill>
-            )}
-          </div>
-          <p className="font-mono text-[12px] text-ink-muted mb-2">{doc.credentialId}</p>
-          <div className="flex items-center gap-2 text-[13px] text-ink-secondary">
-            <span>발급 {doc.issuedAt}</span>
-            <span className="text-ink-muted">·</span>
-            <span>만료 {doc.expiresAt}</span>
-          </div>
-        </div>
-
-        <ChevronRight size={18} className="text-ink-muted mt-2 shrink-0" />
       </div>
+      <div className="text-[15px] font-bold text-ink">{doc.type} (영문)</div>
+      <div className="text-[12px] text-sub">{issuerLabel}</div>
+      <div className="text-[12px] text-sub mt-1">
+        유효기간 <span className="font-bold text-ink">{doc.expiresAt}</span>
+        {days >= 0 && <> (+{days}일)</>}
+      </div>
+      <div className="font-mono text-[10px] text-muted mt-1">{doc.credentialId}</div>
     </button>
   )
 }
@@ -80,32 +90,24 @@ export default function DocumentsPage() {
   const availableCount = mockDocuments.filter(d => d.status === 'available').length
   const expiredCount = mockDocuments.filter(d => d.status === 'expired').length
   const filtered = mockDocuments.filter(d => d.status === tab)
+  const justArrived = tab === 'available' ? mockDocuments.find(d => d.status === 'available' && d.isExpiringSoon) : null
 
   return (
-    <div className="flex flex-col h-full bg-canvas">
-      <AppBar title="내 문서" />
-      <PageHeader size="hero" title="내 증명서" subtitle="발급된 문서와 만료된 문서를 확인하세요" />
-      <div className="ds-divider-bottom shrink-0">
-        <div className="grid grid-cols-2 px-5">
-          <button
-            type="button"
-            onClick={() => setTab('available')}
-            className={`ds-tab ${tab === 'available' ? 'text-primary' : 'text-ink-secondary'}`}
-          >
-            사용 가능 <span className={`ds-tab-count ${tab === 'available' ? 'text-primary' : 'text-ink-muted'}`}>{availableCount}</span>
-            {tab === 'available' && <span className="ds-tab-indicator" />}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('expired')}
-            className={`ds-tab ${tab === 'expired' ? 'text-primary' : 'text-ink-secondary'}`}
-          >
-            만료됨 <span className={`ds-tab-count ${tab === 'expired' ? 'text-primary' : 'text-ink-muted'}`}>{expiredCount}</span>
-            {tab === 'expired' && <span className="ds-tab-indicator" />}
-          </button>
-        </div>
-      </div>
-      <main className="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
+    <div className="flex flex-col flex-1 min-h-full">
+      <AppBar
+        title="내 문서"
+        badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
+      />
+
+      <main className="app-content flex flex-1 flex-col gap-3 overflow-y-auto">
+        <SegmentedControl
+          value={tab}
+          onChange={v => setTab(v as 'available' | 'expired')}
+          options={[
+            { value: 'available', label: '사용 가능', count: availableCount },
+            { value: 'expired',   label: '만료됨',    count: expiredCount },
+          ]}
+        />
         {filtered.length === 0 ? (
           <EmptyState
             icon={Folder}
@@ -115,13 +117,18 @@ export default function DocumentsPage() {
             onCta={() => router.push('/issue/select')}
           />
         ) : (
-          filtered.map(doc => (
-            <DocumentCard
-              key={doc.id}
-              doc={doc}
-              onClick={() => router.push(`/documents/${doc.id}`)}
-            />
-          ))
+          <>
+            {justArrived && tab === 'available' && (
+              <ArrivedCallout name={`${justArrived.type} (영문)`} />
+            )}
+            {filtered.map(doc => (
+              <DocumentRow
+                key={doc.id}
+                doc={doc}
+                onClick={() => router.push(`/documents/${doc.id}`)}
+              />
+            ))}
+          </>
         )}
       </main>
     </div>

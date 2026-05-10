@@ -26,6 +26,7 @@ export function DocCard({
   onClick,
   trailing,
 }: DocCardProps) {
+  const className = ['doc-card press', selected && 'selected', expired && 'expired'].filter(Boolean).join(' ')
   return (
     <button
       type="button"
@@ -33,23 +34,13 @@ export function DocCard({
       aria-checked={selected}
       disabled={disabled}
       onClick={onClick}
-      className={`doc-card press w-full text-left ${selected ? 'selected' : ''} ${expired ? 'expired' : ''}`}
+      className={className}
     >
-      <span className="doc-card-icon" aria-hidden>{issuerIcon}</span>
-      <div className="flex-1 min-w-0">
-        <div className="text-[13px] font-bold text-ink leading-snug truncate">
-          {name}
-        </div>
-        {englishName && (
-          <div className="font-mono text-[11px] text-ink-muted leading-snug truncate">
-            {englishName}
-          </div>
-        )}
-        {use && (
-          <div className="text-[11px] text-ink-secondary leading-snug mt-0.5 truncate">
-            {use}
-          </div>
-        )}
+      <div className="doc-card-icon" aria-hidden>{issuerIcon}</div>
+      <div className="doc-card-body">
+        <div className="doc-card-name">{name}</div>
+        {englishName && <div className="doc-card-eng">{englishName}</div>}
+        {use && <div className="doc-card-use">{use}</div>}
       </div>
       {trailing ?? (issuerCode && (
         <span className="doc-card-issuer">{issuerCode}</span>

@@ -1,16 +1,20 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
-import { Button } from '@/components/ui/button'
-import { PageHeader } from '@/components/ui/page-header'
-import { PageFooter } from '@/components/ui/page-footer'
+import { Pill } from '@/components/ui/pill'
 import { DocCard } from '@/components/ui/doc-card'
+import { PageFooter } from '@/components/ui/page-footer'
 import { mockIssuableDocuments } from '@/lib/mock-data'
 
-export default function IssueSelectPage() {
+function IssueSelectView() {
   const router = useRouter()
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const params = useSearchParams()
+  const preselect = params.get('preselect')
+  const isReissue = !!preselect && mockIssuableDocuments.some(d => d.id === preselect)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(
+    () => (isReissue ? new Set([preselect!]) : new Set()),
+  )
 
   const toggle = (id: string) => {
     setSelectedIds(prev => {
@@ -26,27 +30,42 @@ export default function IssueSelectPage() {
     : null
 
   const ctaLabel =
-    selectedCount === 0 ? '서류를 선택해 주세요'
-    : onlyDoc          ? `${onlyDoc.name} 발급 신청할게요`
+    selectedCount === 0 ? '서류를 선택해요'
+    : isReissue && onlyDoc ? `${onlyDoc.name} 재발급 신청할게요`
+    : onlyDoc          ? '발급 신청할게요'
     :                    `${selectedCount}개 서류 발급 신청할게요`
 
+  const disabled = selectedCount === 0
+
   return (
-    <div className="flex flex-col h-full bg-canvas">
-      <AppBar title="발급 서류 선택" />
-      <PageHeader
-        size="hero"
-        title="어떤 서류를 발급할까요?"
-        subtitle="여러 개를 함께 신청할 수 있어요"
+    <div className="flex flex-col flex-1 min-h-full">
+      <AppBar
+        title={isReissue ? '재발급 신청' : '서류 발급 신청'}
+        badges={
+          <>
+            <Pill variant="testnet" size="sm">Testnet</Pill>
+            <Pill variant="precheck" size="sm">Pre-Check Only</Pill>
+          </>
+        }
       />
 
-      <main className="flex-1 overflow-y-auto px-5 pb-4">
-        <div className="flex flex-col gap-2">
+      <main className="app-content flex-1 overflow-y-auto">
+        <div className="text-[15px] font-bold text-ink mb-1">
+          {isReissue ? '재발급할 서류가 선택되어 있어요' : '어떤 한국 서류를 발급받을까요?'}
+        </div>
+        <div className="text-[12px] leading-relaxed text-sub mb-2">
+          {isReissue
+            ? '필요하면 다른 서류도 함께 선택할 수 있어요'
+            : '발급기관: 한국 정부 · 해외 기관 제출용'}
+        </div>
+
+        <div className="doc-grid">
           {mockIssuableDocuments.map(doc => (
             <DocCard
               key={doc.id}
               issuerIcon={doc.issuerIcon}
               name={doc.name}
-              englishName={doc.englishName}
+              englishName={selectedIds.has(doc.id) ? doc.englishName : undefined}
               use={doc.use}
               issuerCode={doc.issuerCode}
               selected={selectedIds.has(doc.id)}
@@ -55,23 +74,30 @@ export default function IssueSelectPage() {
           ))}
         </div>
 
-        <p className="text-[11px] text-ink-muted mt-4 text-center">
-          발급해두면 유효기간 안에 무한 재사용해요
-        </p>
+        <div className="text-[12px] leading-relaxed text-muted mt-3">발급해두면 유효기간 안에 무한 재사용해요</div>
       </main>
 
       <PageFooter>
-        <Button
-          fullWidth
-          disabled={selectedCount === 0}
+        <button
+          type="button"
+          disabled={disabled}
           onClick={() => router.push('/issue/verify')}
+          className="btn-primary"
         >
           {ctaLabel}
-        </Button>
-        <p className="text-[11px] text-ink-muted text-center mt-1">
+        </button>
+        <div className="text-[12px] leading-relaxed text-muted text-center">
           PIPA §17 동의 포함 · 사용자 디바이스 한정 보관
-        </p>
+        </div>
       </PageFooter>
     </div>
+  )
+}
+
+export default function IssueSelectPage() {
+  return (
+    <Suspense fallback={null}>
+      <IssueSelectView />
+    </Suspense>
   )
 }

@@ -1,25 +1,31 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { CheckCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 export default function IssueCompletePage() {
   const router = useRouter()
   return (
-    <div className="flex flex-col h-full bg-primary">
+    <div className="flex flex-col flex-1 min-h-full" style={{ background: '#3182F6' }}>
       <main className="flex-1 flex flex-col items-center justify-center px-5 text-center">
-        <CheckCircle size={72} className="text-white mb-4" />
-        <h1 className="text-2xl font-bold text-white mb-3">모든 서명이 완료됐어요</h1>
-        <p className="text-base text-white/80 leading-relaxed">
+        <div className="w-20 h-20 rounded-full bg-white/15 flex items-center justify-center mb-4">
+          <CheckCircle size={48} className="text-white" strokeWidth={2} />
+        </div>
+        <h1 className="text-[22px] font-bold text-white mb-2">모든 서명이 완료됐어요</h1>
+        <p className="text-[14px] text-white/85 leading-relaxed">
           서류가 안전하게 발급되었습니다.<br />
           내 문서에서 확인하세요.
         </p>
       </main>
 
-      <footer className="page-footer shrink-0 px-5 pt-3 border-transparent">
-        <Button fullWidth variant="inverted" onClick={() => router.push('/documents')}>
+      <footer
+        className="flex-shrink-0 px-5 pt-3"
+        style={{
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+        }}
+      >
+        <button onClick={() => router.push('/documents')} className="btn-inverted">
           내 문서 보기
-        </Button>
+        </button>
       </footer>
     </div>
   )

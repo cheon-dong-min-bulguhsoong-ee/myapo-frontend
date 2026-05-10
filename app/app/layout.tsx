@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <PersonaProvider>
             <div className="app-frame">
-              <div className="app-scroll">{children}</div>
+              <div className="app-scroll flex flex-col">{children}</div>
               <BottomHomeBar />
             </div>
           </PersonaProvider>

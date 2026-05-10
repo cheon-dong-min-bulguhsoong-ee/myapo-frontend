@@ -11,21 +11,21 @@ interface PillProps {
   children: ReactNode
 }
 
-const classMap: Record<PillVariant, string> = {
-  success: 'green',
-  warning: 'yellow',
-  danger: 'red',
-  info: '',
-  neutral: 'gray',
-  testnet: 'testnet',
-  mock: 'mock',
-  precheck: 'precheck',
-  revoked: 'revoked',
+const variantClass: Record<PillVariant, string> = {
+  success:  'badge-success',
+  warning:  'badge-warning',
+  danger:   'badge-danger',
+  info:     'badge-info',
+  neutral:  'badge-neutral',
+  testnet:  'badge-testnet',
+  mock:     'badge-mock',
+  precheck: 'badge-precheck',
+  revoked:  'badge-revoked',
 }
 
-export function Pill({ variant = 'neutral', size = 'sm', children }: PillProps) {
+export function Pill({ variant = 'neutral', size = 'md', children }: PillProps) {
   return (
-    <span className={`chip ${size === 'sm' ? 'sm' : ''} ${classMap[variant]}`.trim()}>
+    <span className={`vpill ${size === 'sm' ? 'sm' : ''} ${variantClass[variant]}`.trim()}>
       {children}
     </span>
   )

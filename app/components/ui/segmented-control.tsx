@@ -3,7 +3,7 @@
 interface Option {
   value: string
   label: string
-  sublabel?: string
+  count?: number
 }
 
 interface SegmentedControlProps {
@@ -12,22 +12,43 @@ interface SegmentedControlProps {
   onChange: (v: string) => void
 }
 
+/**
+ * A-03 카테고리 탭 — segmented pill control. Mirrors:
+ *   <div class="flex bg-bg-base p-1 rounded-md">
+ *     <button class="flex flex-1 items-center justify-center py-3.5 min-h-[44px] …">…</button>
+ *     <button class="flex-1 py-2 rounded-sm text-[14px] font-medium text-muted">…</button>
+ *   </div>
+ */
 export function SegmentedControl({ options, value, onChange }: SegmentedControlProps) {
   return (
-    <div className="flex gap-1 rounded-xl bg-canvas p-1">
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          type="button"
-          onClick={() => onChange(opt.value)}
-          className={`flex min-h-11 flex-1 flex-col items-center justify-center rounded-lg px-2 ds-caption font-bold transition-colors ${
-            value === opt.value ? 'bg-paper text-primary' : 'text-ink-secondary active:bg-paper'
-          }`}
-        >
-          <span>{opt.label}</span>
-          {opt.sublabel && <span className="mt-0.5 text-xs font-medium opacity-70">{opt.sublabel}</span>}
-        </button>
-      ))}
+    <div
+      role="tablist"
+      className="flex flex-shrink-0 rounded-[10px] border border-border bg-hairline-soft p-1.5"
+    >
+      {options.map((opt) => {
+        const active = value === opt.value
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(opt.value)}
+            className={`flex flex-1 items-center justify-center py-3.5 min-h-[44px] rounded-[7px] text-[14px] transition-colors ${
+              active
+                ? 'bg-white shadow-[0_1px_2px_rgba(0,0,0,.04),0_1px_3px_rgba(0,0,0,.06)] font-bold text-primary'
+                : 'font-medium text-muted'
+            }`}
+          >
+            {opt.label}
+            {typeof opt.count === 'number' && (
+              <span className={`ml-1 ${active ? 'text-primary' : 'text-muted'} font-normal`}>
+                {opt.count}
+              </span>
+            )}
+          </button>
+        )
+      })}
     </div>
   )
 }
