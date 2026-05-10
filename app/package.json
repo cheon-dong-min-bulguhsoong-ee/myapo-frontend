@@ -9,10 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@web3auth/auth-adapter": "^9.7.0",
+    "@web3auth/base": "^9.7.0",
+    "@web3auth/modal": "^9.7.0",
+    "@web3auth/xrpl-provider": "^9.7.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "xrpl": "^2.14.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

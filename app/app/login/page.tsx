@@ -1,18 +1,32 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { LogIn, ShieldCheck } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { LogIn, Loader2, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { login, isLoggedIn, isReady } = useAuth()
   const [open, setOpen] = useState<'terms' | 'privacy' | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleLogin = () => {
-    login()
-    router.push('/persona-select')
+  useEffect(() => {
+    if (isReady && isLoggedIn) router.replace('/persona-select')
+  }, [isReady, isLoggedIn, router])
+
+  const handleLogin = async () => {
+    if (busy || !isReady) return
+    setBusy(true)
+    setError(null)
+    const ok = await login()
+    setBusy(false)
+    if (ok) {
+      router.push('/persona-select')
+    } else {
+      setError('로그인이 취소되었거나 실패했어요. 다시 시도해 주세요.')
+    }
   }
 
   return (
@@ -28,9 +42,25 @@ export default function LoginPage() {
       </div>
 
       <div className="px-5 pb-8 pt-3">
-        <button onClick={handleLogin} className="btn-primary mb-3">
-          <LogIn size={18} strokeWidth={2.2} />
-          Google로 계속하기
+        {error && (
+          <div className="mb-3 text-[12px] leading-relaxed text-danger text-center">{error}</div>
+        )}
+        <button
+          onClick={handleLogin}
+          disabled={busy || !isReady}
+          className="btn-primary mb-3 disabled:opacity-60"
+        >
+          {busy ? (
+            <>
+              <Loader2 size={18} strokeWidth={2.2} className="animate-spin" />
+              로그인 중...
+            </>
+          ) : (
+            <>
+              <LogIn size={18} strokeWidth={2.2} />
+              Google로 계속하기
+            </>
+          )}
         </button>
         <div className="flex justify-center gap-4 text-[12px] text-muted">
           <button onClick={() => setOpen('terms')} className="underline-offset-2 hover:underline">이용약관</button>
