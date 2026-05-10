@@ -1,0 +1,55 @@
+name: Deploy frontend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    env:
+      IMAGE_NAME: myapo-frontend
+      CONTAINER_NAME: myapo-frontend
+      HOST_PORT: "10000"
+      CONTAINER_PORT: "10000"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deployment env
+        run: |
+          test -n "${NEXT_PUBLIC_WEB3AUTH_CLIENT_ID}"
+          test -n "${NEXT_PUBLIC_WEB3AUTH_NETWORK}"
+        env:
+          NEXT_PUBLIC_WEB3AUTH_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID }}
+          NEXT_PUBLIC_WEB3AUTH_NETWORK: ${{ vars.NEXT_PUBLIC_WEB3AUTH_NETWORK || 'sapphire_mainnet' }}
+
+      - name: Build Docker image
+        working-directory: app
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_WEB3AUTH_CLIENT_ID="${NEXT_PUBLIC_WEB3AUTH_CLIENT_ID}" \
+            --build-arg NEXT_PUBLIC_WEB3AUTH_NETWORK="${NEXT_PUBLIC_WEB3AUTH_NETWORK}" \
+            -t "${IMAGE_NAME}:${GITHUB_SHA}" \
+            -t "${IMAGE_NAME}:latest" \
+            .
+        env:
+          NEXT_PUBLIC_WEB3AUTH_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID }}
+          NEXT_PUBLIC_WEB3AUTH_NETWORK: ${{ vars.NEXT_PUBLIC_WEB3AUTH_NETWORK || 'sapphire_mainnet' }}
+
+      - name: Restart app container
+        run: |
+          docker rm -f "${CONTAINER_NAME}" 2>/dev/null || true
+          docker run -d \
+            --name "${CONTAINER_NAME}" \
+            --restart unless-stopped \
+            -p "${HOST_PORT}:${CONTAINER_PORT}" \
+            "${IMAGE_NAME}:${GITHUB_SHA}"
