@@ -59,16 +59,30 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 })
 
-async function readWalletKeys(provider: IProvider): Promise<WalletKeys> {
+// v9 xrpl-provider doesn't register a `private_key` JSON-RPC handler (it falls
+// through to rippled), nor expose the key on a public field. Capture it the only
+// reliable way: hook setupProvider(), which the AuthAdapter calls with the key.
+const capturedPrivateKey = new WeakMap<XrplPrivateKeyProvider, string>()
+
+function instrumentPrivateKeyProvider(provider: XrplPrivateKeyProvider) {
+  const original = provider.setupProvider.bind(provider)
+  provider.setupProvider = (async (pk: string) => {
+    if (typeof pk === 'string' && pk.length > 0) capturedPrivateKey.set(provider, pk)
+    return original(pk)
+  }) as typeof provider.setupProvider
+}
+
+function extractPrivateKey(privateKeyProvider: XrplPrivateKeyProvider): string | null {
+  return capturedPrivateKey.get(privateKeyProvider) ?? null
+}
+
+async function readWalletKeys(
+  provider: IProvider,
+  privateKeyProvider: XrplPrivateKeyProvider,
+): Promise<WalletKeys> {
   let address: string | null = null
   let publicKey: string | null = null
-  let privateKey: string | null = null
-
-  try {
-    privateKey = (await provider.request<unknown, string>({ method: 'private_key' })) ?? null
-  } catch {
-    privateKey = null
-  }
+  let privateKey: string | null = extractPrivateKey(privateKeyProvider)
 
   try {
     const accounts = await provider.request<unknown, unknown[]>({ method: 'xrpl_getAccounts' })
@@ -86,7 +100,10 @@ async function readWalletKeys(provider: IProvider): Promise<WalletKeys> {
 
   if (privateKey && (!publicKey || !address)) {
     try {
-      const wallet = Wallet.fromEntropy(privateKey)
+      const hex = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey
+      const bytes = new Uint8Array(hex.length / 2)
+      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16)
+      const wallet = Wallet.fromEntropy(bytes)
       publicKey = publicKey ?? wallet.publicKey
       address = address ?? wallet.classicAddress
     } catch {
@@ -115,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [wallet, setWallet] = useState<WalletKeys>(EMPTY_WALLET)
   const initRef = useRef(false)
+  const privateKeyProviderRef = useRef<XrplPrivateKeyProvider | null>(null)
 
   useEffect(() => {
     if (initRef.current) return
@@ -125,6 +143,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const privateKeyProvider = new XrplPrivateKeyProvider({
           config: { chainConfig: xrplChainConfig },
         })
+        instrumentPrivateKeyProvider(privateKeyProvider)
+        privateKeyProviderRef.current = privateKeyProvider
 
         const network = WEB3AUTH_NETWORK[NETWORK_KEY] ?? WEB3AUTH_NETWORK.SAPPHIRE_MAINNET
         const instance = new Web3Auth({
@@ -143,10 +163,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setWeb3auth(instance)
 
         if (instance.connected && instance.provider) {
-          const [info, keys] = await Promise.all([
+          const [info, keys, w3aAuth] = await Promise.all([
             instance.getUserInfo().catch(() => null),
-            readWalletKeys(instance.provider),
+            readWalletKeys(instance.provider, privateKeyProvider),
+            instance.authenticateUser().catch(() => null),
           ])
+          const oAuthIdToken = (info as { oAuthIdToken?: string } | null)?.oAuthIdToken ?? null
+          console.log('[web3auth:restore] idToken:', w3aAuth?.idToken ?? null)
+          console.log('[web3auth:restore] oAuthIdToken:', oAuthIdToken)
+          console.log('[web3auth:restore] wallet:', keys)
           setUserInfo((info as UserInfo) ?? null)
           setWallet(keys)
           persistWallet(keys)
@@ -161,14 +186,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = useCallback(async (): Promise<boolean> => {
-    if (!web3auth) return false
+    if (!web3auth || !privateKeyProviderRef.current) return false
     try {
       const provider = await web3auth.connect()
       if (!provider) return false
-      const [info, keys] = await Promise.all([
+      const [info, keys, w3aAuth] = await Promise.all([
         web3auth.getUserInfo().catch(() => null),
-        readWalletKeys(provider),
+        readWalletKeys(provider, privateKeyProviderRef.current),
+        web3auth.authenticateUser().catch(() => null),
       ])
+      const oAuthIdToken = (info as { oAuthIdToken?: string } | null)?.oAuthIdToken ?? null
+      const oAuthAccessToken = (info as { oAuthAccessToken?: string } | null)?.oAuthAccessToken ?? null
+      console.log('[web3auth] idToken (Web3Auth-issued JWT):', w3aAuth?.idToken ?? null)
+      console.log('[web3auth] oAuthIdToken (Google original JWT):', oAuthIdToken)
+      console.log('[web3auth] oAuthAccessToken:', oAuthAccessToken)
+      console.log('[web3auth] userInfo:', info)
+      console.log('[web3auth] wallet:', keys)
       setUserInfo((info as UserInfo) ?? null)
       setWallet(keys)
       persistWallet(keys)
