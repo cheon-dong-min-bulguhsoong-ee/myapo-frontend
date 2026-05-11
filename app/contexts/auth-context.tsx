@@ -35,6 +35,7 @@ const xrplChainConfig = {
 }
 
 const WALLET_STORAGE_KEY = 'myapo_wallet'
+const WEB3AUTH_JWT_STORAGE_KEY = 'web3auth_jwt_token'
 
 interface UserInfo {
   name?: string
@@ -204,6 +205,16 @@ function clearWallet() {
   localStorage.removeItem(WALLET_STORAGE_KEY)
 }
 
+function persistWeb3AuthJwtToken(token: string) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(WEB3AUTH_JWT_STORAGE_KEY, token)
+}
+
+function clearWeb3AuthJwtToken() {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(WEB3AUTH_JWT_STORAGE_KEY)
+}
+
 async function createMyApoSession(externalToken: string, userInfo: UserInfo | null, wallet: WalletKeys) {
   const myApoUser = await signInWithExternalToken(externalToken, {
     name: userInfo?.name,
@@ -211,6 +222,7 @@ async function createMyApoSession(externalToken: string, userInfo: UserInfo | nu
     xrplAddress: wallet.address ?? undefined,
     publicKey: wallet.publicKey ?? undefined,
   })
+  persistWeb3AuthJwtToken(externalToken)
   persistMyApoAccessToken(myApoUser.accessToken)
   return myApoUser
 }
@@ -316,6 +328,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAccessToken(null)
     setWallet(EMPTY_WALLET)
     clearWallet()
+    clearWeb3AuthJwtToken()
     clearMyApoAccessToken()
     if (typeof window !== 'undefined') {
       localStorage.removeItem('myapo_persona')
