@@ -1,41 +1,109 @@
 'use client'
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
 import { DocCard } from '@/components/ui/doc-card'
 import { PageFooter } from '@/components/ui/page-footer'
-import { mockIssuableDocuments } from '@/lib/mock-data'
+import { useAuth } from '@/contexts/auth-context'
+import { listDocumentTypes, type DocumentTypeListItemRes } from '@/lib/myapo-api'
+
+interface IssuableDocumentView {
+  id: string
+  name: string
+  englishName?: string
+  use?: string
+  issuerCode: string
+  issuerIcon: string
+}
+
+interface DocumentCatalogState {
+  accessToken: string | null
+  documents: IssuableDocumentView[]
+  errorMessage: string | null
+}
+
+const EMPTY_DOCUMENTS: IssuableDocumentView[] = []
+
+function toIssuableDocument(item: DocumentTypeListItemRes): IssuableDocumentView {
+  return {
+    id: item.code,
+    name: item.name,
+    englishName: item.englishName ?? undefined,
+    use: item.useCase ?? undefined,
+    issuerCode: item.issuerCode,
+    issuerIcon: item.issuerIconLabel,
+  }
+}
 
 function IssueSelectView() {
   const router = useRouter()
   const params = useSearchParams()
+  const { accessToken } = useAuth()
   const preselect = params.get('preselect')
-  const isReissue = !!preselect && mockIssuableDocuments.some(d => d.id === preselect)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    () => (isReissue ? new Set([preselect!]) : new Set()),
+  const [catalog, setCatalog] = useState<DocumentCatalogState>({
+    accessToken: null,
+    documents: [],
+    errorMessage: null,
+  })
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => (preselect ? new Set([preselect]) : new Set()))
+  const missingTokenMessage = accessToken ? null : '로그인 후 발급 가능한 서류를 불러올 수 있어요'
+  const documents = catalog.accessToken === accessToken ? catalog.documents : EMPTY_DOCUMENTS
+  const errorMessage = missingTokenMessage ?? (catalog.accessToken === accessToken ? catalog.errorMessage : null)
+  const showLoading = Boolean(accessToken) && catalog.accessToken !== accessToken
+
+  useEffect(() => {
+    if (!accessToken) return
+
+    let ignore = false
+
+    listDocumentTypes(accessToken, 'KOREAN')
+      .then(data => {
+        if (ignore) return
+        setCatalog({
+          accessToken,
+          documents: data.items.map(toIssuableDocument),
+          errorMessage: null,
+        })
+      })
+      .catch(err => {
+        console.error('Failed to load document types:', err)
+        if (!ignore) {
+          setCatalog({
+            accessToken,
+            documents: [],
+            errorMessage: '발급 가능한 서류를 불러오지 못했어요. 잠시 후 다시 시도해 주세요',
+          })
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [accessToken])
+
+  const isReissue = useMemo(
+    () => !!preselect && documents.some(d => d.id === preselect),
+    [documents, preselect],
   )
 
   const toggle = (id: string) => {
     setSelectedIds(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id); else next.add(id)
-      return next
+      if (prev.has(id)) return new Set()
+      return new Set([id])
     })
   }
 
-  const selectedCount = selectedIds.size
-  const onlyDoc = selectedCount === 1
-    ? mockIssuableDocuments.find(d => selectedIds.has(d.id)) ?? null
-    : null
+  const selectedDocuments = documents.filter(d => selectedIds.has(d.id))
+  const selectedCount = selectedDocuments.length
+  const onlyDoc = selectedCount === 1 ? selectedDocuments[0] : null
 
   const ctaLabel =
     selectedCount === 0 ? '서류를 선택해요'
     : isReissue && onlyDoc ? `${onlyDoc.name} 재발급 신청할게요`
-    : onlyDoc          ? '발급 신청할게요'
-    :                    `${selectedCount}개 서류 발급 신청할게요`
+    :                    '발급 신청할게요'
 
-  const disabled = selectedCount === 0
+  const disabled = selectedCount === 0 || showLoading || Boolean(errorMessage)
 
   return (
     <div className="flex flex-col flex-1 min-h-full">
@@ -55,24 +123,34 @@ function IssueSelectView() {
         </div>
         <div className="text-[12px] leading-relaxed text-sub mb-2">
           {isReissue
-            ? '필요하면 다른 서류도 함께 선택할 수 있어요'
+            ? '필요하면 다른 서류로 바꿀 수 있어요'
             : '발급기관: 한국 정부 · 해외 기관 제출용'}
         </div>
 
-        <div className="doc-grid">
-          {mockIssuableDocuments.map(doc => (
-            <DocCard
-              key={doc.id}
-              issuerIcon={doc.issuerIcon}
-              name={doc.name}
-              englishName={selectedIds.has(doc.id) ? doc.englishName : undefined}
-              use={doc.use}
-              issuerCode={doc.issuerCode}
-              selected={selectedIds.has(doc.id)}
-              onClick={() => toggle(doc.id)}
-            />
-          ))}
-        </div>
+        {showLoading && (
+          <div className="card p-4 text-[13px] leading-relaxed text-sub">발급 가능한 서류를 불러오고 있어요</div>
+        )}
+
+        {!showLoading && errorMessage && (
+          <div className="card p-4 text-[13px] leading-relaxed text-sub">{errorMessage}</div>
+        )}
+
+        {!showLoading && !errorMessage && (
+          <div className="doc-grid">
+            {documents.map(doc => (
+              <DocCard
+                key={doc.id}
+                issuerIcon={doc.issuerIcon}
+                name={doc.name}
+                englishName={selectedIds.has(doc.id) ? doc.englishName : undefined}
+                use={doc.use}
+                issuerCode={doc.issuerCode}
+                selected={selectedIds.has(doc.id)}
+                onClick={() => toggle(doc.id)}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="text-[12px] leading-relaxed text-muted mt-3">발급해두면 유효기간 안에 무한 재사용해요</div>
       </main>

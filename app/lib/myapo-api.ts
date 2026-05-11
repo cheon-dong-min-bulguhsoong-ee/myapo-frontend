@@ -33,6 +33,26 @@ export interface SignInReq {
   publicKey?: string
 }
 
+export type PersonaType = 'KOREAN' | 'FOREIGNER'
+
+export interface DocumentTypeListItemRes {
+  code: string
+  name: string
+  englishName: string | null
+  useCase: string | null
+  defaultTtlMonths: number
+  personaType: PersonaType
+  issuerCode: string
+  issuerName: string
+  issuerCountryCode: string
+  issuerIconLabel: string
+}
+
+export interface DocumentTypeListRes {
+  items: DocumentTypeListItemRes[]
+  total: number
+}
+
 interface MyApoRequestOptions extends Omit<RequestInit, 'headers'> {
   headers?: HeadersInit
   token?: string | null
@@ -115,6 +135,13 @@ export function signInWithExternalToken(externalToken: string, body: SignInReq) 
 export function logoutFromMyApo(accessToken: string) {
   return myApoRequest<Record<string, never>>('/api/v1/auth/logout', {
     method: 'POST',
+    token: accessToken,
+  })
+}
+
+export function listDocumentTypes(accessToken: string, personaType: PersonaType = 'KOREAN') {
+  const params = new URLSearchParams({ personaType })
+  return myApoRequest<DocumentTypeListRes>(`/api/v1/documents/types?${params.toString()}`, {
     token: accessToken,
   })
 }
