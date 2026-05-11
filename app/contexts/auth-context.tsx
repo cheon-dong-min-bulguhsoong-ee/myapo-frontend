@@ -9,6 +9,14 @@ import {
   type IProvider,
 } from '@web3auth/base'
 import { Wallet } from 'xrpl'
+import {
+  clearMyApoAccessToken,
+  getStoredMyApoAccessToken,
+  logoutFromMyApo,
+  persistMyApoAccessToken,
+  signInWithExternalToken,
+  type MyApoAuthRes,
+} from '@/lib/myapo-api'
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID ?? ''
 const NETWORK_KEY = (process.env.NEXT_PUBLIC_WEB3AUTH_NETWORK ?? 'sapphire_mainnet').toUpperCase() as keyof typeof WEB3AUTH_NETWORK
@@ -31,6 +39,8 @@ interface UserInfo {
   email?: string
   profileImage?: string
   typeOfLogin?: string
+  oAuthIdToken?: string
+  oAuthAccessToken?: string
 }
 
 interface WalletKeys {
@@ -43,6 +53,8 @@ interface AuthContextType {
   isReady: boolean
   isLoggedIn: boolean
   userInfo: UserInfo | null
+  myApoUser: MyApoAuthRes | null
+  accessToken: string | null
   wallet: WalletKeys
   login: () => Promise<boolean>
   logout: () => Promise<void>
@@ -54,6 +66,8 @@ const AuthContext = createContext<AuthContextType>({
   isReady: false,
   isLoggedIn: false,
   userInfo: null,
+  myApoUser: null,
+  accessToken: null,
   wallet: EMPTY_WALLET,
   login: async () => false,
   logout: async () => {},
@@ -76,13 +90,37 @@ function extractPrivateKey(privateKeyProvider: XrplPrivateKeyProvider): string |
   return capturedPrivateKey.get(privateKeyProvider) ?? null
 }
 
+function normalizeUserInfo(value: unknown): UserInfo | null {
+  if (!value || typeof value !== 'object') return null
+
+  const obj = value as Record<string, unknown>
+  return {
+    name: typeof obj.name === 'string' ? obj.name : undefined,
+    email: typeof obj.email === 'string' ? obj.email : undefined,
+    profileImage: typeof obj.profileImage === 'string' ? obj.profileImage : undefined,
+    typeOfLogin: typeof obj.typeOfLogin === 'string' ? obj.typeOfLogin : undefined,
+    oAuthIdToken: typeof obj.oAuthIdToken === 'string' ? obj.oAuthIdToken : undefined,
+    oAuthAccessToken: typeof obj.oAuthAccessToken === 'string' ? obj.oAuthAccessToken : undefined,
+  }
+}
+
+function extractWeb3AuthIdToken(value: unknown): string | null {
+  if (!value || typeof value !== 'object') return null
+  const obj = value as Record<string, unknown>
+  return typeof obj.idToken === 'string' ? obj.idToken : null
+}
+
+function getExternalToken(authResult: unknown, userInfo: UserInfo | null) {
+  return extractWeb3AuthIdToken(authResult) ?? userInfo?.oAuthIdToken ?? null
+}
+
 async function readWalletKeys(
   provider: IProvider,
   privateKeyProvider: XrplPrivateKeyProvider,
 ): Promise<WalletKeys> {
   let address: string | null = null
   let publicKey: string | null = null
-  let privateKey: string | null = extractPrivateKey(privateKeyProvider)
+  const privateKey: string | null = extractPrivateKey(privateKeyProvider)
 
   try {
     const accounts = await provider.request<unknown, unknown[]>({ method: 'xrpl_getAccounts' })
@@ -102,7 +140,7 @@ async function readWalletKeys(
     try {
       const hex = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey
       const bytes = new Uint8Array(hex.length / 2)
-      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16)
+      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16)
       const wallet = Wallet.fromEntropy(bytes)
       publicKey = publicKey ?? wallet.publicKey
       address = address ?? wallet.classicAddress
@@ -125,11 +163,23 @@ function clearWallet() {
   localStorage.removeItem(WALLET_STORAGE_KEY)
 }
 
+async function createMyApoSession(externalToken: string, userInfo: UserInfo | null, wallet: WalletKeys) {
+  const myApoUser = await signInWithExternalToken(externalToken, {
+    name: userInfo?.name,
+    xrplAddress: wallet.address ?? undefined,
+    publicKey: wallet.publicKey ?? undefined,
+  })
+  persistMyApoAccessToken(myApoUser.accessToken)
+  return myApoUser
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null)
   const [isReady, setIsReady] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const [myApoUser, setMyApoUser] = useState<MyApoAuthRes | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(() => getStoredMyApoAccessToken())
   const [wallet, setWallet] = useState<WalletKeys>(EMPTY_WALLET)
   const initRef = useRef(false)
   const privateKeyProviderRef = useRef<XrplPrivateKeyProvider | null>(null)
@@ -163,16 +213,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setWeb3auth(instance)
 
         if (instance.connected && instance.provider) {
-          const [info, keys, w3aAuth] = await Promise.all([
+          const [rawInfo, keys, authResult] = await Promise.all([
             instance.getUserInfo().catch(() => null),
             readWalletKeys(instance.provider, privateKeyProvider),
             instance.authenticateUser().catch(() => null),
           ])
-          const oAuthIdToken = (info as { oAuthIdToken?: string } | null)?.oAuthIdToken ?? null
-          console.log('[web3auth:restore] idToken:', w3aAuth?.idToken ?? null)
-          console.log('[web3auth:restore] oAuthIdToken:', oAuthIdToken)
-          console.log('[web3auth:restore] wallet:', keys)
-          setUserInfo((info as UserInfo) ?? null)
+          const info = normalizeUserInfo(rawInfo)
+          const externalToken = getExternalToken(authResult, info)
+          if (!externalToken) throw new Error('Web3Auth token is missing')
+          const myApoSession = await createMyApoSession(externalToken, info, keys)
+          setUserInfo(info)
+          setMyApoUser(myApoSession)
+          setAccessToken(myApoSession.accessToken)
           setWallet(keys)
           persistWallet(keys)
           setIsLoggedIn(true)
@@ -188,21 +240,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (): Promise<boolean> => {
     if (!web3auth || !privateKeyProviderRef.current) return false
     try {
-      const provider = await web3auth.connect()
+      const privateKeyProvider = privateKeyProviderRef.current
+      const provider = web3auth.provider ?? await web3auth.connect()
       if (!provider) return false
-      const [info, keys, w3aAuth] = await Promise.all([
+      const [rawInfo, keys, authResult] = await Promise.all([
         web3auth.getUserInfo().catch(() => null),
-        readWalletKeys(provider, privateKeyProviderRef.current),
+        readWalletKeys(provider, privateKeyProvider),
         web3auth.authenticateUser().catch(() => null),
       ])
-      const oAuthIdToken = (info as { oAuthIdToken?: string } | null)?.oAuthIdToken ?? null
-      const oAuthAccessToken = (info as { oAuthAccessToken?: string } | null)?.oAuthAccessToken ?? null
-      console.log('[web3auth] idToken (Web3Auth-issued JWT):', w3aAuth?.idToken ?? null)
-      console.log('[web3auth] oAuthIdToken (Google original JWT):', oAuthIdToken)
-      console.log('[web3auth] oAuthAccessToken:', oAuthAccessToken)
-      console.log('[web3auth] userInfo:', info)
-      console.log('[web3auth] wallet:', keys)
-      setUserInfo((info as UserInfo) ?? null)
+      const info = normalizeUserInfo(rawInfo)
+      const externalToken = getExternalToken(authResult, info)
+      if (!externalToken) throw new Error('Web3Auth token is missing')
+      const myApoSession = await createMyApoSession(externalToken, info, keys)
+      setUserInfo(info)
+      setMyApoUser(myApoSession)
+      setAccessToken(myApoSession.accessToken)
       setWallet(keys)
       persistWallet(keys)
       setIsLoggedIn(true)
@@ -215,22 +267,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     if (!web3auth) return
+    const tokenToRevoke = accessToken
     try {
+      if (tokenToRevoke) await logoutFromMyApo(tokenToRevoke)
       await web3auth.logout()
     } catch (err) {
       console.error('Web3Auth logout failed:', err)
     }
     setIsLoggedIn(false)
     setUserInfo(null)
+    setMyApoUser(null)
+    setAccessToken(null)
     setWallet(EMPTY_WALLET)
     clearWallet()
+    clearMyApoAccessToken()
     if (typeof window !== 'undefined') {
       localStorage.removeItem('myapo_persona')
     }
-  }, [web3auth])
+  }, [accessToken, web3auth])
 
   return (
-    <AuthContext.Provider value={{ isReady, isLoggedIn, userInfo, wallet, login, logout }}>
+    <AuthContext.Provider value={{ isReady, isLoggedIn, userInfo, myApoUser, accessToken, wallet, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
