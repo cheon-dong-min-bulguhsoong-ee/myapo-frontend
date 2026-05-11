@@ -39,6 +39,7 @@ interface UserInfo {
   email?: string
   profileImage?: string
   typeOfLogin?: string
+  idToken?: string
   oAuthIdToken?: string
   oAuthAccessToken?: string
 }
@@ -99,19 +100,53 @@ function normalizeUserInfo(value: unknown): UserInfo | null {
     email: typeof obj.email === 'string' ? obj.email : undefined,
     profileImage: typeof obj.profileImage === 'string' ? obj.profileImage : undefined,
     typeOfLogin: typeof obj.typeOfLogin === 'string' ? obj.typeOfLogin : undefined,
+    idToken: typeof obj.idToken === 'string' ? obj.idToken : undefined,
     oAuthIdToken: typeof obj.oAuthIdToken === 'string' ? obj.oAuthIdToken : undefined,
     oAuthAccessToken: typeof obj.oAuthAccessToken === 'string' ? obj.oAuthAccessToken : undefined,
   }
 }
 
+function normalizeToken(value: string | null | undefined) {
+  const token = value?.trim()
+  return token && token.length > 0 ? token : null
+}
+
 function extractWeb3AuthIdToken(value: unknown): string | null {
   if (!value || typeof value !== 'object') return null
   const obj = value as Record<string, unknown>
-  return typeof obj.idToken === 'string' ? obj.idToken : null
+  return typeof obj.idToken === 'string' ? normalizeToken(obj.idToken) : null
 }
 
 function getExternalToken(authResult: unknown, userInfo: UserInfo | null) {
-  return extractWeb3AuthIdToken(authResult) ?? userInfo?.oAuthIdToken ?? null
+  return extractWeb3AuthIdToken(authResult)
+    ?? normalizeToken(userInfo?.idToken)
+    ?? normalizeToken(userInfo?.oAuthIdToken)
+}
+
+function describeTokenAvailability(authResult: unknown, userInfo: UserInfo | null) {
+  return {
+    authenticateUserIdToken: Boolean(extractWeb3AuthIdToken(authResult)),
+    userInfoIdToken: Boolean(normalizeToken(userInfo?.idToken)),
+    userInfoOAuthIdToken: Boolean(normalizeToken(userInfo?.oAuthIdToken)),
+    userInfoOAuthAccessToken: Boolean(normalizeToken(userInfo?.oAuthAccessToken)),
+  }
+}
+
+async function readWeb3AuthSession(web3auth: Web3Auth) {
+  const rawInfo = await web3auth.getUserInfo()
+  const info = normalizeUserInfo(rawInfo)
+  const authResult = await web3auth.authenticateUser().catch((err: unknown) => {
+    console.error('Web3Auth authenticateUser failed:', err)
+    return null
+  })
+  const externalToken = getExternalToken(authResult, info)
+
+  if (!externalToken) {
+    console.error('Web3Auth token fields are empty:', describeTokenAvailability(authResult, info))
+    throw new Error('Web3Auth id token is missing')
+  }
+
+  return { info, externalToken }
 }
 
 async function readWalletKeys(
@@ -213,14 +248,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setWeb3auth(instance)
 
         if (instance.connected && instance.provider) {
-          const [rawInfo, keys, authResult] = await Promise.all([
-            instance.getUserInfo().catch(() => null),
+          const [{ info, externalToken }, keys] = await Promise.all([
+            readWeb3AuthSession(instance),
             readWalletKeys(instance.provider, privateKeyProvider),
-            instance.authenticateUser().catch(() => null),
           ])
-          const info = normalizeUserInfo(rawInfo)
-          const externalToken = getExternalToken(authResult, info)
-          if (!externalToken) throw new Error('Web3Auth token is missing')
           const myApoSession = await createMyApoSession(externalToken, info, keys)
           setUserInfo(info)
           setMyApoUser(myApoSession)
@@ -243,14 +274,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const privateKeyProvider = privateKeyProviderRef.current
       const provider = web3auth.provider ?? await web3auth.connect()
       if (!provider) return false
-      const [rawInfo, keys, authResult] = await Promise.all([
-        web3auth.getUserInfo().catch(() => null),
+      const [{ info, externalToken }, keys] = await Promise.all([
+        readWeb3AuthSession(web3auth),
         readWalletKeys(provider, privateKeyProvider),
-        web3auth.authenticateUser().catch(() => null),
       ])
-      const info = normalizeUserInfo(rawInfo)
-      const externalToken = getExternalToken(authResult, info)
-      if (!externalToken) throw new Error('Web3Auth token is missing')
       const myApoSession = await createMyApoSession(externalToken, info, keys)
       setUserInfo(info)
       setMyApoUser(myApoSession)
