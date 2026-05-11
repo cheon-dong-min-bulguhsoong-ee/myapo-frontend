@@ -21,6 +21,7 @@ import {
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID ?? ''
 const NETWORK_KEY = (process.env.NEXT_PUBLIC_WEB3AUTH_NETWORK ?? 'sapphire_mainnet').toUpperCase() as keyof typeof WEB3AUTH_NETWORK
+const DEFAULT_NATIONALITY = 'KR'
 
 const xrplChainConfig = {
   chainNamespace: CHAIN_NAMESPACES.XRPL,
@@ -206,6 +207,7 @@ function clearWallet() {
 async function createMyApoSession(externalToken: string, userInfo: UserInfo | null, wallet: WalletKeys) {
   const myApoUser = await signInWithExternalToken(externalToken, {
     name: userInfo?.name,
+    nationality: DEFAULT_NATIONALITY,
     xrplAddress: wallet.address ?? undefined,
     publicKey: wallet.publicKey ?? undefined,
   })
