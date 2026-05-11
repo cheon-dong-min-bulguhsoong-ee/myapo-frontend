@@ -2,16 +2,20 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+This project uses **Bun only** for local development and scripts. Do not use `npm`, `yarn`, or `pnpm` for this app.
+
+Install dependencies and run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
 bun dev
+```
+
+Common commands:
+
+```bash
+bun run lint
+bun run build
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

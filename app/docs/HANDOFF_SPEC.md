@@ -13,7 +13,7 @@
 - 로그인은 Web3Auth SDK에서 외부 JWT를 받은 뒤 백엔드 `POST /api/v1/auth/signin`을 호출해 MyApo 자체 accessToken을 저장합니다.
 - 현재 구현된 실제 `/api/v1` 호출은 로그인/로그아웃 인증 교환입니다. 문서/분쟁/제출 화면은 아직 목업 데이터를 사용합니다.
 - 문서, 발급 진행, 이의 신청, 제출 기관 데이터는 `lib/mock-data.ts`의 목업을 사용합니다.
-- `API_SPEC.md`에는 백엔드 전체 27개 엔드포인트가 포함되어 있으며, 현재 프론트가 모두 소비하지는 않습니다.
+- `API_SPEC.md`에는 백엔드 전체 29개 엔드포인트가 포함되어 있으며, 현재 프론트가 모두 소비하지는 않습니다.
 
 ## 2. 기술 스택
 
@@ -22,6 +22,7 @@
 | Framework | Next.js `16.2.6` |
 | React | `18.3.1` |
 | Language | TypeScript |
+| Package manager / runtime | Bun. 앞으로 이 앱의 설치·개발·검증 스크립트는 `npm`, `yarn`, `pnpm` 대신 `bun`만 사용합니다. |
 | Styling | Tailwind CSS v4 + 전역 CSS 토큰 |
 | Auth SDK | `@web3auth/modal`, `@web3auth/auth-adapter`, `@web3auth/xrpl-provider` |
 | Blockchain SDK | `xrpl` |
@@ -35,7 +36,7 @@
 | `/login` | Google/Web3Auth 로그인 | `contexts/auth-context.tsx` | `POST /api/v1/auth/signin`, `POST /api/v1/auth/logout` |
 | `/persona-select` | 사용자 페르소나 선택 | local state / localStorage | 사용자 프로필 확장 API가 필요하면 별도 정의 |
 | `/home` | 주요 메뉴 대시보드 | `mockDocuments`, `mockApplications`, `mockDisputes` | 문서/발급/이의 API 집계 |
-| `/issue/select` | 발급할 문서 선택 | `mockIssuableDocuments` | `POST /api/v1/documents` 또는 문서 카탈로그 API 필요 |
+| `/issue/select` | 발급할 문서 선택 | `mockIssuableDocuments` | `GET /api/v1/documents/types`, `POST /api/v1/documents` |
 | `/issue/verify` | 본인 확인 입력 | local form | 현재 API_SPEC에는 별도 본인확인 API 없음 |
 | `/issue/success` | 발급 신청 완료 | local route transition | `POST /api/v1/documents` 성공 후 이동 |
 | `/history` | 진행 중인 발급 목록 | `mockApplications` | `GET /api/v1/documents` 또는 `GET /api/v1/credentials/issue-requests/{id}` |
@@ -45,7 +46,7 @@
 | `/submission-request` | 기관 제출 요청 선택 | `mockInstitutions` | `POST /api/v1/credentials/{credentialId}/submissions` |
 | `/delivery` | 제출 진행 상태 | local constants | 제출 상태 조회 API가 필요하면 별도 정의 |
 | `/renewal` | 문서 재발급 안내 | `mockDocuments`, `mockIssuableDocuments` | `POST /api/v1/documents` 재사용 가능 |
-| `/disputes` | 이의 신청 목록 | `mockDisputes` | `GET /api/v1/disputes/{id}`는 단건만 있음, 목록 API는 API_SPEC에 없음 |
+| `/disputes` | 이의 신청 목록 | `mockDisputes` | `GET /api/v1/disputes` |
 | `/disputes/[id]` | 이의 신청 상세 | `mockDisputes` | `GET /api/v1/disputes/{id}` |
 | `/disputes/new` | 이의 신청 작성 | local form | `POST /api/v1/disputes` |
 | `/disputes/success` | 이의 신청 완료 | local route transition | `POST /api/v1/disputes` 성공 후 이동 |
@@ -135,7 +136,7 @@ Authorization: Bearer <accessToken>
 
 ## 5. API 연동 우선순위
 
-현재 앱 UX를 실제 API로 살리려면 모든 27개 엔드포인트를 한 번에 연결하지 말고 아래 순서로 붙이는 것이 안전합니다.
+현재 앱 UX를 실제 API로 살리려면 모든 29개 엔드포인트를 한 번에 연결하지 말고 아래 순서로 붙이는 것이 안전합니다.
 
 ### 5.1 1차 연동, 앱 기본 플로우
 
@@ -143,8 +144,9 @@ Authorization: Bearer <accessToken>
 | --- | --- | --- | --- |
 | P0 | `POST /api/v1/auth/signin` | Web3Auth 로그인 후 MyApo accessToken 발급 | `/login` |
 | P0 | `GET /api/v1/users/me` | 로그인 사용자 프로필 확인 | 전역 auth guard, `/home` |
-| P0 | `GET /api/v1/documents` | 문서 목록, 발급 진행 목록 | `/home`, `/documents`, `/history` |
+| P0 | `GET /api/v1/documents` | 문서 목록, 발급 진행 목록. `status`, `documentTypeCode`, `countryCode`, `q`, `page`, `limit` query 지원 | `/home`, `/documents`, `/history` |
 | P0 | `GET /api/v1/documents/{documentCode}` | 문서 상세 및 5단계 진행 상태 | `/documents/[id]`, `/history/[id]` |
+| P0 | `GET /api/v1/documents/types` | 발급 가능한 문서 카탈로그 | `/issue/select` |
 | P0 | `POST /api/v1/documents` | 문서 발급 신청 | `/issue/select`, `/issue/verify`, `/issue/success` |
 
 ### 5.2 2차 연동, 진행/파일/승인
@@ -166,6 +168,7 @@ Authorization: Bearer <accessToken>
 | P2 | `POST /api/v1/credentials/{credentialId}/submissions` | 기관 제출 | `/submission-request`, `/delivery` |
 | P2 | `GET /api/v1/credentials/{credentialId}/submissions` | 제출 이력 | 제출 내역 화면이 생길 경우 |
 | P2 | `POST /api/v1/disputes` | 이의 신청 생성 | `/disputes/new` |
+| P2 | `GET /api/v1/disputes` | 이의 신청 목록 | `/disputes` |
 | P2 | `GET /api/v1/disputes/{id}` | 이의 신청 상세 | `/disputes/[id]` |
 
 ### 5.4 현재 앱에서 직접 쓰지 않는 백엔드/API 후보
@@ -215,6 +218,8 @@ interface Document {
 | `status: available` | `DocumentStatus.VALID` 또는 `CredentialStatus.ISSUED` |
 | `status: expired` | `DocumentStatus.EXPIRED/REVOKED` 또는 `CredentialStatus.EXPIRED/REVOKED` |
 | `credentialId` | `credentialId`, `xrplTxHash`, 또는 별도 표시용 ID |
+
+주의: `GET /api/v1/documents`의 `DocumentListItemRes`에는 `expiresAt`과 `credentialId`가 없습니다. 만료일/credential id가 필요한 화면은 `GET /api/v1/credentials` 또는 상세 API를 함께 조합하는 adapter가 필요합니다.
 
 ### 6.2 현재 `Application`
 
@@ -269,7 +274,7 @@ interface Dispute {
 | `ASSIGNED`, `IN_REVIEW`, `INFO_REQUESTED` | `reviewing` |
 | `RESOLVED`, `REJECTED` | `closed` |
 
-주의: `API_SPEC.md`에는 분쟁 목록 조회 API가 없습니다. `/disputes` 목록 화면을 실제화하려면 `GET /api/v1/disputes` 또는 사용자별 목록 API가 추가로 필요합니다.
+주의: 현재 Swagger에는 `GET /api/v1/disputes` 목록 API가 있습니다. 기존 목업 `Dispute` UI 상태는 `DisputeSummaryRes.status`를 `received/reviewing/closed`로 변환해 사용하세요.
 
 ### 6.4 현재 발급 가능 문서 카탈로그
 
@@ -301,7 +306,7 @@ interface IssuableDocument {
 | `edu` | 학력증명서 (영문) | `KR-학교` | 해외 취업 · 유학 |
 | `health` | 건강보험료납부확인서 (영문) | `KR-건보` | 해외 비자 · 건강보험 증빙 |
 
-현재 `API_SPEC.md`에는 문서 카탈로그 목록 API가 없습니다. 다른 프로젝트에서 동적 카탈로그를 원하면 백엔드에 `GET /api/v1/document-types` 같은 API가 필요합니다.
+현재 Swagger에는 `GET /api/v1/documents/types` 카탈로그 API가 있습니다. `personaType=KOREAN|FOREIGNER` query로 발급 가능 문서 목록을 가져와 `mockIssuableDocuments`를 대체하세요.
 
 ## 7. 디자인 시스템 적용 명세
 
@@ -419,7 +424,7 @@ interface IssuableDocument {
 5. API client를 새로 만들고 `API_SPEC.md`의 공통 응답 `{ success, code, message, data }`를 unwrap합니다.
 6. P0 API부터 붙입니다: signin, users/me, documents list/detail/create.
 7. 목업 화면이 기대하는 상태값으로 백엔드 enum을 변환하는 mapper를 둡니다.
-8. 분쟁 목록, 문서 카탈로그, 제출 상태처럼 API_SPEC에 없는 목록/상태 API는 백엔드 추가 필요 여부를 먼저 확인합니다.
+8. 분쟁 목록과 문서 카탈로그는 각각 `GET /api/v1/disputes`, `GET /api/v1/documents/types`로 대체하고, 제출 요청 목록/상태 API는 백엔드 추가 필요 여부를 먼저 확인합니다.
 
 ## 9. 권장 API client 형태
 
@@ -463,8 +468,8 @@ NEXT_PUBLIC_WEB3AUTH_NETWORK=sapphire_devnet
 
 현재 프론트와 `API_SPEC.md` 사이에 남아 있는 공백입니다.
 
-- 문서 카탈로그 목록 API가 있는지 확인 필요. 현재 발급 가능 문서는 목업 배열입니다.
-- 분쟁 목록 조회 API가 필요합니다. 현재 명세에는 단건 조회만 있습니다.
+- 문서 카탈로그 목록은 `GET /api/v1/documents/types`로 확인됐습니다. 현재 발급 가능 문서는 아직 목업 배열입니다.
+- 분쟁 목록 조회는 `GET /api/v1/disputes`로 확인됐습니다. 현재 `/disputes` 화면은 아직 목업 배열입니다.
 - 제출 요청 목록 API가 필요합니다. 현재 `/submission-request`는 `mockInstitutions`만 사용합니다.
 - `Document` API와 `Credential` API 중 사용자 앱의 “내 문서” source of truth를 하나로 정해야 합니다.
 - Web3Auth JWT는 `ExternalJwtBearer`로 전달하는 설계로 보입니다. 구현 시 `Authorization: Bearer <web3authToken>` 헤더로 보내는지 백엔드와 최종 확인하세요.

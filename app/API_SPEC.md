@@ -10,7 +10,7 @@
 - 버전: 0.0.1
 - OpenAPI 버전: 3.0.0
 - Base URL: `https://api.myapo.xyz`
-- 총 엔드포인트: 27개
+- 총 엔드포인트: 29개
 
 ### 설명
 
@@ -43,6 +43,7 @@ Provides an API for domains managed by the 'MyApo' backend.
 | POST |`/api/v1/credentials/{credentialId}/xrpl/delete/prepare` |XRP Testnet CredentialDelete 서명 payload 생성 |Credentials |
 | POST |`/api/v1/credentials/{credentialId}/xrpl/delete` |XRP Testnet CredentialDelete signed transaction 제출 |Credentials |
 | POST |`/api/v1/disputes` |이의제기(Dispute) 생성 |Disputes |
+| GET |`/api/v1/disputes` |내 분쟁 목록 조회 |Disputes |
 | GET |`/api/v1/disputes/{id}` |분쟁 상세 조회 |Disputes |
 | PATCH |`/api/v1/disputes/{id}/assign` |운영자 배정 (Admin) |Disputes |
 | PATCH |`/api/v1/disputes/{id}/status` |분쟁 상태 변경 (Operator) |Disputes |
@@ -52,6 +53,7 @@ Provides an API for domains managed by the 'MyApo' backend.
 | POST |`/api/v1/documents/stages/advance` |문서 단계 전이 (누적된 사용자 승인 기반 currentStage 진행) |Documents |
 | POST |`/api/v1/documents/files/upload` |문서 첨부 파일 업로드 (일반 — 평문 그대로 저장) |Documents |
 | POST |`/api/v1/documents/files/upload-encrypted` |문서 첨부 PDF 암호화 업로드 (open-password 부착 후 저장) |Documents |
+| GET |`/api/v1/documents/types` |발급 가능한 문서 카탈로그 리스트 (서류 발급 신청 화면) |Documents |
 | GET |`/api/v1/documents/{documentCode}/files/{stage}` |문서 첨부 파일 다운로드 (documentCode + stage 기반) |Documents |
 | GET |`/api/v1/documents/{documentCode}` |문서 상세 조회 (행 펼침 — 5단계 파이프라인 + 사용자 승인 누적) |Documents |
 
@@ -922,6 +924,52 @@ Provides an API for domains managed by the 'MyApo' backend.
 
 ---
 
+#### GET /api/v1/disputes
+
+- 요약: 내 분쟁 목록 조회
+- 설명: 현재 로그인한 사용자가 생성한 분쟁 목록을 조회합니다.
+- Operation ID: `DisputeController_listDisputes`
+- 인증: InternalJwtBearer
+
+##### Parameters
+
+- 없음
+
+##### Request Body
+
+- 없음
+
+##### Responses
+
+| 상태 코드 |설명 |응답 스키마 |
+| --- |--- |--- |
+| `200` |- |`CommonRes` + object |
+
+응답 예시:
+
+```json
+{
+  "success": true,
+  "code": null,
+  "message": null,
+  "data": {
+    "disputes": [
+      {
+        "id": "string",
+        "status": "RECEIVED",
+        "type": "TYPO",
+        "requestId": "string",
+        "operatorId": {},
+        "slaDeadline": "string",
+        "createdAt": "string"
+      }
+    ]
+  }
+}
+```
+
+---
+
 #### GET /api/v1/disputes/{id}
 
 - 요약: 분쟁 상세 조회
@@ -1470,6 +1518,58 @@ Provides an API for domains managed by the 'MyApo' backend.
 
 ---
 
+#### GET /api/v1/documents/types
+
+- 요약: 발급 가능한 문서 카탈로그 리스트 (서류 발급 신청 화면)
+- 설명: 사용자 페르소나별로 발급 가능한 문서 타입 목록을 조회합니다.
+- Operation ID: `DocumentController_listTypes`
+- 인증: InternalJwtBearer
+
+##### Parameters
+
+| 이름 |위치 |필수 |타입 |설명 |
+| --- |--- |--- |--- |--- |
+| `personaType` |query |아니오 |enum(KOREAN, FOREIGNER) |사용자 페르소나 필터 |
+
+##### Request Body
+
+- 없음
+
+##### Responses
+
+| 상태 코드 |설명 |응답 스키마 |
+| --- |--- |--- |
+| `200` |- |`CommonRes` + object |
+
+응답 예시:
+
+```json
+{
+  "success": true,
+  "code": null,
+  "message": null,
+  "data": {
+    "items": [
+      {
+        "code": "KR-NTS-TAX-PAYMENT",
+        "name": "납세증명서",
+        "englishName": {},
+        "useCase": {},
+        "defaultTtlMonths": 12,
+        "personaType": "KOREAN",
+        "issuerCode": "KR-NTS",
+        "issuerName": "국세청",
+        "issuerCountryCode": "KR",
+        "issuerIconLabel": "NTS"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+---
+
 #### GET /api/v1/documents/{documentCode}/files/{stage}
 
 - 요약: 문서 첨부 파일 다운로드 (documentCode + stage 기반)
@@ -1984,4 +2084,3 @@ Provides an API for domains managed by the 'MyApo' backend.
 - 이 문서는 OpenAPI 명세를 기준으로 자동 정리한 API 레퍼런스입니다.
 - 실제 서버 동작, 인증 토큰 발급 방식, 비즈니스 규칙은 백엔드 구현/운영 정책에 따라 추가 확인이 필요할 수 있습니다.
 - Swagger 문서가 갱신되면 이 파일도 다시 생성해야 최신 상태를 유지할 수 있습니다.
-
