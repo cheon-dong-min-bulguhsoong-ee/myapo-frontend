@@ -21,9 +21,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 Build and run the production app with Bun:
 
 ```bash
-docker build -t myapo-frontend ./app
+docker build \
+  --build-arg NEXT_PUBLIC_WEB3AUTH_CLIENT_ID="$NEXT_PUBLIC_WEB3AUTH_CLIENT_ID" \
+  --build-arg NEXT_PUBLIC_WEB3AUTH_NETWORK="${NEXT_PUBLIC_WEB3AUTH_NETWORK:-sapphire_devnet}" \
+  --build-arg NEXT_PUBLIC_MYAPO_API_BASE_URL="${NEXT_PUBLIC_MYAPO_API_BASE_URL:-https://api.myapo.xyz}" \
+  -t myapo-frontend ./app
 docker run --rm -p 10000:10000 myapo-frontend
 ```
+
+`NEXT_PUBLIC_*` values are inlined into the browser bundle during `next build`, so they must be present when the Docker image is built. Setting them only on `docker run` is too late for Web3Auth.
 
 ## GitHub Actions Deployment
 
@@ -35,6 +41,8 @@ Server requirements:
 - Docker installed
 - Runner user can run `docker` without an interactive password
 - Inbound port `10000` is open
+- Repository secret `NEXT_PUBLIC_WEB3AUTH_CLIENT_ID` is set
+- Optional repository variables: `NEXT_PUBLIC_WEB3AUTH_NETWORK`, `NEXT_PUBLIC_MYAPO_API_BASE_URL`
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
