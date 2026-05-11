@@ -4,6 +4,7 @@ import { Web3Auth } from '@web3auth/modal'
 import { AuthAdapter } from '@web3auth/auth-adapter'
 import { XrplPrivateKeyProvider } from '@web3auth/xrpl-provider'
 import {
+  ADAPTER_STATUS,
   CHAIN_NAMESPACES,
   WEB3AUTH_NETWORK,
   type IProvider,
@@ -132,6 +133,10 @@ function describeTokenAvailability(authResult: unknown, userInfo: UserInfo | nul
   }
 }
 
+function isWeb3AuthConnected(web3auth: Web3Auth) {
+  return web3auth.status === ADAPTER_STATUS.CONNECTED && web3auth.connected
+}
+
 async function readWeb3AuthSession(web3auth: Web3Auth) {
   const rawInfo = await web3auth.getUserInfo()
   const info = normalizeUserInfo(rawInfo)
@@ -247,7 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await instance.initModal()
         setWeb3auth(instance)
 
-        if (instance.connected && instance.provider) {
+        if (isWeb3AuthConnected(instance) && instance.provider) {
           const [{ info, externalToken }, keys] = await Promise.all([
             readWeb3AuthSession(instance),
             readWalletKeys(instance.provider, privateKeyProvider),
@@ -272,8 +277,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!web3auth || !privateKeyProviderRef.current) return false
     try {
       const privateKeyProvider = privateKeyProviderRef.current
-      const provider = web3auth.provider ?? await web3auth.connect()
-      if (!provider) return false
+      const provider = isWeb3AuthConnected(web3auth) && web3auth.provider
+        ? web3auth.provider
+        : await web3auth.connect()
+      if (!provider || !isWeb3AuthConnected(web3auth)) return false
       const [{ info, externalToken }, keys] = await Promise.all([
         readWeb3AuthSession(web3auth),
         readWalletKeys(provider, privateKeyProvider),
