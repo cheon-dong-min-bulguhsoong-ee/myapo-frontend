@@ -1,19 +1,30 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { FileText, Download, Send, RefreshCw, AlertCircle } from 'lucide-react'
+import { Check, Clock, FileText, Download, Send, RefreshCw, AlertCircle, X } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
 import { PageFooter } from '@/components/ui/page-footer'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/auth-context'
-import { getDocumentMvp, type DocumentMvpDetailRes } from '@/lib/myapo-api'
+import { getDocumentMvp, type DocumentMvpDetailRes, type DocumentMvpStepStatus, type DocumentMvpUiStepRes } from '@/lib/myapo-api'
 import { mockDocuments } from '@/lib/mock-data'
 
 interface DetailLoadState {
   documentCode: string
   detail: DocumentMvpDetailRes | null
   errorMessage: string | null
+}
+
+type StepTone = 'done' | 'active' | 'wait' | 'error'
+
+interface DisplayStep {
+  step: number
+  label: string
+  status: StepTone
+  statusLabel: string
+  startedAt: string | null
+  completedAt: string | null
 }
 
 function formatDate(value: string | null) {
@@ -25,6 +36,43 @@ function formatDate(value: string | null) {
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : '문서 상세를 불러오지 못했어요. 잠시 후 다시 시도해 주세요'
+}
+
+function toStepTone(status: DocumentMvpStepStatus): StepTone {
+  if (status === 'DONE') return 'done'
+  if (status === 'PENDING') return 'active'
+  if (status === 'FAILED') return 'error'
+  return 'wait'
+}
+
+function toDisplayStep(step: DocumentMvpUiStepRes): DisplayStep {
+  return {
+    step: step.step,
+    label: step.label,
+    status: toStepTone(step.status),
+    statusLabel: step.statusLabel ?? '대기',
+    startedAt: step.startedAt,
+    completedAt: step.completedAt,
+  }
+}
+
+function formatDateTime(value: string | null) {
+  if (!value) return '-'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleString('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function getStepBadgeVariant(status: StepTone): 'success' | 'info' | 'neutral' | 'danger' {
+  if (status === 'done') return 'success'
+  if (status === 'active') return 'info'
+  if (status === 'error') return 'danger'
+  return 'neutral'
 }
 
 function isLegacyMockId(id: string) {
@@ -72,6 +120,10 @@ export default function DocumentDetailPage() {
     : null
   const errorMessage = authErrorMessage ?? apiErrorMessage
   const isLoading = !isLegacyMockId(id) && !detail && !errorMessage
+  const displaySteps = useMemo(
+    () => detail?.uiSteps.map(toDisplayStep) ?? [],
+    [detail],
+  )
 
   if (isLoading) {
     return (
@@ -125,6 +177,15 @@ export default function DocumentDetailPage() {
             <div className="border-t border-border" />
             <Row label="문서 ID" value={detail.documentCode} mono />
           </div>
+
+          <DocumentStepHistory
+            documentTypeName={detail.documentTypeName}
+            issuerName={detail.issuerName}
+            issuerIconLabel={detail.issuerIconLabel}
+            issuerCountryCode={detail.issuerCountryCode}
+            isSuccess={detail.isSuccess}
+            steps={displaySteps}
+          />
 
           <div className="card flex flex-col items-center justify-center" style={{ minHeight: 180 }}>
             <Download size={28} className="text-muted mb-2" strokeWidth={1.6} />
@@ -226,6 +287,97 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
     <div className="flex items-center justify-between gap-3">
       <span className="text-[12px] text-muted flex-shrink-0">{label}</span>
       <span className={`text-[12px] font-bold text-ink text-right ${mono ? 'font-mono break-all' : ''}`}>{value}</span>
+    </div>
+  )
+}
+
+function DocumentStepHistory({
+  documentTypeName,
+  issuerName,
+  issuerIconLabel,
+  issuerCountryCode,
+  isSuccess,
+  steps,
+}: {
+  documentTypeName: string
+  issuerName: string
+  issuerIconLabel: string
+  issuerCountryCode: string
+  isSuccess: boolean
+  steps: DisplayStep[]
+}) {
+  if (!steps.length) return null
+
+  const completedCount = steps.filter(step => step.status === 'done').length
+  const statusText = isSuccess ? '전체 이력 정상이에요' : `${completedCount}/${steps.length} 단계 완료`
+
+  return (
+    <section className="mb-3">
+      <div className="card mb-3 bg-primary-soft border border-primary-soft">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-[8px] bg-card border border-border flex items-center justify-center flex-shrink-0">
+            <FileText size={17} className="text-primary" strokeWidth={2.1} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-bold text-ink truncate">{documentTypeName}</div>
+            <div className="text-[11px] text-sub truncate">{issuerName} · {issuerCountryCode}-{issuerIconLabel}</div>
+          </div>
+          <Pill variant={isSuccess ? 'success' : 'warning'} size="sm">{isSuccess ? '정상' : '진행'}</Pill>
+        </div>
+      </div>
+
+      <div className="text-[13px] font-bold text-ink mb-1">발급 단계별 이력이에요</div>
+      <div className="text-[11px] text-muted mb-3">각 단계가 언제 시작되고 완료됐는지 확인할 수 있어요</div>
+
+      <div className="flex flex-col gap-2">
+        {steps.map((step, index) => (
+          <StepHistoryCard key={step.step} step={step} showConnector={index < steps.length - 1} />
+        ))}
+      </div>
+
+      <div className="flex items-center gap-2 px-3 py-2 rounded-[8px] bg-success-soft border border-success mt-3">
+        <Check size={16} className="text-success flex-shrink-0" strokeWidth={2.4} />
+        <div className="text-[12px] font-bold text-ink">{statusText}</div>
+      </div>
+    </section>
+  )
+}
+
+function StepHistoryCard({ step, showConnector }: { step: DisplayStep; showConnector: boolean }) {
+  const toneClassByStatus: Record<StepTone, string> = {
+    done: 'bg-success text-white',
+    active: 'bg-primary text-white',
+    wait: 'bg-bg-base text-muted border border-border',
+    error: 'bg-danger text-white',
+  }
+  const toneClass = toneClassByStatus[step.status]
+  const badgeVariant = getStepBadgeVariant(step.status)
+  const timeLabel = step.completedAt
+    ? `완료 ${formatDateTime(step.completedAt)}`
+    : step.startedAt
+      ? `시작 ${formatDateTime(step.startedAt)}`
+      : '아직 대기 중이에요'
+
+  return (
+    <div className="card" style={{ border: step.status === 'active' ? '1.5px solid #3182F6' : '1.5px solid #E5E8EB' }}>
+      <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center flex-shrink-0" style={{ width: 28 }}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center ${toneClass}`}>
+            {step.status === 'done' ? <Check size={14} strokeWidth={3} /> : null}
+            {step.status === 'active' ? <Clock size={13} strokeWidth={3} /> : null}
+            {step.status === 'error' ? <X size={13} strokeWidth={3} /> : null}
+          </div>
+          {showConnector && <div className="w-0.5 h-3 bg-border my-0.5" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-[11px] font-bold text-muted">단계 {step.step}</span>
+            <Pill variant={badgeVariant} size="sm">{step.statusLabel}</Pill>
+          </div>
+          <div className="text-[13px] font-bold text-ink">{step.label}</div>
+          <div className="text-[11px] text-sub mt-0.5">{timeLabel}</div>
+        </div>
+      </div>
     </div>
   )
 }
