@@ -3,6 +3,8 @@ const DEFAULT_API_BASE_URL = 'https://api.myapo.xyz'
 export const MYAPO_ACCESS_TOKEN_STORAGE_KEY = 'myapo_access_token'
 export const MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY = 'myapo_pending_document_type_code'
 export const MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY = 'myapo_latest_document_code'
+export const MYAPO_AUTH_TOKEN_EXPIRED_CODE = 'ERR_AUTH_TOKEN_EXPIRED'
+export const MYAPO_AUTH_TOKEN_EXPIRED_EVENT = 'myapo:auth-token-expired'
 
 type CommonRes<T> = {
   success: boolean
@@ -245,6 +247,12 @@ export function clearMyApoAccessToken() {
   localStorage.removeItem(MYAPO_ACCESS_TOKEN_STORAGE_KEY)
 }
 
+function notifyAuthTokenExpired() {
+  clearMyApoAccessToken()
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(MYAPO_AUTH_TOKEN_EXPIRED_EVENT))
+}
+
 export async function myApoRequest<T>(path: string, options: MyApoRequestOptions = {}): Promise<T> {
   const { token, headers, body, ...init } = options
   const isFormData = body instanceof FormData
@@ -270,6 +278,10 @@ export async function myApoRequest<T>(path: string, options: MyApoRequestOptions
   }
 
   if (!response.ok || !payload.success) {
+    if (payload.code === MYAPO_AUTH_TOKEN_EXPIRED_CODE) {
+      notifyAuthTokenExpired()
+    }
+
     throw new MyApoApiError(
       payload.message ?? `MyApo API error: ${response.status}`,
       response.status,

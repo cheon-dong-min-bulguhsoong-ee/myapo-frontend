@@ -15,6 +15,7 @@ import {
   clearMyApoAccessToken,
   getStoredMyApoAccessToken,
   logoutFromMyApo,
+  MYAPO_AUTH_TOKEN_EXPIRED_EVENT,
   persistMyApoAccessToken,
   signInWithExternalToken,
   type MyApoAuthRes,
@@ -239,6 +240,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const initRef = useRef(false)
   const privateKeyProviderRef = useRef<XrplPrivateKeyProvider | null>(null)
 
+  const expireMyApoSession = useCallback(() => {
+    setIsLoggedIn(false)
+    setMyApoUser(null)
+    setAccessToken(null)
+    clearMyApoAccessToken()
+
+    if (typeof window === 'undefined') return
+    const currentPath = `${window.location.pathname}${window.location.search}`
+    if (window.location.pathname === '/login') return
+    window.location.assign(`/login?reason=expired&next=${encodeURIComponent(currentPath)}`)
+  }, [])
+
   useEffect(() => {
     if (initRef.current) return
     initRef.current = true
@@ -287,6 +300,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })()
   }, [])
+
+  useEffect(() => {
+    window.addEventListener(MYAPO_AUTH_TOKEN_EXPIRED_EVENT, expireMyApoSession)
+    return () => window.removeEventListener(MYAPO_AUTH_TOKEN_EXPIRED_EVENT, expireMyApoSession)
+  }, [expireMyApoSession])
 
   const login = useCallback(async (): Promise<boolean> => {
     if (!web3auth || !privateKeyProviderRef.current) return false
