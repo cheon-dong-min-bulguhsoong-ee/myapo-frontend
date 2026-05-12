@@ -10,6 +10,7 @@ import {
   type IProvider,
 } from '@web3auth/base'
 import { Wallet } from 'xrpl'
+import ECDSA from 'xrpl/dist/npm/ECDSA'
 import {
   clearMyApoAccessToken,
   getStoredMyApoAccessToken,
@@ -183,7 +184,7 @@ async function readWalletKeys(
       const hex = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey
       const bytes = new Uint8Array(hex.length / 2)
       for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16)
-      const wallet = Wallet.fromEntropy(bytes)
+      const wallet = Wallet.fromEntropy(bytes, { algorithm: ECDSA.secp256k1 })
       publicKey = publicKey ?? wallet.publicKey
       address = address ?? wallet.classicAddress
     } catch {

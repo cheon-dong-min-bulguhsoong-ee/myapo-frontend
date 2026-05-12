@@ -66,6 +66,10 @@ export type DocumentMvpStage =
 
 export type DocumentMvpStepStatus = 'PENDING' | 'DONE' | 'FAILED' | null
 
+export type CredentialIssueStage = 'MYDATA_RECEIVED' | 'DOCUMENT_MOVED' | 'TRANSLATION_RECEIVED' | 'APOSTILLE_RECEIVED'
+
+export type CredentialStatus = 'ISSUED' | 'FAILED' | 'ACCEPTED' | 'DELETED' | 'EXPIRED' | 'REVOKED'
+
 export interface CreateDocumentMvpReq {
   documentTypeCode: string
 }
@@ -142,6 +146,50 @@ export interface DocumentMvpListItemRes {
 export interface DocumentMvpListRes {
   items: DocumentMvpListItemRes[]
   total: number
+}
+
+export interface CreateCredentialIssueRequestReq {
+  documentTypeId: string
+  documentCode: string
+  currentStage: CredentialIssueStage
+}
+
+export interface CreateCredentialIssueRequestRes {
+  issueRequestId: string
+  credentialId: string | null
+  status: 'ISSUED' | 'FAILED'
+  pipeline: unknown
+  currentStage: CredentialIssueStage
+}
+
+export interface CredentialSummaryRes {
+  credentialId: string
+  documentTypeId: string
+  documentCode: string | null
+  currentStage: CredentialIssueStage | null
+  status: CredentialStatus
+  issuedAt?: string | null
+  expiresAt?: string | null
+  xrplTxHash?: string | null
+}
+
+export interface ListCredentialsRes {
+  credentials: CredentialSummaryRes[]
+}
+
+export type XrplSignableTransaction = import('xrpl').SubmittableTransaction
+
+export interface XrplCredentialTransactionRes {
+  transactionKind: 'CREATE' | 'ACCEPT' | 'DELETE'
+  network: string
+  transaction: XrplSignableTransaction
+}
+
+export interface XrplCredentialEvidenceRes {
+  credentialId: string
+  transactionHash: string
+  engineResult: string
+  validated: boolean
 }
 
 export type DisputeStatus = 'RECEIVED' | 'ASSIGNED' | 'IN_REVIEW' | 'INFO_REQUESTED' | 'RESOLVED' | 'REJECTED'
@@ -271,6 +319,49 @@ export function listDocumentMvp(accessToken: string) {
 export function getDocumentMvp(accessToken: string, documentCode: string) {
   return myApoRequest<DocumentMvpDetailRes>(`/api/v1/document-mvp/${encodeURIComponent(documentCode)}`, {
     token: accessToken,
+  })
+}
+
+export function advanceDocumentMvp(accessToken: string, documentCode: string) {
+  return myApoRequest<DocumentMvpDetailRes>(`/api/v1/document-mvp/${encodeURIComponent(documentCode)}/advance`, {
+    method: 'POST',
+    token: accessToken,
+  })
+}
+
+export function mapDocumentStageToCredentialStage(stage: DocumentMvpStage): CredentialIssueStage {
+  if (stage === 'USER_DOC_REQUESTED') return 'MYDATA_RECEIVED'
+  if (stage === 'AUTHORITY_DOC_ISSUED') return 'DOCUMENT_MOVED'
+  if (stage === 'APOSTILLE_DOC_ISSUED') return 'APOSTILLE_RECEIVED'
+  return 'TRANSLATION_RECEIVED'
+}
+
+export function createCredentialIssueRequest(accessToken: string, body: CreateCredentialIssueRequestReq) {
+  return myApoRequest<CreateCredentialIssueRequestRes>('/api/v1/credentials/issue-requests', {
+    method: 'POST',
+    token: accessToken,
+    body: JSON.stringify(body),
+  })
+}
+
+export function listCredentials(accessToken: string) {
+  return myApoRequest<ListCredentialsRes>('/api/v1/credentials', {
+    token: accessToken,
+  })
+}
+
+export function prepareAcceptTestnetCredential(accessToken: string, credentialId: string) {
+  return myApoRequest<XrplCredentialTransactionRes>(`/api/v1/credentials/${encodeURIComponent(credentialId)}/xrpl/accept/prepare`, {
+    method: 'POST',
+    token: accessToken,
+  })
+}
+
+export function acceptTestnetCredential(accessToken: string, credentialId: string, signedTransactionBlob: string) {
+  return myApoRequest<XrplCredentialEvidenceRes>(`/api/v1/credentials/${encodeURIComponent(credentialId)}/xrpl/accept`, {
+    method: 'POST',
+    token: accessToken,
+    body: JSON.stringify({ signedTransactionBlob }),
   })
 }
 
