@@ -1,20 +1,28 @@
 'use client'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { LogIn, Loader2, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 
-export default function LoginPage() {
+function LoginView() {
   const router = useRouter()
-  const { login, isLoggedIn, isReady } = useAuth()
+  const params = useSearchParams()
+  const { login, isLoggedIn, isReady, accessToken } = useAuth()
   const [open, setOpen] = useState<'terms' | 'privacy' | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const nextPath = useMemo(() => {
+    const next = params.get('next')
+    return next && next.startsWith('/') && !next.startsWith('//') ? next : '/persona-select'
+  }, [params])
+  const expiredMessage = params.get('reason') === 'expired'
+    ? '세션이 만료됐어요. 다시 로그인해 주세요.'
+    : null
 
   useEffect(() => {
-    if (isReady && isLoggedIn) router.replace('/persona-select')
-  }, [isReady, isLoggedIn, router])
+    if (isReady && isLoggedIn && accessToken) router.replace(nextPath)
+  }, [accessToken, isReady, isLoggedIn, nextPath, router])
 
   const handleLogin = async () => {
     if (busy || !isReady) return
@@ -23,7 +31,7 @@ export default function LoginPage() {
     const ok = await login()
     setBusy(false)
     if (ok) {
-      router.push('/persona-select')
+      router.push(nextPath)
     } else {
       setError('로그인이 취소되었거나 실패했어요. 다시 시도해 주세요.')
     }
@@ -42,8 +50,8 @@ export default function LoginPage() {
       </div>
 
       <div className="px-5 pb-8 pt-3">
-        {error && (
-          <div className="mb-3 text-[12px] leading-relaxed text-danger text-center">{error}</div>
+        {(error || expiredMessage) && (
+          <div className="mb-3 text-[12px] leading-relaxed text-danger text-center">{error ?? expiredMessage}</div>
         )}
         <button
           onClick={handleLogin}
@@ -89,5 +97,13 @@ export default function LoginPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginView />
+    </Suspense>
   )
 }
