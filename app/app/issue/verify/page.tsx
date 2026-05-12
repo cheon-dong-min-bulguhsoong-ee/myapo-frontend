@@ -10,7 +10,9 @@ import { useAuth } from '@/contexts/auth-context'
 import {
   MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY,
   MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY,
+  createCredentialIssueRequest,
   createDocumentMvp,
+  mapDocumentStageToCredentialStage,
 } from '@/lib/myapo-api'
 
 function getStoredDocumentTypeCode() {
@@ -53,6 +55,11 @@ function IssueVerifyView() {
 
     try {
       const document = await createDocumentMvp(accessToken, { documentTypeCode })
+      await createCredentialIssueRequest(accessToken, {
+        documentTypeId: document.documentTypeCode,
+        documentCode: document.documentCode,
+        currentStage: mapDocumentStageToCredentialStage(document.currentStage),
+      })
       if (typeof window !== 'undefined') {
         sessionStorage.setItem(MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY, document.documentCode)
       }
