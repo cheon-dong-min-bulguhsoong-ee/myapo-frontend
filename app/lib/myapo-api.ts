@@ -1,6 +1,8 @@
 const DEFAULT_API_BASE_URL = 'https://api.myapo.xyz'
 
 export const MYAPO_ACCESS_TOKEN_STORAGE_KEY = 'myapo_access_token'
+export const MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY = 'myapo_pending_document_type_code'
+export const MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY = 'myapo_latest_document_code'
 
 type CommonRes<T> = {
   success: boolean
@@ -51,6 +53,111 @@ export interface DocumentTypeListItemRes {
 export interface DocumentTypeListRes {
   items: DocumentTypeListItemRes[]
   total: number
+}
+
+export type DocumentMvpStatus = 'IN_PIPELINE' | 'AWAITING_USER_APPROVAL' | 'VALID' | 'FAILED'
+
+export type DocumentMvpStage =
+  | 'USER_DOC_REQUESTED'
+  | 'AUTHORITY_DOC_ISSUED'
+  | 'TRANSLATOR_DOC_RECEIVED'
+  | 'TRANSLATOR_DOC_NOTARIZED'
+  | 'APOSTILLE_DOC_ISSUED'
+
+export type DocumentMvpStepStatus = 'PENDING' | 'DONE' | 'FAILED' | null
+
+export interface CreateDocumentMvpReq {
+  documentTypeCode: string
+}
+
+export interface CreateDocumentMvpRes {
+  documentCode: string
+  documentTypeCode: string
+  status: DocumentMvpStatus
+  statusLabel: string
+  currentStage: DocumentMvpStage
+  currentStageLabel: string
+  currentStep: number
+  currentStepLabel: string
+  totalSteps: number
+  requestedAt: string
+}
+
+export interface DocumentMvpUiStepRes {
+  step: number
+  label: string
+  status: DocumentMvpStepStatus
+  statusLabel: string | null
+  startedAt: string | null
+  completedAt: string | null
+}
+
+export interface DocumentMvpStageDetailRes {
+  stage: DocumentMvpStage
+  stageLabel: string
+  status: DocumentMvpStepStatus
+  statusLabel: string | null
+  startedAt: string | null
+  completedAt: string | null
+  failureReason: string | null
+}
+
+export interface DocumentMvpDetailRes {
+  documentCode: string
+  documentTypeCode: string
+  documentTypeName: string
+  issuerName: string
+  issuerIconLabel: string
+  issuerCountryCode: string
+  status: DocumentMvpStatus
+  statusLabel: string
+  currentStage: DocumentMvpStage
+  currentStageLabel: string
+  requestedAt: string
+  issuedAt: string | null
+  isSuccess: boolean
+  uiSteps: DocumentMvpUiStepRes[]
+  stages: DocumentMvpStageDetailRes[]
+}
+
+export interface DocumentMvpListItemRes {
+  documentCode: string
+  documentTypeCode: string
+  documentTypeName: string
+  issuerName: string
+  issuerIconLabel: string
+  issuerCountryCode: string
+  status: DocumentMvpStatus
+  statusLabel: string
+  currentStage: DocumentMvpStage
+  currentStageLabel: string
+  currentStep: number
+  currentStepLabel: string
+  totalSteps: number
+  requestedAt: string
+  issuedAt: string | null
+  isSuccess: boolean
+}
+
+export interface DocumentMvpListRes {
+  items: DocumentMvpListItemRes[]
+  total: number
+}
+
+export type DisputeStatus = 'RECEIVED' | 'ASSIGNED' | 'IN_REVIEW' | 'INFO_REQUESTED' | 'RESOLVED' | 'REJECTED'
+
+export interface DisputeSummaryRes {
+  id: string
+  status: DisputeStatus
+  type: string
+  requestId: string
+  operatorId: string | null
+  slaDeadline: string
+  createdAt: string
+}
+
+export interface ListDisputesRes {
+  disputes: DisputeSummaryRes[]
 }
 
 interface MyApoRequestOptions extends Omit<RequestInit, 'headers'> {
@@ -142,6 +249,32 @@ export function logoutFromMyApo(accessToken: string) {
 export function listDocumentTypes(accessToken: string, personaType: PersonaType = 'KOREAN') {
   const params = new URLSearchParams({ personaType })
   return myApoRequest<DocumentTypeListRes>(`/api/v1/documents/types?${params.toString()}`, {
+    token: accessToken,
+  })
+}
+
+export function createDocumentMvp(accessToken: string, body: CreateDocumentMvpReq) {
+  return myApoRequest<CreateDocumentMvpRes>('/api/v1/document-mvp', {
+    method: 'POST',
+    token: accessToken,
+    body: JSON.stringify(body),
+  })
+}
+
+export function listDocumentMvp(accessToken: string) {
+  return myApoRequest<DocumentMvpListRes>('/api/v1/document-mvp', {
+    token: accessToken,
+  })
+}
+
+export function getDocumentMvp(accessToken: string, documentCode: string) {
+  return myApoRequest<DocumentMvpDetailRes>(`/api/v1/document-mvp/${encodeURIComponent(documentCode)}`, {
+    token: accessToken,
+  })
+}
+
+export function listDisputes(accessToken: string) {
+  return myApoRequest<ListDisputesRes>('/api/v1/disputes', {
     token: accessToken,
   })
 }
