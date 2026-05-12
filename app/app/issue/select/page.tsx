@@ -28,6 +28,15 @@ interface DocumentCatalogState {
 }
 
 const EMPTY_DOCUMENTS: IssuableDocumentView[] = []
+const ENABLED_DOCUMENT_NAMES = ['범죄경력증명서', '가족관계증명서', '주민등록등본'] as const
+
+function normalizeDocumentName(name: string) {
+  return name.replace(/\s+/g, '')
+}
+
+const ENABLED_DOCUMENT_NAME_ORDER = new Map(
+  ENABLED_DOCUMENT_NAMES.map((name, index) => [normalizeDocumentName(name), index]),
+)
 
 function toIssuableDocument(item: DocumentTypeListItemRes): IssuableDocumentView {
   return {
@@ -38,6 +47,26 @@ function toIssuableDocument(item: DocumentTypeListItemRes): IssuableDocumentView
     issuerCode: item.issuerCode,
     issuerIcon: item.issuerIconLabel,
   }
+}
+
+function getEnabledDocumentOrder(document: IssuableDocumentView) {
+  return ENABLED_DOCUMENT_NAME_ORDER.get(normalizeDocumentName(document.name))
+}
+
+function isEnabledDocument(document: IssuableDocumentView) {
+  return getEnabledDocumentOrder(document) !== undefined
+}
+
+function sortDocumentsByEnabledOrder(documents: IssuableDocumentView[]) {
+  return [...documents].sort((a, b) => {
+    const aOrder = getEnabledDocumentOrder(a)
+    const bOrder = getEnabledDocumentOrder(b)
+
+    if (aOrder !== undefined && bOrder !== undefined) return aOrder - bOrder
+    if (aOrder !== undefined) return -1
+    if (bOrder !== undefined) return 1
+    return 0
+  })
 }
 
 function IssueSelectView() {
@@ -52,7 +81,10 @@ function IssueSelectView() {
   })
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => (preselect ? new Set([preselect]) : new Set()))
   const missingTokenMessage = accessToken ? null : '로그인 후 발급 가능한 서류를 불러올 수 있어요'
-  const documents = catalog.accessToken === accessToken ? catalog.documents : EMPTY_DOCUMENTS
+  const documents = useMemo(
+    () => (catalog.accessToken === accessToken ? sortDocumentsByEnabledOrder(catalog.documents) : EMPTY_DOCUMENTS),
+    [accessToken, catalog.accessToken, catalog.documents],
+  )
   const errorMessage = missingTokenMessage ?? (catalog.accessToken === accessToken ? catalog.errorMessage : null)
   const showLoading = Boolean(accessToken) && catalog.accessToken !== accessToken
 
@@ -92,13 +124,16 @@ function IssueSelectView() {
   )
 
   const toggle = (id: string) => {
+    const document = documents.find(d => d.id === id)
+    if (!document || !isEnabledDocument(document)) return
+
     setSelectedIds(prev => {
       if (prev.has(id)) return new Set()
       return new Set([id])
     })
   }
 
-  const selectedDocuments = documents.filter(d => selectedIds.has(d.id))
+  const selectedDocuments = documents.filter(d => selectedIds.has(d.id) && isEnabledDocument(d))
   const selectedCount = selectedDocuments.length
   const onlyDoc = selectedCount === 1 ? selectedDocuments[0] : null
 
@@ -149,18 +184,24 @@ function IssueSelectView() {
 
         {!showLoading && !errorMessage && (
           <div className="doc-grid">
-            {documents.map(doc => (
-              <DocCard
-                key={doc.id}
-                issuerIcon={doc.issuerIcon}
-                name={doc.name}
-                englishName={selectedIds.has(doc.id) ? doc.englishName : undefined}
-                use={doc.use}
-                issuerCode={doc.issuerCode}
-                selected={selectedIds.has(doc.id)}
-                onClick={() => toggle(doc.id)}
-              />
-            ))}
+            {documents.map(doc => {
+              const isSelectable = isEnabledDocument(doc)
+              const isSelected = isSelectable && selectedIds.has(doc.id)
+
+              return (
+                <DocCard
+                  key={doc.id}
+                  issuerIcon={doc.issuerIcon}
+                  name={doc.name}
+                  englishName={isSelected ? doc.englishName : undefined}
+                  use={doc.use}
+                  issuerCode={doc.issuerCode}
+                  selected={isSelected}
+                  disabled={!isSelectable}
+                  onClick={() => toggle(doc.id)}
+                />
+              )
+            })}
           </div>
         )}
 
