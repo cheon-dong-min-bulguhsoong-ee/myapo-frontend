@@ -13,7 +13,7 @@
 - 로그인은 Web3Auth SDK에서 외부 JWT를 받은 뒤 백엔드 `POST /api/v1/auth/signin`을 호출해 MyApo 자체 accessToken을 저장합니다.
 - 현재 구현된 실제 `/api/v1` 호출은 로그인/로그아웃 인증 교환입니다. 문서/분쟁/제출 화면은 아직 목업 데이터를 사용합니다.
 - 문서, 발급 진행, 이의 신청, 제출 기관 데이터는 `lib/mock-data.ts`의 목업을 사용합니다.
-- `API_SPEC.md`에는 백엔드 전체 29개 엔드포인트가 포함되어 있으며, 현재 프론트가 모두 소비하지는 않습니다.
+- `API_SPEC.md`에는 백엔드 전체 33개 엔드포인트가 포함되어 있으며, 현재 프론트가 모두 소비하지는 않습니다.
 
 ## 2. 기술 스택
 
@@ -39,8 +39,8 @@
 | `/issue/select` | 발급할 문서 선택 | `mockIssuableDocuments` | `GET /api/v1/documents/types`, `POST /api/v1/documents` |
 | `/issue/verify` | 본인 확인 입력 | local form | 현재 API_SPEC에는 별도 본인확인 API 없음 |
 | `/issue/success` | 발급 신청 완료 | local route transition | `POST /api/v1/documents` 성공 후 이동 |
-| `/history` | 진행 중인 발급 목록 | `mockApplications` | `GET /api/v1/documents` 또는 `GET /api/v1/credentials/issue-requests/{id}` |
-| `/history/[id]` | 발급 진행 상세 | `mockApplications` | `GET /api/v1/documents/{documentCode}` |
+| `/history` | 진행 중인 발급 목록 | `mockApplications` | MVP 기준 `GET /api/v1/document-mvp`, 운영/상세 후보 `GET /api/v1/documents` 또는 `GET /api/v1/credentials/issue-requests/{id}` |
+| `/history/[id]` | 발급 진행 상세 | `mockApplications` | MVP 기준 `GET /api/v1/document-mvp/{documentCode}`, 운영 상세 후보 `GET /api/v1/documents/{documentCode}` |
 | `/documents` | 지갑에 도착한 문서 목록 | `mockDocuments` | `GET /api/v1/documents` 또는 `GET /api/v1/credentials` |
 | `/documents/[id]` | 문서 상세, 제출, 재발급, 이의 신청 | `mockDocuments` | `GET /api/v1/documents/{documentCode}`, 파일 다운로드, 제출 API |
 | `/submission-request` | 기관 제출 요청 선택 | `mockInstitutions` | `POST /api/v1/credentials/{credentialId}/submissions` |
@@ -136,7 +136,7 @@ Authorization: Bearer <accessToken>
 
 ## 5. API 연동 우선순위
 
-현재 앱 UX를 실제 API로 살리려면 모든 29개 엔드포인트를 한 번에 연결하지 말고 아래 순서로 붙이는 것이 안전합니다.
+현재 앱 UX를 실제 API로 살리려면 모든 33개 엔드포인트를 한 번에 연결하지 말고 아래 순서로 붙이는 것이 안전합니다.
 
 ### 5.1 1차 연동, 앱 기본 플로우
 
@@ -144,17 +144,19 @@ Authorization: Bearer <accessToken>
 | --- | --- | --- | --- |
 | P0 | `POST /api/v1/auth/signin` | Web3Auth 로그인 후 MyApo accessToken 발급 | `/login` |
 | P0 | `GET /api/v1/users/me` | 로그인 사용자 프로필 확인 | 전역 auth guard, `/home` |
-| P0 | `GET /api/v1/documents` | 문서 목록, 발급 진행 목록. `status`, `documentTypeCode`, `countryCode`, `q`, `page`, `limit` query 지원 | `/home`, `/documents`, `/history` |
-| P0 | `GET /api/v1/documents/{documentCode}` | 문서 상세 및 5단계 진행 상태 | `/documents/[id]`, `/history/[id]` |
 | P0 | `GET /api/v1/documents/types` | 발급 가능한 문서 카탈로그 | `/issue/select` |
-| P0 | `POST /api/v1/documents` | 문서 발급 신청 | `/issue/select`, `/issue/verify`, `/issue/success` |
+| P0 | `GET /api/v1/document-mvp` | 모바일 history 화면용 내 문서 목록 | `/home`, `/history` |
+| P0 | `GET /api/v1/document-mvp/{documentCode}` | 모바일 history/app-1 화면용 문서 상세 및 4단계 UI 상태 | `/history/[id]`, `/documents/[id]` 후보 |
+| P0 | `POST /api/v1/document-mvp` | MVP 문서 발급 신청. Mock 흐름은 stage 3부터 시작 | `/issue/select`, `/issue/verify`, `/issue/success` |
+| P0 | `POST /api/v1/document-mvp/{documentCode}/advance` | MVP 다음 단계 전이 | `/history/[id]`, 진행 상세 화면 |
+| P0 | `GET /api/v1/documents` | 운영/콘솔 성격의 문서 관리 목록. `status`, `documentTypeCode`, `countryCode`, `q`, `page`, `limit` query 지원 | 관리자/운영자 화면 후보, 사용자 앱에서는 MVP API 우선 |
+| P0 | `GET /api/v1/documents/{documentCode}` | 운영 상세 및 5단계 진행 상태 | 관리자/운영자 화면 후보 |
 
 ### 5.2 2차 연동, 진행/파일/승인
 
 | 우선순위 | API | 목적 | 연결 화면 |
 | --- | --- | --- | --- |
-| P1 | `POST /api/v1/documents/approvals` | 사용자가 다음 단계로 넘어가기 위한 XRPL TX 해시 제출 | 진행 상세 화면 |
-| P1 | `POST /api/v1/documents/stages/advance` | 승인 누적 후 currentStage 전진 | 진행 상세 화면 |
+| P1 | `POST /api/v1/documents/{documentCode}/stages/advance` | 운영 Document의 단계 승인 + 전이. `documentCode`는 path, 승인 정보는 body로 전달 | 진행 상세 화면 또는 운영자 도구 |
 | P1 | `GET /api/v1/documents/{documentCode}/files/{stage}` | PDF 다운로드 | `/documents/[id]` |
 | P1 | `POST /api/v1/documents/files/upload` | 일반 첨부 파일 업로드 | 운영자/백오피스 프로젝트 후보 |
 | P1 | `POST /api/v1/documents/files/upload-encrypted` | 암호화 PDF 업로드 | 운영자/백오피스 프로젝트 후보 |
@@ -164,6 +166,7 @@ Authorization: Bearer <accessToken>
 | 우선순위 | API | 목적 | 연결 화면 |
 | --- | --- | --- | --- |
 | P2 | `GET /api/v1/credentials` | 사용자 크리덴셜 목록 | `/documents` 대체 후보 |
+| P2 | `GET /api/v1/credentials/issue-pipeline-stages/{currentStage}` | 특정 credential issue pipeline stage 기준 크리덴셜 목록 | 단계별 운영/디버그 화면 후보 |
 | P2 | `GET /api/v1/credentials/{credentialId}` | 크리덴셜 상세 | `/documents/[id]` 대체 후보 |
 | P2 | `POST /api/v1/credentials/{credentialId}/submissions` | 기관 제출 | `/submission-request`, `/delivery` |
 | P2 | `GET /api/v1/credentials/{credentialId}/submissions` | 제출 이력 | 제출 내역 화면이 생길 경우 |
@@ -181,7 +184,8 @@ Authorization: Bearer <accessToken>
 | `PATCH /api/v1/users/{id}/role` | Admin 전용, 모바일 사용자 앱 범위 밖 |
 | `POST /api/v1/auth/logout` | 현재 Web3Auth SDK logout만 호출 |
 | `POST /api/v1/credentials/issue-requests` | 현재 문서 API 중심 UX와 중복 가능 |
-| `GET /api/v1/credentials/issue-requests/{issueRequestId}` | 현재 진행 상세는 목업 `mockApplications` 사용 |
+| `GET /api/v1/credentials/issue-requests/{issueRequestId}` | 현재 진행 상세는 MVP 문서 API 우선 |
+| `GET /api/v1/credentials/issue-pipeline-stages/{currentStage}` | 모바일 사용자 앱 직접 화면 없음. 단계별 운영/디버그 화면 후보 |
 | `POST /api/v1/credentials/{credentialId}/xrpl/accept/prepare` | XRPL accept 수동 서명 UI 없음 |
 | `POST /api/v1/credentials/{credentialId}/xrpl/accept` | XRPL accept 제출 UI 없음 |
 | `POST /api/v1/credentials/{credentialId}/xrpl/delete/prepare` | XRPL delete 수동 서명 UI 없음 |
@@ -235,21 +239,23 @@ interface Application {
 }
 ```
 
-백엔드 `DocumentDetailRes.stages[]`를 UI 단계로 변환하세요.
+모바일 MVP 연동은 `DocumentMvpDetailRes.uiSteps[]`와 `DocumentMvpDetailRes.stages[]`를 우선 사용하세요. 운영 Document API를 붙일 때는 `DocumentDetailRes.stages[]`를 UI 단계로 변환하세요.
 
-| 백엔드 stage | UI label 추천 |
+| MVP 백엔드 stage | UI label 추천 |
 | --- | --- |
-| `AUTHORITY_ISSUED` | 발급 신청 |
-| `DOCUMENT_ARRIVED` | 문서 도착 |
-| `TRANSLATED_NOTARIZED` | 번역·공증 |
-| `APOSTILLE_ISSUED` | 아포스티유 |
-| `WALLET_STORED` | 지갑 보관 |
+| `USER_DOC_REQUESTED` | 신청 완료 |
+| `AUTHORITY_DOC_ISSUED` | 기관 발급 |
+| `TRANSLATOR_DOC_RECEIVED` | 번역 접수 |
+| `TRANSLATOR_DOC_NOTARIZED` | 번역·공증 |
+| `APOSTILLE_DOC_ISSUED` | 아포스티유 |
+
+운영 Document API의 기존 5단계 stage(`AUTHORITY_ISSUED`, `DOCUMENT_ARRIVED`, `TRANSLATED_NOTARIZED`, `APOSTILLE_ISSUED`, `WALLET_STORED`)는 관리자/운영자 화면을 붙일 때 사용하세요.
 
 | 백엔드 status | UI status |
 | --- | --- |
 | `DONE` | `done` |
-| `IN_PROGRESS` 또는 현재 stage | `active` |
-| `PENDING` 또는 null | `wait` |
+| `PENDING` 또는 현재 stage | `active` |
+| null 또는 미시작 | `wait` |
 | `FAILED` | `error` |
 
 ### 6.3 현재 `Dispute`
@@ -422,7 +428,7 @@ interface IssuableDocument {
 3. `contexts/auth-context.tsx`를 옮기되, private key localStorage 저장은 운영용으로 교체합니다.
 4. `lib/mock-data.ts` 타입을 기준으로 API adapter 타입을 만듭니다.
 5. API client를 새로 만들고 `API_SPEC.md`의 공통 응답 `{ success, code, message, data }`를 unwrap합니다.
-6. P0 API부터 붙입니다: signin, users/me, documents list/detail/create.
+6. P0 API부터 붙입니다: signin, users/me, documents/types, document-mvp list/detail/create/advance.
 7. 목업 화면이 기대하는 상태값으로 백엔드 enum을 변환하는 mapper를 둡니다.
 8. 분쟁 목록과 문서 카탈로그는 각각 `GET /api/v1/disputes`, `GET /api/v1/documents/types`로 대체하고, 제출 요청 목록/상태 API는 백엔드 추가 필요 여부를 먼저 확인합니다.
 
@@ -470,8 +476,8 @@ NEXT_PUBLIC_WEB3AUTH_NETWORK=sapphire_devnet
 
 - 문서 카탈로그 목록은 `GET /api/v1/documents/types`로 확인됐습니다. 현재 발급 가능 문서는 아직 목업 배열입니다.
 - 분쟁 목록 조회는 `GET /api/v1/disputes`로 확인됐습니다. 현재 `/disputes` 화면은 아직 목업 배열입니다.
-- 제출 요청 목록 API가 필요합니다. 현재 `/submission-request`는 `mockInstitutions`만 사용합니다.
-- `Document` API와 `Credential` API 중 사용자 앱의 “내 문서” source of truth를 하나로 정해야 합니다.
+- 제출 요청 목록 API가 필요합니다. 현재 `/submission-request`는 `mockInstitutions`만 사용하며, 최신 Swagger에도 기관 제출 요청 목록 API는 없습니다.
+- 사용자 앱의 “내 문서/발급 진행” source of truth는 최신 Swagger 기준 `Document MVP` API가 가장 직접적입니다. 운영/콘솔 화면은 `Document` API, 자격증명 지갑 화면은 `Credential` API를 조합하세요.
 - Web3Auth JWT는 `ExternalJwtBearer`로 전달하는 설계로 보입니다. 구현 시 `Authorization: Bearer <web3authToken>` 헤더로 보내는지 백엔드와 최종 확인하세요.
 - `POST /api/v1/auth/signin` 요청 body에는 `name`, `nationality`, `xrplAddress`, `publicKey`만 있습니다. 토큰은 body가 아니라 `ExternalJwtBearer` 헤더로 전달하는 전제입니다.
 - 운영용 키 보관 정책이 필요합니다. 현재 localStorage private key 저장은 데모 전용입니다.
