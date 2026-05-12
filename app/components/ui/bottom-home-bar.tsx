@@ -2,7 +2,7 @@
 import { Home, Folder, Settings } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
 
-const HIDE_ON = ['/', '/login', '/persona-select', '/issue/success', '/disputes/success', '/issue-complete']
+const HIDE_ON = ['/', '/login', '/persona-select', '/disputes/success', '/issue-complete']
 
 interface NavItem {
   label: string

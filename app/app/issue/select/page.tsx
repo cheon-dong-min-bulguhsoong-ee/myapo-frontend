@@ -6,7 +6,11 @@ import { Pill } from '@/components/ui/pill'
 import { DocCard } from '@/components/ui/doc-card'
 import { PageFooter } from '@/components/ui/page-footer'
 import { useAuth } from '@/contexts/auth-context'
-import { listDocumentTypes, type DocumentTypeListItemRes } from '@/lib/myapo-api'
+import {
+  MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY,
+  listDocumentTypes,
+  type DocumentTypeListItemRes,
+} from '@/lib/myapo-api'
 
 interface IssuableDocumentView {
   id: string
@@ -105,6 +109,14 @@ function IssueSelectView() {
 
   const disabled = selectedCount === 0 || showLoading || Boolean(errorMessage)
 
+  const continueToVerify = () => {
+    if (!onlyDoc) return
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY, onlyDoc.id)
+    }
+    router.push(`/issue/verify?documentTypeCode=${encodeURIComponent(onlyDoc.id)}`)
+  }
+
   return (
     <div className="flex flex-col flex-1 min-h-full">
       <AppBar
@@ -159,7 +171,7 @@ function IssueSelectView() {
         <button
           type="button"
           disabled={disabled}
-          onClick={() => router.push('/issue/verify')}
+          onClick={continueToVerify}
           className="btn-primary"
         >
           {ctaLabel}

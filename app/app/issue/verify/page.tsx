@@ -1,19 +1,69 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Check } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
 import { TextField } from '@/components/ui/text-field'
 import { PageFooter } from '@/components/ui/page-footer'
+import { useAuth } from '@/contexts/auth-context'
+import {
+  MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY,
+  MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY,
+  createDocumentMvp,
+} from '@/lib/myapo-api'
 
-export default function IssueVerifyPage() {
+function getStoredDocumentTypeCode() {
+  if (typeof window === 'undefined') return null
+  return sessionStorage.getItem(MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY)
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : '발급 신청을 만들지 못했어요. 잠시 후 다시 시도해 주세요'
+}
+
+function IssueVerifyView() {
   const router = useRouter()
+  const params = useSearchParams()
+  const { accessToken } = useAuth()
   const [form, setForm] = useState({ name: '', id: '', phone: '', code: '', agreed: false })
   const [codeSent, setCodeSent] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const documentTypeCode = useMemo(
+    () => params.get('documentTypeCode') ?? getStoredDocumentTypeCode(),
+    [params],
+  )
 
   const update = (key: keyof typeof form, value: string) => setForm(f => ({ ...f, [key]: value }))
-  const canSubmit = form.name && form.id && form.phone && form.code && form.agreed
+  const canSubmit = Boolean(form.name && form.id && form.phone && form.code && form.agreed && documentTypeCode && accessToken && !isSubmitting)
+
+  const completeVerification = async () => {
+    if (!documentTypeCode) {
+      setErrorMessage('발급할 서류를 먼저 선택해 주세요')
+      return
+    }
+    if (!accessToken) {
+      setErrorMessage('로그인 후 발급 신청을 진행할 수 있어요')
+      return
+    }
+
+    setIsSubmitting(true)
+    setErrorMessage(null)
+
+    try {
+      const document = await createDocumentMvp(accessToken, { documentTypeCode })
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY, document.documentCode)
+      }
+      router.push(`/issue/success?documentCode=${encodeURIComponent(document.documentCode)}`)
+    } catch (error) {
+      console.error('Failed to create document MVP:', error)
+      setErrorMessage(getErrorMessage(error))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="flex flex-col flex-1 min-h-full">
@@ -83,18 +133,32 @@ export default function IssueVerifyPage() {
             개인정보보호법 제17조에 따른 개인정보 제3자 제공에 동의합니다
           </p>
         </button>
+
+        {errorMessage && (
+          <div className="card mt-4 text-[12px] leading-relaxed text-danger">
+            {errorMessage}
+          </div>
+        )}
       </main>
 
       <PageFooter>
         <button
           type="button"
           disabled={!canSubmit}
-          onClick={() => router.push('/issue/success')}
+          onClick={completeVerification}
           className="btn-primary"
         >
-          본인 확인 완료
+          {isSubmitting ? '발급 신청 중...' : '본인 확인 완료'}
         </button>
       </PageFooter>
     </div>
+  )
+}
+
+export default function IssueVerifyPage() {
+  return (
+    <Suspense fallback={null}>
+      <IssueVerifyView />
+    </Suspense>
   )
 }
