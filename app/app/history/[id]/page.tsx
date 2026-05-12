@@ -1,14 +1,26 @@
 'use client'
-import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'next/navigation'
-import { Clock, CheckCircle, AlertTriangle } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { Clock, CheckCircle, AlertTriangle, Bell, FileSignature, Loader2 } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
 import { StepTimeline } from '@/components/ui/step-timeline'
 import { ProgressFill } from '@/components/ui/progress-fill'
 import { Spinner } from '@/components/ui/spinner'
+import { PageFooter } from '@/components/ui/page-footer'
 import { useAuth } from '@/contexts/auth-context'
-import { getDocumentMvp, type DocumentMvpDetailRes, type DocumentMvpStepStatus } from '@/lib/myapo-api'
+import {
+  acceptTestnetCredential,
+  advanceDocumentMvp,
+  createCredentialIssueRequest,
+  getDocumentMvp,
+  listCredentials,
+  mapDocumentStageToCredentialStage,
+  prepareAcceptTestnetCredential,
+  type DocumentMvpDetailRes,
+  type DocumentMvpStepStatus,
+} from '@/lib/myapo-api'
+import { signXrplTransactionBlob } from '@/lib/xrpl-signing'
 import { mockApplications } from '@/lib/mock-data'
 
 type TimelineStatus = 'done' | 'active' | 'wait' | 'error'
@@ -24,8 +36,44 @@ interface DetailLoadState {
   errorMessage: string | null
 }
 
+type SigningState = 'idle' | 'signing' | 'refreshing'
+
+function subscribeToHydrationStore() {
+  return () => {}
+}
+
+function getHydratedSnapshot() {
+  return true
+}
+
+function getServerSnapshot() {
+  return false
+}
+
+function HistoryLoadingShell() {
+  return (
+    <div className="flex flex-col flex-1 min-h-full">
+      <AppBar title="발급 진행 중" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
+      <main className="app-content flex-1 overflow-y-auto">
+        <div className="card flex items-center justify-center gap-2 p-4 text-[13px] leading-relaxed text-sub">
+          <Spinner size="sm" tone="primary" />
+          발급 현황을 불러오고 있어요
+        </div>
+      </main>
+    </div>
+  )
+}
+
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : '발급 상세를 불러오지 못했어요. 잠시 후 다시 시도해 주세요'
+}
+
+function getRecoverableCredentialAcceptSignal(error: unknown) {
+  const message = error instanceof Error ? error.message : ''
+  const text = message.toLowerCase()
+  if (text.includes('tecduplicate') || text.includes('duplicate')) return '이미 서명된 크리덴셜이에요. 다음 단계로 넘어갈게요'
+  if (text.includes('tecno_entry') || text.includes('no_entry')) return '이전 서명 상태가 이미 바뀌었어요. 발급 단계를 새로 확인할게요'
+  return null
 }
 
 function toTimelineStatus(status: DocumentMvpStepStatus): TimelineStatus {
@@ -48,13 +96,25 @@ function isLegacyMockId(id: string) {
 
 export default function HistoryDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const { accessToken, isReady } = useAuth()
+  const router = useRouter()
+  const { accessToken, isReady, wallet } = useAuth()
+  const hasHydrated = useSyncExternalStore(subscribeToHydrationStore, getHydratedSnapshot, getServerSnapshot)
   const [detailState, setDetailState] = useState<DetailLoadState>({
     documentCode: '',
     detail: null,
     errorMessage: null,
   })
+  const [signingState, setSigningState] = useState<SigningState>('idle')
+  const [signingMessage, setSigningMessage] = useState<string | null>(null)
+  const [signingError, setSigningError] = useState<string | null>(null)
+  const refreshTimerRef = useRef<number | null>(null)
   const app = mockApplications.find(a => a.id === id)
+
+  function clearScheduledRefresh() {
+    if (refreshTimerRef.current === null) return
+    window.clearTimeout(refreshTimerRef.current)
+    refreshTimerRef.current = null
+  }
 
   useEffect(() => {
     if (isLegacyMockId(id)) return
@@ -79,6 +139,8 @@ export default function HistoryDetailPage() {
     }
   }, [accessToken, id])
 
+  useEffect(() => clearScheduledRefresh, [])
+
   const detail = detailState.documentCode === id ? detailState.detail : null
   const apiErrorMessage = detailState.documentCode === id ? detailState.errorMessage : null
   const authErrorMessage = !isLegacyMockId(id) && isReady && !accessToken
@@ -92,23 +154,99 @@ export default function HistoryDetailPage() {
     [detail],
   )
 
-  if (!isLegacyMockId(id) && isLoading) {
-    return (
-      <div className="flex flex-col flex-1 min-h-full">
-        <AppBar title="발급 진행 중" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
-        <main className="app-content flex-1 flex flex-col items-center justify-center gap-3 text-center">
-          <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center">
-            <Spinner size="lg" tone="primary" />
-          </div>
-          <div className="text-[15px] font-bold text-ink">발급 현황을 불러오고 있어요</div>
-        </main>
-      </div>
+  async function refreshDetail() {
+    if (!accessToken) return null
+    const nextDetail = await getDocumentMvp(accessToken, id)
+    setDetailState({ documentCode: id, detail: nextDetail, errorMessage: null })
+    return nextDetail
+  }
+
+  function finishRefresh(nextDetail: DocumentMvpDetailRes | null) {
+    setSigningState('idle')
+    setSigningMessage(
+      nextDetail?.uiSteps.some(step => step.status === 'PENDING') && !nextDetail.isSuccess && nextDetail.status !== 'VALID'
+        ? '다음 단계 서명이 준비됐어요'
+        : '서명이 완료됐어요',
     )
+  }
+
+  function scheduleDetailRefresh() {
+    clearScheduledRefresh()
+    setSigningState('refreshing')
+    setSigningError(null)
+    setSigningMessage('서명에 성공했어요. 다음 단계 알림을 기다리고 있어요')
+    refreshTimerRef.current = window.setTimeout(() => {
+      refreshTimerRef.current = null
+      void refreshDetail()
+        .then(finishRefresh)
+        .catch(error => {
+          console.error('Failed to refresh document MVP detail:', error)
+          setSigningState('idle')
+          setSigningError(getErrorMessage(error))
+          setSigningMessage(null)
+        })
+    }, 3000)
+  }
+
+  async function signPendingStep() {
+    if (!detail || !accessToken) return
+    if (!wallet.privateKey) {
+      setSigningError('지갑 키를 불러오지 못했어요. 다시 로그인한 뒤 사인해 주세요')
+      return
+    }
+
+    setSigningState('signing')
+    setSigningError(null)
+    setSigningMessage('서명할 크리덴셜을 찾고 있어요')
+
+    try {
+      const credentials = await listCredentials(accessToken)
+      const currentStage = mapDocumentStageToCredentialStage(detail.currentStage)
+      const existingCredential = credentials.credentials.find(credential => (
+        credential.documentCode === detail.documentCode && credential.currentStage === currentStage
+      ))
+      const credentialId = existingCredential?.credentialId
+        ?? (await createCredentialIssueRequest(accessToken, {
+          documentTypeId: detail.documentTypeCode,
+          documentCode: detail.documentCode,
+          currentStage,
+        })).credentialId
+
+      if (!credentialId) {
+        throw new Error('서명할 크리덴셜 ID를 찾지 못했어요. 잠시 후 다시 시도해 주세요')
+      }
+
+      setSigningMessage('XRPL 서명 요청을 준비하고 있어요')
+      const prepared = await prepareAcceptTestnetCredential(accessToken, credentialId)
+      const signedTransactionBlob = await signXrplTransactionBlob(wallet.privateKey, prepared.transaction, prepared.network)
+
+      setSigningMessage('서명한 트랜잭션을 제출하고 있어요')
+      try {
+        await acceptTestnetCredential(accessToken, credentialId, signedTransactionBlob)
+      } catch (error) {
+        const recoverableSignal = getRecoverableCredentialAcceptSignal(error)
+        if (!recoverableSignal) throw error
+        setSigningMessage(recoverableSignal)
+      }
+
+      setSigningMessage('다음 발급 단계로 이동하고 있어요')
+      await advanceDocumentMvp(accessToken, detail.documentCode)
+      scheduleDetailRefresh()
+    } catch (error) {
+      console.error('Failed to sign pending credential:', error)
+      setSigningState('idle')
+      setSigningError(getErrorMessage(error))
+      setSigningMessage(null)
+    }
+  }
+
+  if (!hasHydrated || (!isLegacyMockId(id) && isLoading)) {
+    return <HistoryLoadingShell />
   }
 
   if (!isLegacyMockId(id) && errorMessage) {
     return (
-      <div className="flex flex-col flex-1 min-h-full">
+      <div className="relative flex flex-col flex-1 min-h-full overflow-hidden">
         <AppBar title="발급 진행 중" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
         <main className="app-content flex-1 text-[12px] leading-relaxed text-sub">
           <div className="card text-danger">{errorMessage}</div>
@@ -123,9 +261,13 @@ export default function HistoryDetailPage() {
     const isError = apiStages.some(stage => stage.status === 'error') || detail.status === 'FAILED'
     const isDone = detail.isSuccess || detail.status === 'VALID'
     const progress = apiStages.length ? (doneSteps / apiStages.length) * 100 : 0
+    const pendingStep = detail.uiSteps.find(step => step.status === 'PENDING')
+    const isWaitingNextStep = signingState === 'refreshing'
+    const shouldShowSigningCta = Boolean(pendingStep && !isDone && !isError && !isWaitingNextStep)
+    const isSigning = signingState === 'signing' || signingState === 'refreshing'
 
     return (
-      <div className="flex flex-col flex-1 min-h-full">
+      <div className="relative flex flex-col flex-1 min-h-full overflow-hidden">
         <AppBar
           title="발급 진행 중"
           badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
@@ -183,13 +325,102 @@ export default function HistoryDetailPage() {
             <div className="mt-1 text-[10px] text-muted font-mono break-all">문서 ID {detail.documentCode}</div>
           </div>
 
-          {!isDone && !isError && (
+          {shouldShowSigningCta && (
+            <div className="card mb-3" style={{ border: '1px solid #3182F6', background: '#E8F2FE' }}>
+              <div className="flex items-start gap-2">
+                <Bell size={16} className="text-primary mt-0.5 flex-shrink-0" strokeWidth={2.4} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-bold text-ink">{pendingStep?.label} 단계 서명이 필요해요</div>
+                  <div className="text-[11px] text-sub mt-0.5">다음 발급 단계로 보내려면 지갑 승인이 필요해요</div>
+                  <div className="text-[10px] text-muted mt-1">Testnet · XRPL CredentialAccept</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isWaitingNextStep && !isDone && !isError && (
+            <div className="card mb-3" style={{ border: '1px solid #00A661', background: '#E6F8EE' }}>
+              <div className="flex items-start gap-2">
+                <CheckCircle size={16} className="text-success mt-0.5 flex-shrink-0" strokeWidth={2.4} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-bold text-ink">서명에 성공했어요</div>
+                  <div className="text-[11px] text-sub mt-0.5">3초 뒤 다음 서명 알림을 확인할게요</div>
+                  <div className="text-[10px] text-muted mt-1">Testnet · 다음 단계 확인 중</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!shouldShowSigningCta && !isDone && !isError && (
             <div className="text-[12px] text-muted text-center">
               <Clock size={14} className="inline-block mr-1 align-middle" strokeWidth={2} />
               다음 단계가 완료되면 알려드릴게요
             </div>
           )}
         </main>
+
+        {isDone && (
+          <PageFooter>
+            <button
+              type="button"
+              onClick={() => router.push(`/documents/${encodeURIComponent(detail.documentCode)}`)}
+              className="btn-primary"
+            >
+              발급 문서 보기
+            </button>
+          </PageFooter>
+        )}
+
+        {shouldShowSigningCta && (
+          <div className="bottom-sheet-overlay">
+            <div className="bottom-sheet">
+              <div className="bottom-sheet-handle" />
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-primary">
+                  {isSigning ? <Loader2 size={17} className="animate-spin" strokeWidth={2.4} /> : <FileSignature size={18} strokeWidth={2.4} />}
+                </div>
+                <div className="text-[17px] font-bold text-ink">서명이 필요해요</div>
+              </div>
+              <div className="text-[13px] text-sub mb-3">
+                {pendingStep?.label} 단계가 준비됐어요. 다음 단계로 보낼까요?
+              </div>
+              <div className="card mb-3" style={{ background: '#F9FAFB' }}>
+                <div className="flex justify-between gap-3 py-1 border-b border-border">
+                  <span className="text-[12px] text-muted">서류명</span>
+                  <span className="text-[12px] font-bold text-ink text-right">{detail.documentTypeName}</span>
+                </div>
+                <div className="flex justify-between gap-3 py-1 border-b border-border">
+                  <span className="text-[12px] text-muted">발급기관</span>
+                  <span className="text-[12px] font-bold text-ink text-right">{detail.issuerCountryCode}-{detail.issuerIconLabel}</span>
+                </div>
+                <div className="flex justify-between gap-3 py-1">
+                  <span className="text-[12px] text-muted">단계</span>
+                  <span className="text-[12px] font-bold text-ink text-right">{pendingStep?.step}/{detail.uiSteps.length} · {pendingStep?.label}</span>
+                </div>
+              </div>
+              <div className={`text-[11px] mb-3 ${signingError ? 'text-danger' : 'text-muted'}`}>
+                {signingError ?? signingMessage ?? 'Testnet · Pre-Check Only · XRPL Credential'}
+              </div>
+              <button
+                type="button"
+                onClick={() => void signPendingStep()}
+                disabled={isSigning || !accessToken}
+                className="btn-primary mb-2"
+                style={{ height: 52, fontSize: 16 }}
+              >
+                {isSigning ? '서명 처리 중...' : '사인하기'}
+              </button>
+              <button
+                type="button"
+                disabled={isSigning}
+                className="btn-secondary"
+                style={{ height: 40, fontSize: 14 }}
+              >
+                나중에 할게요
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
