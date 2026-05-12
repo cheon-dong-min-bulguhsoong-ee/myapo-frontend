@@ -150,6 +150,7 @@ export interface DisputeSummaryRes {
   id: string
   status: DisputeStatus
   type: string
+  targetStage: string
   requestId: string
   operatorId: string | null
   slaDeadline: string

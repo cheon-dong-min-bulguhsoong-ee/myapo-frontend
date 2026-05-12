@@ -2,7 +2,7 @@
 
 > 원본 Swagger UI: [https://api.myapo.xyz/docs#/](https://api.myapo.xyz/docs#/)
 > OpenAPI JSON: [https://api.myapo.xyz/docs-json](https://api.myapo.xyz/docs-json)
-> 업데이트일: 2026-05-12
+> 업데이트일: 2026-05-13
 
 ## 개요
 
@@ -18,6 +18,7 @@
 - Documents 단계 전이 API가 `POST /api/v1/documents/{documentCode}/stages/advance`로 정리되고, 경로 파라미터 `documentCode`를 사용합니다.
 - 모바일 history/app-1 화면용 `Documents (MVP)` API 4개가 추가되었습니다: `GET/POST /api/v1/document-mvp`, `POST /api/v1/document-mvp/{documentCode}/advance`, `GET /api/v1/document-mvp/{documentCode}`.
 - Credential 발급 파이프라인 enum이 `MYDATA_RECEIVED`, `DOCUMENT_MOVED`, `TRANSLATION_RECEIVED`, `APOSTILLE_RECEIVED` 흐름으로 갱신되었습니다.
+- Credentials 응답에 원천 문서 식별자 `documentCode`가 추가되고, dispute 생성/목록/상세 응답에 이의 대상 단계 `targetStage`가 추가되었습니다.
 
 ## 인증
 
@@ -1334,6 +1335,7 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 | 필드               | 타입                                                                              | 필수  | 설명  |
 | ---------------- | ------------------------------------------------------------------------------- | --- | --- |
 | `issueRequestId` | string                                                                          | 예   | -   |
+| `credentialId`   | object                                                                          | 예   | -   |
 | `status`         | enum(ISSUED, FAILED)                                                            | 예   | -   |
 | `pipeline`       | IssuePipelineStageItemRes[]                                                     | 예   | -   |
 | `currentStage`   | enum(MYDATA_RECEIVED, DOCUMENT_MOVED, TRANSLATION_RECEIVED, APOSTILLE_RECEIVED) | 예   | -   |
@@ -1345,7 +1347,8 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 | 필드               | 타입     | 필수  | 설명                                                                                               |
 | ---------------- | ------ | --- | ------------------------------------------------------------------------------------------------ |
 | `documentTypeId` | string | 예   | Credential 발급 대상 문서 카탈로그 ID                                                                      |
-| `documentCode`   | string | 아니오 | 원천 Document UUID. credential_issue_requests.document_code는 documents.document_code를 참조할 때만 사용한다. |
+| `documentCode`   | string | 예   | 원천 Document UUID. credential_issue_requests.document_code는 documents.document_code를 참조한다.             |
+| `currentStage`   | enum(MYDATA_RECEIVED, DOCUMENT_MOVED, TRANSLATION_RECEIVED, APOSTILLE_RECEIVED) | 예   | Credential issue pipeline 현재 stage |
 
 
 ### CredentialIssueRequestRes
@@ -1368,6 +1371,7 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 | -------------------- | ----------------------------------------- | --- | --- |
 | `credentialId`       | string                                    | 예   | -   |
 | `issueRequestId`     | string                                    | 예   | -   |
+| `documentCode`       | string                                    | 예   | -   |
 | `documentTypeId`     | string                                    | 예   | -   |
 | `documentTypeName`   | string                                    | 예   | -   |
 | `issuerId`           | string                                    | 예   | -   |
@@ -1399,6 +1403,7 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 | -------------------- | ----------------------------------------- | --- | --- |
 | `credentialId`       | string                                    | 예   | -   |
 | `issueRequestId`     | string                                    | 예   | -   |
+| `documentCode`       | string                                    | 예   | -   |
 | `documentTypeId`     | string                                    | 예   | -   |
 | `documentTypeName`   | string                                    | 예   | -   |
 | `issuerId`           | string                                    | 예   | -   |
@@ -1453,6 +1458,7 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 | -------------------- | ----------------------------------------- | --- | --- |
 | `credentialId`       | string                                    | 예   | -   |
 | `issueRequestId`     | string                                    | 예   | -   |
+| `documentCode`       | string                                    | 예   | -   |
 | `documentTypeId`     | string                                    | 예   | -   |
 | `documentTypeName`   | string                                    | 예   | -   |
 | `issuerId`           | string                                    | 예   | -   |
@@ -1568,6 +1574,7 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 | `id`          | string             | 예   | -   |
 | `status`      | string             | 예   | -   |
 | `type`        | string             | 예   | -   |
+| `targetStage` | string             | 예   | -   |
 | `requestId`   | string             | 예   | -   |
 | `requesterId` | string             | 예   | -   |
 | `operatorId`  | object             | 아니오 | -   |
@@ -1582,8 +1589,9 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 
 | 필드          | 타입                                                     | 필수  | 설명  |
 | ----------- | ------------------------------------------------------ | --- | --- |
-| `type`      | enum(TYPO, IDENTITY_MISMATCH, DOCUMENT_INVALID, OTHER) | 예   | -   |
-| `requestId` | string                                                 | 예   | -   |
+| `type`        | enum(TYPO, MISSING_CONTENT, IMAGE_QUALITY, REISSUE_REQUIRED, IDENTITY_MISMATCH, DOCUMENT_INVALID, OTHERS) | 예   | -   |
+| `targetStage` | enum(MYDATA_RECEIVED, DOCUMENT_MOVED, TRANSLATION_RECEIVED, APOSTILLE_RECEIVED)                            | 예   | -   |
+| `requestId`   | string                                                                                                    | 예   | -   |
 
 
 ### DisputeSummaryRes
@@ -1594,6 +1602,7 @@ stage 5 (APOSTILLE_DOC_ISSUED) 도달 시 즉시 DONE + status=VALID + issuedAt 
 | `id`          | string | 예   | -   |
 | `status`      | string | 예   | -   |
 | `type`        | string | 예   | -   |
+| `targetStage` | string | 예   | -   |
 | `requestId`   | string | 예   | -   |
 | `operatorId`  | object | 아니오 | -   |
 | `slaDeadline` | string | 예   | -   |

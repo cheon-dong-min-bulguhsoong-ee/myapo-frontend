@@ -266,6 +266,7 @@ interface Dispute {
   id: string
   documentType: string
   stage: string
+  targetStage?: string
   reason: string
   status: 'received' | 'reviewing' | 'closed'
   createdAt: string
@@ -281,7 +282,7 @@ interface Dispute {
 | `ASSIGNED`, `IN_REVIEW`, `INFO_REQUESTED` | `reviewing` |
 | `RESOLVED`, `REJECTED` | `closed` |
 
-주의: 현재 Swagger에는 `GET /api/v1/disputes` 목록 API가 있습니다. 기존 목업 `Dispute` UI 상태는 `DisputeSummaryRes.status`를 `received/reviewing/closed`로 변환해 사용하세요.
+주의: 현재 Swagger에는 `GET /api/v1/disputes` 목록 API가 있습니다. 기존 목업 `Dispute` UI 상태는 `DisputeSummaryRes.status`를 `received/reviewing/closed`로 변환해 사용하세요. 최신 응답에는 이의 대상 파이프라인 단계 `targetStage`가 포함되므로, 단계별 분쟁 화면을 붙일 때 `MYDATA_RECEIVED`, `DOCUMENT_MOVED`, `TRANSLATION_RECEIVED`, `APOSTILLE_RECEIVED` 값을 표시용 라벨로 매핑하세요.
 
 ### 6.4 현재 발급 가능 문서 카탈로그
 
