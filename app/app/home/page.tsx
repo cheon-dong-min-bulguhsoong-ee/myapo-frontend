@@ -1,16 +1,18 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FilePlus, Wallet, ClipboardList, Scale } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
-import { mockDocuments, mockApplications, mockDisputes } from '@/lib/mock-data'
+import { useAuth } from '@/contexts/auth-context'
+import { listDisputes, listDocumentMvp } from '@/lib/myapo-api'
 
 interface MenuItem {
   icon: LucideIcon
   label: string
   sublabel: string
-  count: number
+  count: number | null
   href: string
   tone: 'blue' | 'green' | 'yellow' | 'red'
 }
@@ -22,18 +24,71 @@ const toneBg: Record<MenuItem['tone'], string> = {
   red:    'bg-danger-soft text-danger',
 }
 
+interface HomeCountsState {
+  accessToken: string | null
+  validDocs: number | null
+  inProgress: number | null
+  openDisputes: number | null
+}
+
+const EMPTY_COUNTS: HomeCountsState = {
+  accessToken: null,
+  validDocs: null,
+  inProgress: null,
+  openDisputes: null,
+}
+
+function isOpenDispute(status: string) {
+  return status !== 'RESOLVED' && status !== 'REJECTED'
+}
+
 export default function HomePage() {
   const router = useRouter()
+  const { accessToken } = useAuth()
+  const [countsState, setCountsState] = useState<HomeCountsState>(EMPTY_COUNTS)
 
-  const validDocs = mockDocuments.filter(d => d.status === 'available').length
-  const inProgress = mockApplications.length
-  const openDisputes = mockDisputes.filter(d => d.status !== 'closed').length
+  useEffect(() => {
+    if (!accessToken) return
+
+    let ignore = false
+
+    Promise.allSettled([
+      listDocumentMvp(accessToken),
+      listDisputes(accessToken),
+    ])
+      .then(([documentsResult, disputesResult]) => {
+        if (ignore) return
+
+        if (documentsResult.status === 'rejected') {
+          console.error('Failed to load home document badge counts:', documentsResult.reason)
+        }
+        if (disputesResult.status === 'rejected') {
+          console.error('Failed to load home dispute badge count:', disputesResult.reason)
+        }
+
+        const documentItems = documentsResult.status === 'fulfilled' ? documentsResult.value.items : null
+        const disputes = disputesResult.status === 'fulfilled' ? disputesResult.value.disputes : null
+
+        setCountsState({
+          accessToken,
+          validDocs: documentItems ? documentItems.filter(item => item.isSuccess).length : null,
+          inProgress: documentItems ? documentItems.filter(item => !item.isSuccess).length : null,
+          openDisputes: disputes ? disputes.filter(dispute => isOpenDispute(dispute.status)).length : null,
+        })
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [accessToken])
+
+  const counts = countsState.accessToken === accessToken ? countsState : EMPTY_COUNTS
 
   const menuItems: MenuItem[] = [
-    { icon: FilePlus,      label: '증명서 발급', sublabel: '새 문서 발급',  count: 0,             href: '/issue/select', tone: 'blue'   },
-    { icon: Wallet,        label: '내 증명서',   sublabel: '발급된 문서',   count: validDocs,     href: '/documents',    tone: 'green'  },
-    { icon: ClipboardList, label: '발급 내역',   sublabel: '진행 중',        count: inProgress,    href: '/history',      tone: 'yellow' },
-    { icon: Scale,         label: '분쟁 내역',   sublabel: '신고 현황',      count: openDisputes,  href: '/disputes',     tone: 'red'    },
+    { icon: FilePlus,      label: '증명서 발급', sublabel: '새 문서 발급',  count: null,                href: '/issue/select', tone: 'blue'   },
+    { icon: Wallet,        label: '내 증명서',   sublabel: '발급된 문서',   count: counts.validDocs,     href: '/documents',    tone: 'green'  },
+    { icon: ClipboardList, label: '발급 내역',   sublabel: '진행 중',        count: counts.inProgress,    href: '/history',      tone: 'yellow' },
+    { icon: Scale,         label: '분쟁 내역',   sublabel: '신고 현황',      count: counts.openDisputes,  href: '/disputes',     tone: 'red'    },
   ]
 
   return (
@@ -62,7 +117,7 @@ export default function HomePage() {
               className="card press relative flex flex-col items-start text-left gap-2"
               style={{ minHeight: 132 }}
             >
-              {count > 0 && (
+              {count !== null && (
                 <span
                   className="absolute top-3 right-3 min-h-6 min-w-6 px-1.5 rounded-full bg-primary text-white text-[12px] font-bold flex items-center justify-center"
                   aria-label={`${count}건`}
