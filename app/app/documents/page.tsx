@@ -1,26 +1,31 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Folder, ChevronRight, RotateCcw, History, CheckCircle } from 'lucide-react'
+import { Folder, ChevronRight, CheckCircle } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
 import { Pill } from '@/components/ui/pill'
-import { SegmentedControl } from '@/components/ui/segmented-control'
 import { EmptyState } from '@/components/ui/empty-state'
-import { mockDocuments, type Document } from '@/lib/mock-data'
+import { Spinner } from '@/components/ui/spinner'
+import { useAuth } from '@/contexts/auth-context'
+import { listDocumentMvp, type DocumentMvpListItemRes } from '@/lib/myapo-api'
 
-const issuerLabels: Record<string, string> = {
-  납세증명서:    'KR-NTS · 한국 국세청',
-  가족관계증명서: 'KR-법원 · 한국 법원',
-  주민등록등본:   'KR-MOIS · 행정안전부',
-  졸업증명서:    'KR-학교 · 학사정보원',
-  재직증명서:    'KR-건보 · 건강보험공단',
-  범죄경력회보서: 'KR-경찰청 · 경찰청',
+interface DocumentMvpListState {
+  accessToken: string | null
+  items: DocumentMvpListItemRes[]
+  errorMessage: string | null
 }
 
-function daysUntil(dateStr: string): number {
-  const target = new Date(dateStr).getTime()
-  const today = new Date().setHours(0, 0, 0, 0)
-  return Math.round((target - today) / (1000 * 60 * 60 * 24))
+const EMPTY_ITEMS: DocumentMvpListItemRes[] = []
+
+function formatDate(value: string | null) {
+  if (!value) return '-'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : '내 증명서를 불러오지 못했어요. 잠시 후 다시 시도해 주세요'
 }
 
 function ArrivedCallout({ name }: { name: string }) {
@@ -32,65 +37,75 @@ function ArrivedCallout({ name }: { name: string }) {
       <CheckCircle size={16} className="text-success flex-shrink-0" />
       <div>
         <div className="text-[15px] font-bold text-ink leading-snug">{name}가 지갑에 도착했어요</div>
-        <div className="text-[12px] leading-relaxed text-sub mt-0.5">총 3번의 서명을 완료해주셨어요</div>
+        <div className="text-[12px] leading-relaxed text-sub mt-0.5">발급 완료된 증명서만 모아 보여드려요</div>
       </div>
     </div>
   )
 }
 
-function DocumentRow({ doc, onClick }: { doc: Document; onClick: () => void }) {
-  const expired = doc.status === 'expired'
-  const issuerLabel = issuerLabels[doc.type] ?? '한국 정부'
-  const days = daysUntil(doc.expiresAt)
-
-  if (expired) {
-    return (
-      <button
-        onClick={onClick}
-        className="card press w-full text-left"
-        style={{
-          opacity: 0.7,
-          background: 'repeating-linear-gradient(45deg, #F9FAFB 0 8px, #F0F1F3 8px 16px)',
-        }}
-      >
-        <div className="flex items-center justify-between mb-1">
-          <Pill variant="revoked" size="sm">Revoked · 자동 폐기됨</Pill>
-        </div>
-        <div className="text-[15px] font-bold text-ink line-through">{doc.type} (영문)</div>
-        <div className="text-[12px] text-muted line-through">{issuerLabel}</div>
-        <div className="text-[12px] text-muted mt-1">유효기간 {doc.expiresAt} 만료됨</div>
-      </button>
-    )
-  }
-
+function DocumentRow({ doc, onClick }: { doc: DocumentMvpListItemRes; onClick: () => void }) {
   return (
     <button onClick={onClick} className="card press w-full text-left">
       <div className="flex items-center justify-between mb-2">
-        <Pill variant="testnet" size="sm">XLS-70 · Active</Pill>
+        <Pill variant="success" size="sm">발급 완료</Pill>
         <div className="flex items-center gap-1 text-muted">
-          <span className="p-1"><RotateCcw size={14} strokeWidth={2} /></span>
-          <span className="p-1"><History size={14} strokeWidth={2} /></span>
           <ChevronRight size={16} strokeWidth={2} />
         </div>
       </div>
-      <div className="text-[15px] font-bold text-ink">{doc.type} (영문)</div>
-      <div className="text-[12px] text-sub">{issuerLabel}</div>
+      <div className="text-[15px] font-bold text-ink">{doc.documentTypeName}</div>
+      <div className="text-[12px] text-sub">{doc.issuerCountryCode}-{doc.issuerIconLabel} · {doc.issuerName}</div>
       <div className="text-[12px] text-sub mt-1">
-        유효기간 <span className="font-bold text-ink">{doc.expiresAt}</span>
-        {days >= 0 && <> (+{days}일)</>}
+        발급일 <span className="font-bold text-ink">{formatDate(doc.issuedAt)}</span>
       </div>
-      <div className="font-mono text-[10px] text-muted mt-1">{doc.credentialId}</div>
+      <div className="font-mono text-[10px] text-muted mt-1 break-all">{doc.documentCode}</div>
     </button>
   )
 }
 
 export default function DocumentsPage() {
-  const [tab, setTab] = useState<'available' | 'expired'>('available')
   const router = useRouter()
-  const availableCount = mockDocuments.filter(d => d.status === 'available').length
-  const expiredCount = mockDocuments.filter(d => d.status === 'expired').length
-  const filtered = mockDocuments.filter(d => d.status === tab)
-  const justArrived = tab === 'available' ? mockDocuments.find(d => d.status === 'available' && d.isExpiringSoon) : null
+  const { accessToken, isReady } = useAuth()
+  const [listState, setListState] = useState<DocumentMvpListState>({
+    accessToken: null,
+    items: [],
+    errorMessage: null,
+  })
+  const missingTokenMessage = isReady && !accessToken ? '로그인 후 내 증명서를 확인할 수 있어요' : null
+  const items = listState.accessToken === accessToken ? listState.items : EMPTY_ITEMS
+  const issuedItems = items.filter(item => item.isSuccess)
+  const errorMessage = missingTokenMessage ?? (listState.accessToken === accessToken ? listState.errorMessage : null)
+  const showLoading = Boolean(accessToken) && listState.accessToken !== accessToken
+  const justArrived = issuedItems[0] ?? null
+
+  useEffect(() => {
+    if (!accessToken) return
+
+    let ignore = false
+
+    listDocumentMvp(accessToken)
+      .then(data => {
+        if (ignore) return
+        setListState({
+          accessToken,
+          items: data.items,
+          errorMessage: null,
+        })
+      })
+      .catch(error => {
+        console.error('Failed to load document MVP list:', error)
+        if (!ignore) {
+          setListState({
+            accessToken,
+            items: [],
+            errorMessage: getErrorMessage(error),
+          })
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [accessToken])
 
   return (
     <div className="flex flex-col flex-1 min-h-full">
@@ -100,32 +115,40 @@ export default function DocumentsPage() {
       />
 
       <main className="app-content flex flex-1 flex-col gap-3 overflow-y-auto">
-        <SegmentedControl
-          value={tab}
-          onChange={v => setTab(v as 'available' | 'expired')}
-          options={[
-            { value: 'available', label: '사용 가능', count: availableCount },
-            { value: 'expired',   label: '만료됨',    count: expiredCount },
-          ]}
-        />
-        {filtered.length === 0 ? (
+        <div>
+          <div className="text-[15px] font-bold text-ink mb-1">발급 완료된 증명서예요</div>
+          <div className="text-[12px] leading-relaxed text-sub">완료된 문서만 내 증명서에 표시됩니다</div>
+        </div>
+
+        {showLoading && (
+          <div className="card flex items-center justify-center gap-2 p-4 text-[13px] leading-relaxed text-sub">
+            <Spinner size="sm" tone="primary" />
+            내 증명서를 불러오고 있어요
+          </div>
+        )}
+
+        {!showLoading && errorMessage && (
+          <div className="card p-4 text-[13px] leading-relaxed text-sub">{errorMessage}</div>
+        )}
+
+        {!showLoading && !errorMessage && issuedItems.length === 0 ? (
           <EmptyState
             icon={Folder}
-            title={tab === 'available' ? '발급된 문서가 없어요' : '만료된 문서가 없어요'}
-            description="발급 신청을 통해 문서를 발급받으세요"
+            title="발급 완료된 증명서가 없어요"
+            description="진행 중인 발급은 발급 내역에서 확인할 수 있어요"
             ctaLabel="발급 신청하기"
             onCta={() => router.push('/issue/select')}
           />
-        ) : (
+        ) : null}
+
+        {!showLoading && !errorMessage && issuedItems.length > 0 && (
           <>
-            {justArrived && tab === 'available' && (
-              <ArrivedCallout name={`${justArrived.type} (영문)`} />
-            )}
-            {filtered.map(doc => (
+            {justArrived && <ArrivedCallout name={justArrived.documentTypeName} />}
+            {issuedItems.map(doc => (
               <DocumentRow
-                key={doc.id}
+                key={doc.documentCode}
                 doc={doc}
-                onClick={() => router.push(`/documents/${doc.id}`)}
+                onClick={() => router.push(`/documents/${encodeURIComponent(doc.documentCode)}`)}
               />
             ))}
           </>
