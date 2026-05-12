@@ -88,6 +88,7 @@ XRPL 설정:
 - 현재 데모는 `myapo_wallet` localStorage에 XRPL private key를 저장합니다.
 - 운영 서비스에서는 XSS 위험 때문에 private key를 localStorage에 저장하면 안 됩니다.
 - Web3Auth 로그인 후 백엔드 세션을 만들려면 Web3Auth JWT 또는 OAuth ID token을 `POST /api/v1/auth/signin`에 전달하는 별도 API client가 필요합니다.
+- XRPL CredentialAccept / CredentialDelete에서 필요한 `signedTransactionBlob`은 prepare API 응답을 Web3Auth XRPL 지갑으로 서명해 얻습니다. 구현 전에 `docs/XRPL_SIGNED_TRANSACTION_BLOB.md`를 먼저 읽으세요.
 
 ### 4.2 백엔드 인증 방식
 
@@ -487,6 +488,7 @@ NEXT_PUBLIC_WEB3AUTH_NETWORK=sapphire_devnet
 | 파일 | 용도 |
 | --- | --- |
 | `API_SPEC.md` | 백엔드 전체 OpenAPI 정리본 |
+| `docs/XRPL_SIGNED_TRANSACTION_BLOB.md` | XRPL `signedTransactionBlob` 생성, 제출, 검증 절차 |
 | `lib/myapo-api.ts` | MyApo API base URL, 공통 request wrapper, signin/logout, accessToken storage |
 | `design-system/README.md` | 디자인 철학, 색/타입/레이아웃 규칙 |
 | `design-system/tokens.css` | 원본 토큰 |
