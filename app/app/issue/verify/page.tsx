@@ -63,7 +63,7 @@ function IssueVerifyView() {
       if (typeof window !== 'undefined') {
         sessionStorage.setItem(MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY, document.documentCode)
       }
-      router.push(`/issue/success?documentCode=${encodeURIComponent(document.documentCode)}`)
+      router.push(`/history/${encodeURIComponent(document.documentCode)}`)
     } catch (error) {
       console.error('Failed to create document MVP:', error)
       setErrorMessage(getErrorMessage(error))

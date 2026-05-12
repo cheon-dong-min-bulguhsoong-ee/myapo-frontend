@@ -1,3 +1,7 @@
+.idea
+
+GEMINI.md
+
 /.omc/
 app/.omc/
 app/.claude/scheduled_tasks.lock

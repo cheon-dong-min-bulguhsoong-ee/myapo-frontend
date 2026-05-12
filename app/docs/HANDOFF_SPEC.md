@@ -148,7 +148,7 @@ Authorization: Bearer <accessToken>
 | P0 | `GET /api/v1/documents/types` | 발급 가능한 문서 카탈로그 | `/issue/select` |
 | P0 | `GET /api/v1/document-mvp` | 모바일 history 화면용 내 문서 목록 | `/home`, `/history` |
 | P0 | `GET /api/v1/document-mvp/{documentCode}` | 모바일 history/app-1 화면용 문서 상세 및 4단계 UI 상태 | `/history/[id]`, `/documents/[id]` 후보 |
-| P0 | `POST /api/v1/document-mvp` | MVP 문서 발급 신청. Mock 흐름은 stage 3부터 시작 | `/issue/select`, `/issue/verify`, `/issue/success` |
+| P0 | POST /api/v1/document-mvp | MVP 문서 발급 신청. 신청 즉시 1단계 서명 요청(/credentials/issue-requests) 연동 | /issue/verify -> /history/[id] |
 | P0 | `POST /api/v1/document-mvp/{documentCode}/advance` | MVP 다음 단계 전이 | `/history/[id]`, 진행 상세 화면 |
 | P0 | `GET /api/v1/documents` | 운영/콘솔 성격의 문서 관리 목록. `status`, `documentTypeCode`, `countryCode`, `q`, `page`, `limit` query 지원 | 관리자/운영자 화면 후보, 사용자 앱에서는 MVP API 우선 |
 | P0 | `GET /api/v1/documents/{documentCode}` | 운영 상세 및 5단계 진행 상태 | 관리자/운영자 화면 후보 |
