@@ -14,9 +14,9 @@ export function EmptyState({ icon: Icon, title, description, ctaLabel, onCta }: 
   return (
     <div className="flex h-full min-h-[280px] flex-col items-center justify-center px-6 py-10 text-center">
       <Icon size={48} strokeWidth={1.5} className="mb-4 text-muted" />
-      <h2 className="text-[15px] font-bold leading-snug text-ink">{title}</h2>
+      <h2 className="text-base font-bold leading-snug text-ink">{title}</h2>
       {description && (
-        <p className="mt-1.5 text-[12px] leading-relaxed text-sub">{description}</p>
+        <p className="mt-2 text-sm leading-relaxed text-sub">{description}</p>
       )}
       {ctaLabel && onCta && (
         <div className="mt-5 w-full max-w-[200px]">
