@@ -6,7 +6,6 @@ import { AppBar } from '@/components/ui/app-bar'
 import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { StepTimeline } from '@/components/ui/step-timeline'
-import { ProgressFill } from '@/components/ui/progress-fill'
 import { Spinner } from '@/components/ui/spinner'
 import { PageFooter } from '@/components/ui/page-footer'
 import { useAuth } from '@/contexts/auth-context'
@@ -317,11 +316,9 @@ export default function HistoryDetailPage() {
   }
 
   if (detail) {
-    const doneSteps = apiStages.filter(stage => stage.status === 'done').length
     const activeStage = apiStages.find(stage => stage.status === 'active')
     const isError = apiStages.some(stage => stage.status === 'error') || detail.status === 'FAILED'
     const isDone = detail.isSuccess || detail.status === 'VALID'
-    const progress = apiStages.length ? (doneSteps / apiStages.length) * 100 : 0
     const pendingStep = detail.uiSteps.find(step => step.status === 'PENDING')
     const isWaitingNextStep = signingState === 'refreshing'
     const shouldShowSigningCta = Boolean(pendingStep && !isDone && !isError && !isWaitingNextStep)
@@ -377,12 +374,6 @@ export default function HistoryDetailPage() {
             <div className="mt-2 mb-2">
               <StepTimeline stages={apiStages} />
             </div>
-            {!isDone && !isError && (
-              <>
-                <ProgressFill value={progress} />
-                <div className="mt-1 text-right text-xs text-muted">{detail.currentStageLabel} 처리 중이에요</div>
-              </>
-            )}
             <div className="mt-2 text-xs text-muted">신청일 {formatDate(detail.requestedAt)}</div>
             <div className="mt-1 break-all font-mono text-xs text-muted">문서 ID {detail.documentCode}</div>
           </div>
@@ -517,7 +508,6 @@ export default function HistoryDetailPage() {
     )
   }
 
-  const stepProgress = (app.stage / app.totalStages) * 100
   const isError = app.stages.some(s => s.status === 'error')
   const isDone  = app.stages.every(s => s.status === 'done')
   const activeStage = app.stages.find(s => s.status === 'active')
@@ -568,12 +558,6 @@ export default function HistoryDetailPage() {
           <div className="mt-2 mb-2">
             <StepTimeline stages={app.stages} />
           </div>
-          {!isDone && !isError && (
-            <>
-              <ProgressFill value={stepProgress} />
-              <div className="mt-1 text-right text-xs text-muted">{activeStage?.label} 처리 중이에요</div>
-            </>
-          )}
           <div className="mt-2 text-xs text-muted">신청일 {app.createdAt}</div>
         </div>
 
