@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import { PersonaProvider } from '@/contexts/persona-context'
-import { AuthProvider } from '@/contexts/auth-context'
-import { BottomHomeBar } from '@/components/ui/bottom-home-bar'
+import { RouteShell } from '@/components/route-shell'
 
 export const metadata: Metadata = {
   title: 'MyApo',
@@ -19,15 +17,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="app-body">
-        <AuthProvider>
-          <PersonaProvider>
-            <div className="app-frame">
-              <div className="app-scroll flex flex-col">{children}</div>
-              <BottomHomeBar />
-            </div>
-          </PersonaProvider>
-        </AuthProvider>
+      <body>
+        <RouteShell>{children}</RouteShell>
       </body>
     </html>
   )
