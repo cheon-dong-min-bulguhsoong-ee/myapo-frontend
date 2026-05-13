@@ -204,6 +204,7 @@ Server requirements:
 - 20px radius card, pill button/chip
 - 60·30·10 color rule
 - slide deck / web page UI kit
+- app / console / institution wireframes in [`app/design-system/wireframes/`](./app/design-system/wireframes/Readme.md)
 
 자세한 내용은 [`app/design-system/README.md`](./app/design-system/README.md)를 확인하세요.
 
@@ -217,6 +218,7 @@ Server requirements:
 | [`app/docs/UI_CONSISTENCY_HARNESS.md`](./app/docs/UI_CONSISTENCY_HARNESS.md) | UI 일관성 점검 기준과 화면 품질 체크리스트 |
 | [`app/docs/XRPL_SIGNED_TRANSACTION_BLOB.md`](./app/docs/XRPL_SIGNED_TRANSACTION_BLOB.md) | XRPL `signedTransactionBlob` 처리 명세 |
 | [`app/design-system/README.md`](./app/design-system/README.md) | 디자인 토큰, 타이포그래피, 컴포넌트, 피치덱 UI kit 안내 |
+| [`app/design-system/wireframes/Readme.md`](./app/design-system/wireframes/Readme.md) | 앱, 콘솔, 기관 화면 HTML 와이어프레임 링크 모음 |
 
 ## Integration Notes
 

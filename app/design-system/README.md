@@ -23,6 +23,7 @@
 | `fonts/` | Font-loading notes (Pretendard/Work Sans are CDN-loaded — see note below). |
 | `templates/slide-templates.html` | Cover · content · section-break skeleton to fork from. |
 | `preview/` | The **design-system cards** registered in this project's Design System tab. |
+| `wireframes/` | Linked HTML wireframes for app, console, and institution surfaces — see [`wireframes/Readme.md`](./wireframes/Readme.md). |
 | `ui_kits/slide-deck/` | JSX UI kit — slide shell, cover, content, evidence, big-number, section-break. |
 | `ui_kits/web-page/` | JSX UI kit — header, hero, feature cards, comparison, footer. |
 | `slides/` | Sample slide HTML files registered as cards (cover, content, big-number, evidence, section-break). |

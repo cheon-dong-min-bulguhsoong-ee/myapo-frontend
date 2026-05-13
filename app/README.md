@@ -170,10 +170,11 @@ myapo-frontend/
 - 20px radius card, pill button/chip
 - 60·30·10 color rule
 - slide deck / web page UI kit
+- app / console / institution wireframes in [`design-system/wireframes/`](./design-system/wireframes/Readme.md)
 
-자세한 내용은 `design-system/README.md`를 확인하세요.
+자세한 내용은 [`design-system/README.md`](./design-system/README.md)를 확인하세요.
 
-See `design-system/README.md` for the full design system reference.
+See [`design-system/README.md`](./design-system/README.md) for the full design system reference.
 
 ## How to Start myapo-frontend
 
