@@ -35,14 +35,14 @@ export function BottomHomeBar() {
             aria-label={label}
             aria-selected={active}
             onClick={() => router.push(href)}
-            className="press flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors"
+            className="press flex h-full flex-1 flex-col items-center justify-center gap-1 transition-colors"
           >
             <Icon
               size={20}
               strokeWidth={active ? 2.2 : 1.8}
               className={active ? 'text-primary' : 'text-muted'}
             />
-            <span className={`text-[10px] font-bold ${active ? 'text-primary' : 'text-muted'}`}>{label}</span>
+            <span className={`text-xs font-bold ${active ? 'text-primary' : 'text-muted'}`}>{label}</span>
           </button>
         )
       })}

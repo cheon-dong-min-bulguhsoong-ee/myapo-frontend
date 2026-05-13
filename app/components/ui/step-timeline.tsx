@@ -55,7 +55,7 @@ export function StepTimeline({ stages }: StepTimelineProps) {
         style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}
       >
         {stages.map((s, i) => (
-          <div key={i} className={`text-[10px] ${labelWeight[s.status]} ${labelTone[s.status]}`}>
+          <div key={i} className={`text-xs ${labelWeight[s.status]} ${labelTone[s.status]}`}>
             {s.label}
           </div>
         ))}

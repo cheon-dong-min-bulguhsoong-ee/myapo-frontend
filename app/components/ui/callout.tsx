@@ -13,11 +13,11 @@ interface CalloutProps {
   onClick?: () => void
 }
 
-const styles: Record<Tone, { bg: string; border: string; text: string }> = {
-  info:    { bg: '#E8F2FE', border: '#3182F6', text: 'text-primary' },
-  success: { bg: '#E6FAF3', border: '#00C48C', text: 'text-success' },
-  warning: { bg: '#FFF4DE', border: '#FFB020', text: 'text-warning' },
-  danger:  { bg: '#FDE7E9', border: '#F04452', text: 'text-danger' },
+const styles: Record<Tone, { surface: string; text: string }> = {
+  info:    { surface: 'bg-primary-soft border-primary', text: 'text-primary' },
+  success: { surface: 'bg-success-soft border-success', text: 'text-success' },
+  warning: { surface: 'bg-warning-soft border-warning', text: 'text-warning' },
+  danger:  { surface: 'bg-danger-soft border-danger', text: 'text-danger' },
 }
 
 export function Callout({ tone = 'info', icon, title, description, onClick }: CalloutProps) {
@@ -27,8 +27,7 @@ export function Callout({ tone = 'info', icon, title, description, onClick }: Ca
     <Wrapper
       onClick={onClick}
       type={onClick ? 'button' : undefined}
-      className="press w-full text-left flex items-start gap-2 p-3 rounded-[8px]"
-      style={{ background: s.bg, border: `1px solid ${s.border}` }}
+      className={`press flex w-full items-start gap-2 rounded-xl border p-3 text-left ${s.surface}`}
     >
       {icon === 'spinner' ? (
         <Spinner size="sm" tone={tone === 'info' ? 'primary' : 'ink'} className="flex-shrink-0 mt-0.5" />
@@ -36,9 +35,9 @@ export function Callout({ tone = 'info', icon, title, description, onClick }: Ca
         renderIcon(icon, s.text)
       ) : null}
       <div className="min-w-0 flex-1">
-        <p className="text-[15px] font-bold text-ink leading-snug">{title}</p>
+        <p className="text-sm font-bold leading-snug text-ink">{title}</p>
         {description && (
-          <p className="text-[12px] leading-relaxed text-sub mt-0.5">{description}</p>
+          <p className="mt-1 text-xs leading-relaxed text-sub">{description}</p>
         )}
       </div>
     </Wrapper>
