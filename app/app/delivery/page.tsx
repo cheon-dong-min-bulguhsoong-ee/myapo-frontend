@@ -6,7 +6,6 @@ import { AppBar } from '@/components/ui/app-bar'
 import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { StepTimeline } from '@/components/ui/step-timeline'
-import { ProgressFill } from '@/components/ui/progress-fill'
 import { PageFooter } from '@/components/ui/page-footer'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -87,10 +86,6 @@ export default function DeliveryPage() {
           </div>
           <div className="mt-2 mb-2">
             <StepTimeline stages={deliveryStages} />
-          </div>
-          <ProgressFill value={progress} />
-          <div className={`text-[12px] mt-1 text-right ${completed ? 'text-success font-bold' : 'text-muted'}`}>
-            {completed ? '기관 접수 확인 완료' : '서류 패키지 전송 중'}
           </div>
         </div>
 
