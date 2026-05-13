@@ -36,6 +36,7 @@ RUN bun install --production
 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/design-system ./design-system
 COPY --from=builder /app/next.config.ts ./next.config.ts
 
 EXPOSE 10000
