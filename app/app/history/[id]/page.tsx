@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import { useParams, useRouter } from 'next/navigation'
 import { Clock, CheckCircle, AlertTriangle, Bell, FileSignature, Loader2 } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { StepTimeline } from '@/components/ui/step-timeline'
 import { ProgressFill } from '@/components/ui/progress-fill'
@@ -37,6 +38,25 @@ interface DetailLoadState {
 }
 
 type SigningState = 'idle' | 'signing' | 'refreshing'
+type ToastTone = 'info' | 'success' | 'danger'
+
+interface SigningToast {
+  tone: ToastTone
+  title: string
+  message: string
+}
+
+const toastToneClass: Record<ToastTone, { surface: string; badge: string; progress: string }> = {
+  info:    { surface: 'app-toast--info', badge: 'app-toast__badge--info', progress: 'app-toast__progress--info' },
+  success: { surface: 'app-toast--success', badge: 'app-toast__badge--success', progress: 'app-toast__progress--success' },
+  danger:  { surface: 'app-toast--danger', badge: 'app-toast__badge--danger', progress: 'app-toast__progress--danger' },
+}
+
+function ToastIcon({ tone }: { tone: ToastTone }) {
+  if (tone === 'success') return <CheckCircle size={17} strokeWidth={2.5} />
+  if (tone === 'danger') return <AlertTriangle size={17} strokeWidth={2.5} />
+  return <Bell size={17} strokeWidth={2.5} />
+}
 
 function subscribeToHydrationStore() {
   return () => {}
@@ -54,12 +74,12 @@ function HistoryLoadingShell() {
   return (
     <div className="flex flex-col flex-1 min-h-full">
       <AppBar title="발급 진행 중" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="card flex items-center justify-center gap-2 p-4 text-[13px] leading-relaxed text-sub">
           <Spinner size="sm" tone="primary" />
           발급 현황을 불러오고 있어요
         </div>
-      </main>
+      </AppContent>
     </div>
   )
 }
@@ -107,13 +127,30 @@ export default function HistoryDetailPage() {
   const [signingState, setSigningState] = useState<SigningState>('idle')
   const [signingMessage, setSigningMessage] = useState<string | null>(null)
   const [signingError, setSigningError] = useState<string | null>(null)
+  const [toast, setToast] = useState<SigningToast | null>(null)
   const refreshTimerRef = useRef<number | null>(null)
+  const toastTimerRef = useRef<number | null>(null)
   const app = mockApplications.find(a => a.id === id)
 
   function clearScheduledRefresh() {
     if (refreshTimerRef.current === null) return
     window.clearTimeout(refreshTimerRef.current)
     refreshTimerRef.current = null
+  }
+
+  function clearToastTimer() {
+    if (toastTimerRef.current === null) return
+    window.clearTimeout(toastTimerRef.current)
+    toastTimerRef.current = null
+  }
+
+  function showToast(nextToast: SigningToast) {
+    clearToastTimer()
+    setToast(nextToast)
+    toastTimerRef.current = window.setTimeout(() => {
+      toastTimerRef.current = null
+      setToast(null)
+    }, 3800)
   }
 
   useEffect(() => {
@@ -139,7 +176,10 @@ export default function HistoryDetailPage() {
     }
   }, [accessToken, id])
 
-  useEffect(() => clearScheduledRefresh, [])
+  useEffect(() => () => {
+    clearScheduledRefresh()
+    clearToastTimer()
+  }, [])
 
   const detail = detailState.documentCode === id ? detailState.detail : null
   const apiErrorMessage = detailState.documentCode === id ? detailState.errorMessage : null
@@ -162,12 +202,13 @@ export default function HistoryDetailPage() {
   }
 
   function finishRefresh(nextDetail: DocumentMvpDetailRes | null) {
+    const nextMessage = nextDetail?.uiSteps.some(step => step.status === 'PENDING') && !nextDetail.isSuccess && nextDetail.status !== 'VALID'
+      ? '다음 단계 서명이 준비됐어요'
+      : '서명이 완료됐어요'
+
     setSigningState('idle')
-    setSigningMessage(
-      nextDetail?.uiSteps.some(step => step.status === 'PENDING') && !nextDetail.isSuccess && nextDetail.status !== 'VALID'
-        ? '다음 단계 서명이 준비됐어요'
-        : '서명이 완료됐어요',
-    )
+    setSigningMessage(nextMessage)
+    showToast({ tone: 'success', title: nextMessage, message: '진행 내역을 새로 확인했어요' })
   }
 
   function scheduleDetailRefresh() {
@@ -175,15 +216,22 @@ export default function HistoryDetailPage() {
     setSigningState('refreshing')
     setSigningError(null)
     setSigningMessage('서명에 성공했어요. 다음 단계 알림을 기다리고 있어요')
+    showToast({
+      tone: 'success',
+      title: '서명에 성공했어요',
+      message: '다음 단계 알림을 기다리고 있어요',
+    })
     refreshTimerRef.current = window.setTimeout(() => {
       refreshTimerRef.current = null
       void refreshDetail()
         .then(finishRefresh)
         .catch(error => {
           console.error('Failed to refresh document MVP detail:', error)
+          const errorMessage = getErrorMessage(error)
           setSigningState('idle')
-          setSigningError(getErrorMessage(error))
+          setSigningError(errorMessage)
           setSigningMessage(null)
+          showToast({ tone: 'danger', title: '발급 상태를 새로고침하지 못했어요', message: errorMessage })
         })
     }, 3000)
   }
@@ -191,13 +239,20 @@ export default function HistoryDetailPage() {
   async function signPendingStep() {
     if (!detail || !accessToken) return
     if (!wallet.privateKey) {
-      setSigningError('지갑 키를 불러오지 못했어요. 다시 로그인한 뒤 사인해 주세요')
+      const errorMessage = '지갑 키를 불러오지 못했어요. 다시 로그인한 뒤 사인해 주세요'
+      setSigningError(errorMessage)
+      showToast({ tone: 'danger', title: '서명할 수 없어요', message: errorMessage })
       return
     }
 
     setSigningState('signing')
     setSigningError(null)
     setSigningMessage('서명할 크리덴셜을 찾고 있어요')
+    showToast({
+      tone: 'info',
+      title: '서명 처리 중',
+      message: '진행 내역 화면에서 처리 상태를 확인할게요',
+    })
 
     try {
       const credentials = await listCredentials(accessToken)
@@ -223,10 +278,12 @@ export default function HistoryDetailPage() {
       setSigningMessage('서명한 트랜잭션을 제출하고 있어요')
       try {
         await acceptTestnetCredential(accessToken, credentialId, signedTransactionBlob)
+        showToast({ tone: 'success', title: '서명 응답이 도착했어요', message: '다음 발급 단계로 이동할게요' })
       } catch (error) {
         const recoverableSignal = getRecoverableCredentialAcceptSignal(error)
         if (!recoverableSignal) throw error
         setSigningMessage(recoverableSignal)
+        showToast({ tone: 'info', title: '서명 상태를 확인했어요', message: recoverableSignal })
       }
 
       setSigningMessage('다음 발급 단계로 이동하고 있어요')
@@ -234,9 +291,11 @@ export default function HistoryDetailPage() {
       scheduleDetailRefresh()
     } catch (error) {
       console.error('Failed to sign pending credential:', error)
+      const errorMessage = getErrorMessage(error)
       setSigningState('idle')
-      setSigningError(getErrorMessage(error))
+      setSigningError(errorMessage)
       setSigningMessage(null)
+      showToast({ tone: 'danger', title: '서명에 실패했어요', message: errorMessage })
     }
   }
 
@@ -248,9 +307,9 @@ export default function HistoryDetailPage() {
     return (
       <div className="relative flex flex-col flex-1 min-h-full overflow-hidden">
         <AppBar title="발급 진행 중" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
-        <main className="app-content flex-1 text-[12px] leading-relaxed text-sub">
+        <AppContent scrollable={false} className="text-[12px] leading-relaxed text-sub">
           <div className="card text-danger">{errorMessage}</div>
-        </main>
+        </AppContent>
       </div>
     )
   }
@@ -264,6 +323,7 @@ export default function HistoryDetailPage() {
     const pendingStep = detail.uiSteps.find(step => step.status === 'PENDING')
     const isWaitingNextStep = signingState === 'refreshing'
     const shouldShowSigningCta = Boolean(pendingStep && !isDone && !isError && !isWaitingNextStep)
+    const shouldShowSigningSheet = shouldShowSigningCta && signingState === 'idle'
     const isSigning = signingState === 'signing' || signingState === 'refreshing'
 
     return (
@@ -273,7 +333,7 @@ export default function HistoryDetailPage() {
           badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
         />
 
-        <main className="app-content flex-1 overflow-y-auto">
+        <AppContent>
           <div className="flex flex-col items-center pt-4 pb-3 gap-2">
             {isDone ? (
               <>
@@ -357,7 +417,7 @@ export default function HistoryDetailPage() {
               다음 단계가 완료되면 알려드릴게요
             </div>
           )}
-        </main>
+        </AppContent>
 
         {isDone && (
           <PageFooter>
@@ -371,41 +431,64 @@ export default function HistoryDetailPage() {
           </PageFooter>
         )}
 
-        {shouldShowSigningCta && (
+        {toast && (
+          <div
+            key={`${toast.tone}-${toast.title}-${toast.message}`}
+            role={toast.tone === 'danger' ? 'alert' : 'status'}
+            aria-live={toast.tone === 'danger' ? 'assertive' : 'polite'}
+            className={`app-toast absolute left-5 right-5 top-[calc(env(safe-area-inset-top,0px)+16px)] z-20 ${toastToneClass[toast.tone].surface}`}
+          >
+            <div className="app-toast__shine" />
+            <div className="app-toast__body flex items-start gap-3">
+              <span className={`app-toast__badge ${toastToneClass[toast.tone].badge}`}>
+                <ToastIcon tone={toast.tone} />
+              </span>
+              <div className="min-w-0">
+                <div className="app-toast__title">{toast.title}</div>
+                <div className="app-toast__message">{toast.message}</div>
+              </div>
+            </div>
+            <div className="app-toast__timer" aria-hidden="true">
+              <div className={`app-toast__progress ${toastToneClass[toast.tone].progress}`} />
+            </div>
+          </div>
+        )}
+
+        {shouldShowSigningSheet && (
           <div className="bottom-sheet-overlay">
             <div className="bottom-sheet">
               <div className="bottom-sheet-handle" />
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-primary">
                   {isSigning ? <Loader2 size={17} className="animate-spin" strokeWidth={2.4} /> : <FileSignature size={18} strokeWidth={2.4} />}
                 </div>
                 <div className="text-[17px] font-bold text-ink">서명이 필요해요</div>
               </div>
-              <div className="text-[13px] text-sub mb-3">
+              <div className="text-[13px] text-sub mb-4 leading-relaxed">
                 {pendingStep?.label} 단계가 준비됐어요. 다음 단계로 보낼까요?
               </div>
-              <div className="card mb-3" style={{ background: '#F9FAFB' }}>
-                <div className="flex justify-between gap-3 py-1 border-b border-border">
+              <div className="card mb-4" style={{ background: '#F9FAFB' }}>
+                <div className="flex justify-between gap-5 py-3 border-b border-border">
                   <span className="text-[12px] text-muted">서류명</span>
                   <span className="text-[12px] font-bold text-ink text-right">{detail.documentTypeName}</span>
                 </div>
-                <div className="flex justify-between gap-3 py-1 border-b border-border">
+                <div className="flex justify-between gap-5 py-3 border-b border-border">
                   <span className="text-[12px] text-muted">발급기관</span>
                   <span className="text-[12px] font-bold text-ink text-right">{detail.issuerCountryCode}-{detail.issuerIconLabel}</span>
                 </div>
-                <div className="flex justify-between gap-3 py-1">
+                <div className="flex justify-between gap-5 py-3">
                   <span className="text-[12px] text-muted">단계</span>
                   <span className="text-[12px] font-bold text-ink text-right">{pendingStep?.step}/{detail.uiSteps.length} · {pendingStep?.label}</span>
                 </div>
               </div>
-              <div className={`text-[11px] mb-3 ${signingError ? 'text-danger' : 'text-muted'}`}>
+              <div className={`text-[11px] mb-4 ${signingError ? 'text-danger' : 'text-muted'}`}>
                 {signingError ?? signingMessage ?? 'Testnet · Pre-Check Only · XRPL Credential'}
               </div>
               <button
                 type="button"
                 onClick={() => void signPendingStep()}
                 disabled={isSigning || !accessToken}
-                className="btn-primary mb-2"
+                className="btn-primary mb-3"
                 style={{ height: 52, fontSize: 16 }}
               >
                 {isSigning ? '서명 처리 중...' : '사인하기'}
@@ -429,7 +512,7 @@ export default function HistoryDetailPage() {
     return (
       <div className="flex flex-col flex-1 min-h-full">
         <AppBar title="발급 진행 중" />
-        <div className="app-content flex-1 text-[12px] leading-relaxed text-sub">신청 내역을 찾을 수 없어요</div>
+        <AppContent scrollable={false} className="text-[12px] leading-relaxed text-sub">신청 내역을 찾을 수 없어요</AppContent>
       </div>
     )
   }
@@ -446,7 +529,7 @@ export default function HistoryDetailPage() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="flex flex-col items-center pt-4 pb-3 gap-2">
           {isDone ? (
             <>
@@ -500,7 +583,7 @@ export default function HistoryDetailPage() {
             다음 단계가 완료되면 알려드릴게요
           </div>
         )}
-      </main>
+      </AppContent>
     </div>
   )
 }
