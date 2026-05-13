@@ -3,6 +3,7 @@ import { Suspense, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Check } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { TextField } from '@/components/ui/text-field'
 import { PageFooter } from '@/components/ui/page-footer'
@@ -79,7 +80,7 @@ function IssueVerifyView() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">본인 정보를 확인할게요</div>
         <div className="text-[12px] leading-relaxed text-sub mb-3">발급을 위해 본인 명의 인증이 필요해요</div>
 
@@ -146,7 +147,7 @@ function IssueVerifyView() {
             {errorMessage}
           </div>
         )}
-      </main>
+      </AppContent>
 
       <PageFooter>
         <button

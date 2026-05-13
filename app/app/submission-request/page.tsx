@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { PageFooter } from '@/components/ui/page-footer'
 import { mockInstitutions } from '@/lib/mock-data'
@@ -25,7 +26,7 @@ export default function SubmissionRequestPage() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">받은 제출 요청이에요</div>
         <div className="text-[12px] leading-relaxed text-sub mb-2">기관이 먼저 요청한 경우에만 보내드릴 수 있어요</div>
 
@@ -63,7 +64,7 @@ export default function SubmissionRequestPage() {
             </button>
           )
         })}
-      </main>
+      </AppContent>
 
       <PageFooter>
         <button

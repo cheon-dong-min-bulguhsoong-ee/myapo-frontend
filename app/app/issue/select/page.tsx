@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { DocCard } from '@/components/ui/doc-card'
 import { PageFooter } from '@/components/ui/page-footer'
@@ -164,7 +165,7 @@ function IssueSelectView() {
         }
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">
           {isReissue ? '재발급할 서류가 선택되어 있어요' : '어떤 한국 서류를 발급받을까요?'}
         </div>
@@ -206,7 +207,7 @@ function IssueSelectView() {
         )}
 
         <div className="text-[12px] leading-relaxed text-muted mt-3">발급해두면 유효기간 안에 무한 재사용해요</div>
-      </main>
+      </AppContent>
 
       <PageFooter>
         <button
