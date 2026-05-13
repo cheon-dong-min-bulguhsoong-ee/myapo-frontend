@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Clock, ChevronRight } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { ProgressFill } from '@/components/ui/progress-fill'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -79,7 +80,7 @@ export default function HistoryPage() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">진행 중인 발급이에요</div>
         <div className="text-[12px] leading-relaxed text-sub mb-2">신청하신 서류의 발급 상황을 확인하세요</div>
 
@@ -138,7 +139,7 @@ export default function HistoryPage() {
             )
           })
         )}
-      </main>
+      </AppContent>
     </div>
   )
 }

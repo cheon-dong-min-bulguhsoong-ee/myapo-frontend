@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { FilePlus, Wallet, ClipboardList, Scale } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { useAuth } from '@/contexts/auth-context'
 import { listDisputes, listDocumentMvp } from '@/lib/myapo-api'
@@ -104,7 +105,7 @@ export default function HomePage() {
         }
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">무엇을 도와드릴까요?</div>
         <div className="text-[12px] leading-relaxed text-sub mb-3">자주 쓰는 메뉴를 모아두었어요</div>
 
@@ -135,7 +136,7 @@ export default function HomePage() {
             </button>
           ))}
         </div>
-      </main>
+      </AppContent>
     </div>
   )
 }

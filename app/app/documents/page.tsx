@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Folder, ChevronRight, CheckCircle } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Spinner } from '@/components/ui/spinner'
@@ -114,7 +115,7 @@ export default function DocumentsPage() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex flex-1 flex-col gap-3 overflow-y-auto">
+      <AppContent className="flex flex-col gap-3">
         <div>
           <div className="text-[15px] font-bold text-ink mb-1">발급 완료된 증명서예요</div>
           <div className="text-[12px] leading-relaxed text-sub">완료된 문서만 내 증명서에 표시됩니다</div>
@@ -153,7 +154,7 @@ export default function DocumentsPage() {
             ))}
           </>
         )}
-      </main>
+      </AppContent>
     </div>
   )
 }
