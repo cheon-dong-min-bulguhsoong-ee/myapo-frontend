@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { RefreshCw, Bell, FileSignature, Wallet, ShieldCheck } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { Callout } from '@/components/ui/callout'
 import { PageFooter } from '@/components/ui/page-footer'
@@ -29,18 +30,20 @@ function RenewalView() {
   const router = useRouter()
   const params = useSearchParams()
   const docId = params.get('docId')
+  const preselect = params.get('preselect')
+  const documentTypeName = params.get('documentTypeName')
 
   const doc = docId ? mockDocuments.find(d => d.id === docId) ?? null : null
-  const issuableId = doc ? documentTypeToIssuableId[doc.type] : null
+  const issuableId = doc ? documentTypeToIssuableId[doc.type] : preselect
   const issuable = issuableId
     ? mockIssuableDocuments.find(d => d.id === issuableId) ?? null
     : null
 
-  if (docId && !doc) {
+  if (docId && !doc && !preselect) {
     return (
       <div className="flex flex-col flex-1 min-h-full">
         <AppBar title="재발급 안내" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
-        <main className="app-content flex-1 overflow-y-auto">
+        <AppContent>
           <div className="flex flex-col items-center py-12 gap-3">
             <div className="w-14 h-14 rounded-full bg-success-soft flex items-center justify-center">
               <ShieldCheck size={28} strokeWidth={2.2} className="text-success" />
@@ -48,7 +51,7 @@ function RenewalView() {
             <div className="text-[15px] font-bold text-ink text-center">재발급할 문서가 없어요</div>
             <div className="text-[12px] leading-relaxed text-muted text-center">모든 문서가 유효해요</div>
           </div>
-        </main>
+        </AppContent>
         <PageFooter>
           <button onClick={() => router.push('/home')} className="btn-secondary">홈으로</button>
         </PageFooter>
@@ -56,9 +59,9 @@ function RenewalView() {
     )
   }
 
-  const targetName = issuable?.name ?? doc?.type
+  const targetName = issuable?.name ?? documentTypeName ?? doc?.type
   const ctaTarget = issuableId
-    ? `/issue/select?preselect=${issuableId}`
+    ? `/issue/verify?documentTypeCode=${encodeURIComponent(issuableId)}`
     : '/issue/select'
 
   return (
@@ -68,7 +71,7 @@ function RenewalView() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">
           {targetName ? `${targetName}를 다시 발급할게요` : '문서 재발급 안내'}
         </div>
@@ -119,7 +122,7 @@ function RenewalView() {
             </div>
           ))}
         </div>
-      </main>
+      </AppContent>
 
       <PageFooter>
         <button onClick={() => router.push(ctaTarget)} className="btn-primary">
