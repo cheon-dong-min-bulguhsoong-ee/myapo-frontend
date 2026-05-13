@@ -23,7 +23,7 @@ export function Button({ variant = 'primary', children, fullWidth, className = '
       <button
         type="button"
         {...props}
-        className={`inline-flex min-h-10 items-center justify-center px-1 text-[15px] font-semibold text-primary transition-opacity active:opacity-70 disabled:cursor-not-allowed disabled:text-muted ${className}`}
+        className={`inline-flex min-h-10 items-center justify-center px-1 text-sm font-semibold text-primary transition-opacity active:opacity-70 disabled:cursor-not-allowed disabled:text-muted ${className}`}
       >
         {children}
       </button>

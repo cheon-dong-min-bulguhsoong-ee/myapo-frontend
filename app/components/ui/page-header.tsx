@@ -12,12 +12,12 @@ export function PageHeader({ title, subtitle, eyebrow }: PageHeaderProps) {
   return (
     <header>
       {eyebrow && (
-        <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-primary mb-1">
+        <p className="mb-1 text-xs font-bold uppercase tracking-[0.06em] text-primary">
           {eyebrow}
         </p>
       )}
-      <h1 className="text-[15px] font-bold text-ink mb-1">{title}</h1>
-      {subtitle && <p className="text-[12px] leading-relaxed text-sub mb-2">{subtitle}</p>}
+      <h1 className="mb-1 text-lg font-bold leading-snug text-ink">{title}</h1>
+      {subtitle && <p className="mb-2 text-sm leading-relaxed text-sub">{subtitle}</p>}
     </header>
   )
 }
