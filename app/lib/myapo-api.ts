@@ -96,6 +96,7 @@ export interface DocumentMvpUiStepRes {
   statusLabel: string | null
   startedAt: string | null
   completedAt: string | null
+  pdfUrl: string | null
 }
 
 export interface DocumentMvpStageDetailRes {
