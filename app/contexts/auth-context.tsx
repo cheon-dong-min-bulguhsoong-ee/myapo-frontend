@@ -9,7 +9,7 @@ import {
   WEB3AUTH_NETWORK,
   type IProvider,
 } from '@web3auth/base'
-import { Wallet } from 'xrpl'
+import { Client, Wallet } from 'xrpl'
 import ECDSA from 'xrpl/dist/npm/ECDSA'
 import {
   clearMyApoAccessToken,
@@ -38,6 +38,10 @@ const xrplChainConfig = {
 
 const WALLET_STORAGE_KEY = 'myapo_wallet'
 const WEB3AUTH_JWT_STORAGE_KEY = 'web3auth_jwt_token'
+const XRPL_TESTNET_FAUCET_STORAGE_PREFIX = 'myapo_xrpl_testnet_faucet_requested:'
+const XRPL_TESTNET_WS_URL = 'wss://s.altnet.rippletest.net:51233'
+const XRPL_TESTNET_FAUCET_HOST = 'faucet.altnet.rippletest.net'
+const XRPL_TESTNET_FAUCET_PATH = '/accounts'
 
 interface UserInfo {
   name?: string
@@ -94,6 +98,17 @@ function instrumentPrivateKeyProvider(provider: XrplPrivateKeyProvider) {
 
 function extractPrivateKey(privateKeyProvider: XrplPrivateKeyProvider): string | null {
   return capturedPrivateKey.get(privateKeyProvider) ?? null
+}
+
+function getHexBytes(hexValue: string) {
+  const hex = hexValue.startsWith('0x') ? hexValue.slice(2) : hexValue
+  const bytes = new Uint8Array(hex.length / 2)
+  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16)
+  return bytes
+}
+
+function getWalletFromPrivateKey(privateKey: string) {
+  return Wallet.fromEntropy(getHexBytes(privateKey), { algorithm: ECDSA.secp256k1 })
 }
 
 function normalizeUserInfo(value: unknown): UserInfo | null {
@@ -182,10 +197,7 @@ async function readWalletKeys(
 
   if (privateKey && (!publicKey || !address)) {
     try {
-      const hex = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey
-      const bytes = new Uint8Array(hex.length / 2)
-      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16)
-      const wallet = Wallet.fromEntropy(bytes, { algorithm: ECDSA.secp256k1 })
+      const wallet = getWalletFromPrivateKey(privateKey)
       publicKey = publicKey ?? wallet.publicKey
       address = address ?? wallet.classicAddress
     } catch {
@@ -217,6 +229,44 @@ function clearWeb3AuthJwtToken() {
   localStorage.removeItem(WEB3AUTH_JWT_STORAGE_KEY)
 }
 
+function hasRequestedTestnetFaucet(address: string) {
+  if (typeof window === 'undefined') return true
+  return localStorage.getItem(`${XRPL_TESTNET_FAUCET_STORAGE_PREFIX}${address}`) === '1'
+}
+
+function markTestnetFaucetRequested(address: string) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(`${XRPL_TESTNET_FAUCET_STORAGE_PREFIX}${address}`, '1')
+}
+
+async function requestTestnetFaucetSilently(wallet: WalletKeys) {
+  if (!wallet.address || !wallet.privateKey || hasRequestedTestnetFaucet(wallet.address)) return
+
+  const xrplWallet = getWalletFromPrivateKey(wallet.privateKey)
+  if (xrplWallet.classicAddress !== wallet.address) return
+
+  const client = new Client(XRPL_TESTNET_WS_URL)
+  try {
+    await client.connect()
+    await client.fundWallet(xrplWallet, {
+      faucetHost: XRPL_TESTNET_FAUCET_HOST,
+      faucetPath: XRPL_TESTNET_FAUCET_PATH,
+      usageContext: 'myapo-login',
+    })
+    markTestnetFaucetRequested(wallet.address)
+  } finally {
+    await client.disconnect().catch((error: unknown) => {
+      console.warn('XRPL testnet faucet disconnect failed:', error)
+    })
+  }
+}
+
+function requestTestnetFaucetInBackground(wallet: WalletKeys) {
+  void requestTestnetFaucetSilently(wallet).catch((error: unknown) => {
+    console.warn('XRPL testnet faucet request failed:', error)
+  })
+}
+
 async function createMyApoSession(externalToken: string, userInfo: UserInfo | null, wallet: WalletKeys) {
   const myApoUser = await signInWithExternalToken(externalToken, {
     name: userInfo?.name,
@@ -224,6 +274,7 @@ async function createMyApoSession(externalToken: string, userInfo: UserInfo | nu
     xrplAddress: wallet.address ?? undefined,
     publicKey: wallet.publicKey ?? undefined,
   })
+  requestTestnetFaucetInBackground(wallet)
   persistWeb3AuthJwtToken(externalToken)
   persistMyApoAccessToken(myApoUser.accessToken)
   return myApoUser
