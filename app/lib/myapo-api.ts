@@ -154,7 +154,7 @@ export interface DocumentMvpListRes {
 export interface CreateCredentialIssueRequestReq {
   documentTypeId: string
   documentCode: string
-  currentStage: CredentialIssueStage
+  currentStage: DocumentMvpStage
 }
 
 export interface CreateCredentialIssueRequestRes {

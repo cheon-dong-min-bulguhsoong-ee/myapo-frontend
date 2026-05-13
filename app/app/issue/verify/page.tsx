@@ -13,7 +13,7 @@ import {
   MYAPO_PENDING_DOCUMENT_TYPE_STORAGE_KEY,
   createCredentialIssueRequest,
   createDocumentMvp,
-  mapDocumentStageToCredentialStage,
+  getDocumentMvp,
 } from '@/lib/myapo-api'
 
 function getStoredDocumentTypeCode() {
@@ -56,15 +56,16 @@ function IssueVerifyView() {
 
     try {
       const document = await createDocumentMvp(accessToken, { documentTypeCode })
+      const latestDocument = await getDocumentMvp(accessToken, document.documentCode)
       await createCredentialIssueRequest(accessToken, {
-        documentTypeId: document.documentTypeCode,
-        documentCode: document.documentCode,
-        currentStage: mapDocumentStageToCredentialStage(document.currentStage),
+        documentTypeId: latestDocument.documentTypeCode,
+        documentCode: latestDocument.documentCode,
+        currentStage: latestDocument.currentStage,
       })
       if (typeof window !== 'undefined') {
-        sessionStorage.setItem(MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY, document.documentCode)
+        sessionStorage.setItem(MYAPO_LATEST_DOCUMENT_CODE_STORAGE_KEY, latestDocument.documentCode)
       }
-      router.push(`/history/${encodeURIComponent(document.documentCode)}`)
+      router.push(`/history/${encodeURIComponent(latestDocument.documentCode)}`)
     } catch (error) {
       console.error('Failed to create document MVP:', error)
       setErrorMessage(getErrorMessage(error))

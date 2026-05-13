@@ -255,16 +255,18 @@ export default function HistoryDetailPage() {
     })
 
     try {
+      const latestDetail = await getDocumentMvp(accessToken, detail.documentCode)
+      setDetailState({ documentCode: latestDetail.documentCode, detail: latestDetail, errorMessage: null })
       const credentials = await listCredentials(accessToken)
-      const currentStage = mapDocumentStageToCredentialStage(detail.currentStage)
+      const credentialStage = mapDocumentStageToCredentialStage(latestDetail.currentStage)
       const existingCredential = credentials.credentials.find(credential => (
-        credential.documentCode === detail.documentCode && credential.currentStage === currentStage
+        credential.documentCode === latestDetail.documentCode && credential.currentStage === credentialStage
       ))
       const credentialId = existingCredential?.credentialId
         ?? (await createCredentialIssueRequest(accessToken, {
-          documentTypeId: detail.documentTypeCode,
-          documentCode: detail.documentCode,
-          currentStage,
+          documentTypeId: latestDetail.documentTypeCode,
+          documentCode: latestDetail.documentCode,
+          currentStage: latestDetail.currentStage,
         })).credentialId
 
       if (!credentialId) {
