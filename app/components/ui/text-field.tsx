@@ -12,7 +12,7 @@ export function TextField({ label, trailing, hint, error, ...inputProps }: TextF
   const inputClass = `text-input ${error ? 'error' : ''}`.trim()
   return (
     <div>
-      <p className="text-[12px] font-semibold text-sub mb-2 px-1">{label}</p>
+      <p className="mb-2 px-1 text-xs font-semibold text-sub">{label}</p>
       {trailing ? (
         <div className="flex gap-2">
           <input {...inputProps} className={`${inputClass} flex-1`} />
@@ -22,7 +22,7 @@ export function TextField({ label, trailing, hint, error, ...inputProps }: TextF
         <input {...inputProps} className={inputClass} />
       )}
       {(hint || error) && (
-        <p className={`mt-1.5 text-[12px] ${error ? 'text-danger' : 'text-muted'} px-1`}>
+        <p className={`mt-2 px-1 text-xs ${error ? 'text-danger' : 'text-muted'}`}>
           {error ?? hint}
         </p>
       )}
