@@ -2,6 +2,7 @@
 import { useParams } from 'next/navigation'
 import { MessageSquare } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { mockDisputes } from '@/lib/mock-data'
 import { disputeStatusMap } from '@/lib/dispute-status'
@@ -14,7 +15,7 @@ export default function DisputeDetailPage() {
     return (
       <div className="flex flex-col flex-1 min-h-full">
         <AppBar title="이의 신청 상세" />
-        <div className="app-content flex-1 text-[12px] leading-relaxed text-sub">이의 신청을 찾을 수 없어요</div>
+        <AppContent scrollable={false} className="text-[12px] leading-relaxed text-sub">이의 신청을 찾을 수 없어요</AppContent>
       </div>
     )
   }
@@ -26,7 +27,7 @@ export default function DisputeDetailPage() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="card mb-3">
           <div className="flex items-center justify-between mb-2">
             <Pill variant={disputeStatusMap[d.status].variant} size="sm">
@@ -48,7 +49,7 @@ export default function DisputeDetailPage() {
             <p className="text-[15px] leading-relaxed text-ink">{d.operatorResponse}</p>
           </div>
         )}
-      </main>
+      </AppContent>
     </div>
   )
 }

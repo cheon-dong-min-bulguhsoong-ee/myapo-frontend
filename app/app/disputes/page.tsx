@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation'
 import { AlertCircle, ChevronRight } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PageFooter } from '@/components/ui/page-footer'
@@ -18,7 +19,7 @@ export default function DisputesPage() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">이의 신청 내역</div>
         <div className="text-[12px] leading-relaxed text-sub mb-2">신고하신 건의 처리 상태를 확인하세요</div>
 
@@ -48,7 +49,7 @@ export default function DisputesPage() {
             </button>
           ))
         )}
-      </main>
+      </AppContent>
 
       <PageFooter>
         <button onClick={() => router.push('/disputes/new')} className="btn-danger">

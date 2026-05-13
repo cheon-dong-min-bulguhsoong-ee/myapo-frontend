@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check } from 'lucide-react'
 import { AppBar } from '@/components/ui/app-bar'
+import { AppContent } from '@/components/ui/app-content'
 import { Pill } from '@/components/ui/pill'
 import { TextArea } from '@/components/ui/text-area'
 import { PageFooter } from '@/components/ui/page-footer'
@@ -25,7 +26,7 @@ export default function DisputeNewPage() {
         badges={<Pill variant="testnet" size="sm">Testnet</Pill>}
       />
 
-      <main className="app-content flex-1 overflow-y-auto">
+      <AppContent>
         <div className="text-[15px] font-bold text-ink mb-1">어떤 문제가 있었나요?</div>
         <div className="text-[12px] leading-relaxed text-sub mb-3">자세히 알려주시면 빠르게 처리해 드릴게요</div>
 
@@ -83,7 +84,7 @@ export default function DisputeNewPage() {
           placeholder="불편하셨던 내용을 자세히 설명해 주세요 (10자 이상)"
           showCount
         />
-      </main>
+      </AppContent>
 
       <PageFooter>
         <button
