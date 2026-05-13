@@ -33,7 +33,7 @@ export default function PersonaSelectPage() {
     <div className="flex flex-col flex-1 min-h-full bg-base">
       <AppBar wordmark showBack={false} />
 
-      <main className="flex-1 px-5 pt-7 pb-5 flex flex-col">
+      <main className="flex-1 px-5 py-7 flex flex-col items-center justify-center">
         <div className="text-center mb-7">
           <h1 className="text-[22px] font-bold text-ink leading-snug tracking-[-0.02em]">
             어떤 분이신가요?
@@ -43,7 +43,7 @@ export default function PersonaSelectPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid w-full max-w-[390px] grid-cols-2 gap-3">
           {personas.map(({ value, label, sublabel, icon: Icon }) => {
             const isSelected = selected === value
             return (
