@@ -99,8 +99,20 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
   overflow-y: auto;
 }
 .app-content {
-  /* Mirrors `.mobile-content` in reference: 12px 20px 8px. */
-  padding: 12px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  justify-content: safe center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 20px 32px;
+  scroll-padding-bottom: 96px;
+}
+.app-content > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 390px;
 }
 
 /* Safe-area helpers */
@@ -149,24 +161,26 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
 .app-bar-back:active { background: #F9FAFB; transform: scale(0.92); }
 
 /* ───────── Bottom CTA + bottom-nav (production page-footer + home-bar) ── */
-.mobile-cta {
-  padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 12px);
-  background: #FFFFFF;
-  border-top: 1px solid #E5E8EB;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.mobile-cta,
 .page-footer {
-  /* alias of mobile-cta for back-compat */
-  padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 12px);
+  padding: 14px 20px calc(env(safe-area-inset-bottom, 0px) + 14px);
   background: #FFFFFF;
   border-top: 1px solid #E5E8EB;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  width: 100%;
+}
+.mobile-cta > *,
+.page-footer > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 390px;
 }
 .mobile-nav {
   height: calc(56px + env(safe-area-inset-bottom, 0px));
@@ -296,7 +310,7 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
   border: 1px solid #E5E8EB;
   border-radius: 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
-  padding: 16px;
+  padding: 18px;
 }
 .card.no-shadow { box-shadow: none; }
 .card.flat { box-shadow: none; }
@@ -330,18 +344,18 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
 .doc-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 12px;
 }
 .doc-card {
   background: #FFFFFF;
   border: 1.5px solid #E5E8EB;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   cursor: pointer;
   transition: border-color 120ms, background 120ms;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   text-align: left;
   font-family: inherit;
@@ -464,7 +478,114 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
   0%, 100% { box-shadow: 0 0 0 0 rgba(49, 130, 246, 0.4); }
   50%      { box-shadow: 0 0 0 4px rgba(49, 130, 246, 0); }
 }
+@keyframes toastSlideDown {
+  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastTimer {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
 .pulse-border { animation: pulseRing 1.5s ease-in-out infinite; }
+.app-toast {
+  --toast-tone: var(--color-primary);
+  --toast-soft: var(--color-primary-soft);
+  --toast-ink: var(--color-primary-deep);
+  overflow: hidden;
+  padding: 14px 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--toast-tone) 22%, var(--color-card));
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--toast-soft) 76%, var(--color-card)) 0%, var(--color-card) 56%),
+    var(--color-card);
+  box-shadow:
+    0 18px 38px color-mix(in srgb, var(--color-ink) 14%, transparent),
+    0 4px 12px color-mix(in srgb, var(--toast-tone) 12%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-card) 92%, transparent);
+  animation: toastSlideDown 260ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  isolation: isolate;
+}
+.app-toast--info {
+  --toast-tone: var(--color-primary);
+  --toast-soft: var(--color-primary-soft);
+  --toast-ink: var(--color-primary-deep);
+}
+.app-toast--success {
+  --toast-tone: var(--color-success);
+  --toast-soft: var(--color-success-soft);
+  --toast-ink: var(--color-success);
+}
+.app-toast--danger {
+  --toast-tone: var(--color-danger);
+  --toast-soft: var(--color-danger-soft);
+  --toast-ink: var(--color-danger);
+}
+.app-toast__shine {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 48px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-card) 72%, transparent), transparent);
+  opacity: 0.76;
+  pointer-events: none;
+  z-index: 0;
+}
+.app-toast__body {
+  position: relative;
+  z-index: 1;
+}
+.app-toast__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  color: var(--toast-ink);
+  background: color-mix(in srgb, var(--toast-soft) 84%, var(--color-card));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--toast-tone) 18%, transparent),
+    0 6px 14px color-mix(in srgb, var(--toast-tone) 14%, transparent);
+  flex-shrink: 0;
+}
+.app-toast__badge--info { color: var(--color-primary-deep); }
+.app-toast__badge--success { color: var(--color-success); }
+.app-toast__badge--danger { color: var(--color-danger); }
+.app-toast__title {
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+}
+.app-toast__message {
+  margin-top: 3px;
+  color: var(--color-sub);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.48;
+}
+.app-toast__timer {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 8px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--toast-soft) 74%, var(--color-card));
+  z-index: 1;
+}
+.app-toast__progress {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--toast-tone) 72%, var(--color-card)), var(--toast-tone));
+  transform-origin: left center;
+  animation: toastTimer 3800ms linear forwards;
+}
+.app-toast__progress--info { background: linear-gradient(90deg, var(--color-info), var(--color-primary)); }
+.app-toast__progress--success { background: var(--color-success); }
+.app-toast__progress--danger { background: var(--color-danger); }
 
 /* ───────── Bottom sheet (A-02 signature, A-04 confirm, A-06 download) ──── */
 .bottom-sheet-overlay {
@@ -503,7 +624,9 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
 }
 @media (prefers-reduced-motion: reduce) {
   .bottom-sheet-overlay,
-  .bottom-sheet {
+  .bottom-sheet,
+  .app-toast,
+  .app-toast__progress {
     animation: none;
   }
 }
@@ -547,8 +670,8 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
 /* ───────── Form fields ─────────────────────────────────────────────────── */
 .text-input {
   width: 100%;
-  height: 48px;
-  padding: 0 14px;
+  height: 50px;
+  padding: 0 16px;
   background: #FFFFFF;
   border: 1px solid #E5E8EB;
   border-radius: 12px;
@@ -568,7 +691,7 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
 .text-area {
   width: 100%;
   min-height: 120px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: #FFFFFF;
   border: 1px solid #E5E8EB;
   border-radius: 12px;
@@ -594,7 +717,7 @@ input, button, .tabular { font-variant-numeric: tabular-nums; }
   background: #FFFFFF;
   border: 1.5px solid #E5E8EB;
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
   cursor: pointer;
   transition: border-color 120ms, background 120ms;
   text-align: left;
