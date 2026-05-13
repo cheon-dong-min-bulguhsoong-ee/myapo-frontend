@@ -8,7 +8,14 @@ import { BottomHomeBar } from '@/components/ui/bottom-home-bar'
 import { ProductNav } from '@/components/product-nav'
 
 const PRODUCT_ROUTES = new Set(['/'])
-const PRODUCT_NAV_ROUTES = new Set(['/home'])
+const PRODUCT_NAV_ROUTES = new Set([
+  '/home',
+  '/persona-select',
+  '/issue/select',
+  '/documents',
+  '/history',
+  '/disputes',
+])
 
 export function RouteShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
