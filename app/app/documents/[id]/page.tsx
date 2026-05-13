@@ -150,7 +150,7 @@ export default function DocumentDetailPage() {
           <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center">
             <Spinner size="lg" tone="primary" />
           </div>
-          <div className="text-[15px] font-bold text-ink">문서 상세를 불러오고 있어요</div>
+          <div className="text-base font-bold text-ink">문서 상세를 불러오고 있어요</div>
         </main>
       </div>
     )
@@ -160,7 +160,7 @@ export default function DocumentDetailPage() {
     return (
       <div className="flex flex-col flex-1 min-h-full">
         <AppBar title="문서 상세" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
-        <main className="app-content flex-1 text-[12px] leading-relaxed text-sub">
+        <main className="app-content flex-1 text-sm leading-relaxed text-sub">
           <div className="card text-danger">{errorMessage}</div>
         </main>
       </div>
@@ -177,14 +177,14 @@ export default function DocumentDetailPage() {
 
         <main className="app-content flex-1 overflow-y-auto space-y-6 pb-6">
           <section className="card">
-            <div className="flex items-center justify-between mb-3.5">
+            <div className="mb-4 flex items-center justify-between">
               <Pill variant={detail.isSuccess ? 'success' : 'warning'} size="sm">
                 {detail.statusLabel}
               </Pill>
               <FileText size={20} className="text-muted" />
             </div>
-            <div className="text-[18px] font-bold text-ink leading-snug">{detail.documentTypeName}</div>
-            <div className="text-[12px] text-sub mt-2">{detail.issuerCountryCode}-{detail.issuerIconLabel} · {detail.issuerName}</div>
+            <div className="text-lg font-bold leading-snug text-ink">{detail.documentTypeName}</div>
+            <div className="mt-2 text-sm text-sub">{detail.issuerCountryCode}-{detail.issuerIconLabel} · {detail.issuerName}</div>
           </section>
 
           <section className="card flex flex-col gap-4">
@@ -231,7 +231,7 @@ export default function DocumentDetailPage() {
     return (
       <div className="flex flex-col flex-1 min-h-full">
         <AppBar title="문서 상세" />
-        <div className="app-content flex-1 text-[12px] leading-relaxed text-sub">문서를 찾을 수 없어요</div>
+        <div className="app-content flex-1 text-sm leading-relaxed text-sub">문서를 찾을 수 없어요</div>
       </div>
     )
   }
@@ -247,7 +247,7 @@ export default function DocumentDetailPage() {
 
       <main className="app-content flex-1 overflow-y-auto space-y-5 pb-5">
         <section className="card">
-          <div className="flex items-center justify-between mb-3.5">
+            <div className="mb-4 flex items-center justify-between">
             {expired ? (
               <Pill variant="revoked" size="sm">Revoked · 자동 폐기됨</Pill>
             ) : (
@@ -255,8 +255,8 @@ export default function DocumentDetailPage() {
             )}
             <FileText size={20} className="text-muted" />
           </div>
-          <div className="text-[18px] font-bold text-ink leading-snug">{doc.type} (영문)</div>
-          <div className="text-[12px] text-sub mt-2">한국 정부 발급</div>
+          <div className="text-lg font-bold leading-snug text-ink">{doc.type} (영문)</div>
+          <div className="mt-2 text-sm text-sub">한국 정부 발급</div>
           {doc.isExpiringSoon && !expired && (
             <div className="mt-3">
               <Pill variant="warning" size="sm">D-7 만료 예정</Pill>
@@ -294,8 +294,8 @@ export default function DocumentDetailPage() {
 function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-[12px] text-muted flex-shrink-0">{label}</span>
-      <span className={`text-[13px] font-bold text-ink text-right ${mono ? 'font-mono break-all' : ''}`}>{value}</span>
+      <span className="flex-shrink-0 text-xs text-muted">{label}</span>
+      <span className={`text-right text-sm font-bold text-ink ${mono ? 'font-mono break-all' : ''}`}>{value}</span>
     </div>
   )
 }
@@ -320,23 +320,23 @@ function DocumentStepHistory({
   if (!steps.length) return null
 
   return (
-    <section className="flex flex-col gap-7">
+    <section className="flex flex-col gap-6">
       <div className="rounded-[12px] bg-primary-soft p-5">
-        <div className="flex items-center gap-3.5">
+        <div className="flex items-center gap-4">
           <div className="w-11 h-11 rounded-[10px] bg-card border border-border flex items-center justify-center flex-shrink-0">
             <FileText size={19} className="text-primary" strokeWidth={2.1} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[13.5px] font-bold text-ink truncate">{documentTypeName}</div>
-            <div className="text-[11.5px] text-sub truncate mt-2">{issuerName} · {issuerCountryCode}-{issuerIconLabel}</div>
+            <div className="truncate text-sm font-bold text-ink">{documentTypeName}</div>
+            <div className="mt-2 truncate text-xs text-sub">{issuerName} · {issuerCountryCode}-{issuerIconLabel}</div>
           </div>
           <Pill variant={isSuccess ? 'success' : 'warning'} size="sm">{isSuccess ? '정상' : '진행'}</Pill>
         </div>
       </div>
 
       <div>
-        <div className="text-[14px] font-bold text-ink">발급 단계별 이력이에요</div>
-        <div className="text-[11.5px] text-muted mt-3 leading-relaxed">
+        <div className="text-base font-bold text-ink">발급 단계별 이력이에요</div>
+        <div className="mt-2 text-xs leading-relaxed text-muted">
           {isSuccess ? '각 단계를 눌러 PDF를 다운로드할 수 있어요' : '진행 중인 단계가 있어요'}
         </div>
       </div>
@@ -387,13 +387,7 @@ function StepHistoryCard({
   const filename = step.pdfUrl ? getPdfFilename(step.pdfUrl, `${step.label}.pdf`) : ''
 
   return (
-    <div
-      className="card"
-      style={{
-        border: step.status === 'active' ? '1.5px solid #3182F6' : '1.5px solid #E5E8EB',
-        padding: '22px 20px',
-      }}
-    >
+    <div className={`card dense ${step.status === 'active' ? 'border-primary' : 'border-strong'}`}>
       <button
         type="button"
         onClick={onToggle}
@@ -410,11 +404,11 @@ function StepHistoryCard({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-[11px] font-bold text-muted">단계 {step.step}</span>
+            <span className="text-xs font-bold text-muted">단계 {step.step}</span>
             <Pill variant={badgeVariant} size="sm">{step.statusLabel}</Pill>
           </div>
-          <div className="text-[14.5px] font-bold text-ink leading-snug">{step.label}</div>
-          <div className="text-[11.5px] text-sub mt-4">{timeLabel}</div>
+          <div className="text-sm font-bold leading-snug text-ink">{step.label}</div>
+          <div className="mt-3 text-xs text-sub">{timeLabel}</div>
         </div>
         {hasDownload && (
           <ChevronDown
@@ -430,16 +424,16 @@ function StepHistoryCard({
           <a
             href={buildPdfProxyUrl(step.pdfUrl, filename)}
             download={filename}
-            className="flex items-center gap-5 py-5 pl-5 pr-7 rounded-[12px] bg-primary-soft hover:bg-primary-soft active:scale-[0.98] transition-transform"
+            className="flex items-center gap-4 rounded-xl bg-primary-soft py-5 pl-5 pr-6 transition-transform hover:bg-primary-soft active:scale-[0.98]"
           >
             <div className="w-11 h-11 rounded-[10px] bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
               <Download size={18} className="text-primary" strokeWidth={2.2} />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13.5px] font-bold text-ink">PDF 다운로드</div>
-              <div className="text-[11px] text-muted truncate mt-2">{filename}</div>
+              <div className="text-sm font-bold text-ink">PDF 다운로드</div>
+              <div className="mt-2 truncate text-xs text-muted">{filename}</div>
             </div>
-            <div className="text-[11px] font-bold text-primary flex-shrink-0">받기</div>
+            <div className="flex-shrink-0 text-xs font-bold text-primary">받기</div>
           </a>
         </div>
       )}

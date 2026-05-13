@@ -75,7 +75,7 @@ function HistoryLoadingShell() {
     <div className="flex flex-col flex-1 min-h-full">
       <AppBar title="발급 진행 중" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
       <AppContent>
-        <div className="card flex items-center justify-center gap-2 p-4 text-[13px] leading-relaxed text-sub">
+        <div className="card flex items-center justify-center gap-2 p-4 text-sm leading-relaxed text-sub">
           <Spinner size="sm" tone="primary" />
           발급 현황을 불러오고 있어요
         </div>
@@ -307,7 +307,7 @@ export default function HistoryDetailPage() {
     return (
       <div className="relative flex flex-col flex-1 min-h-full overflow-hidden">
         <AppBar title="발급 진행 중" badges={<Pill variant="testnet" size="sm">Testnet</Pill>} />
-        <AppContent scrollable={false} className="text-[12px] leading-relaxed text-sub">
+        <AppContent scrollable={false} className="text-sm leading-relaxed text-sub">
           <div className="card text-danger">{errorMessage}</div>
         </AppContent>
       </div>
@@ -340,24 +340,24 @@ export default function HistoryDetailPage() {
                 <div className="w-16 h-16 rounded-full bg-success-soft flex items-center justify-center">
                   <CheckCircle size={36} className="text-success" strokeWidth={2} />
                 </div>
-                <div className="text-[17px] font-bold text-ink text-center">발급이 완료됐어요</div>
-                <div className="text-[12px] leading-relaxed text-sub text-center">{detail.documentTypeName}가<br />지갑에 도착했어요</div>
+                <div className="text-center text-lg font-bold text-ink">발급이 완료됐어요</div>
+                <div className="text-center text-sm leading-relaxed text-sub">{detail.documentTypeName}가<br />지갑에 도착했어요</div>
               </>
             ) : isError ? (
               <>
                 <div className="w-16 h-16 rounded-full bg-danger-soft flex items-center justify-center">
                   <AlertTriangle size={32} className="text-danger" strokeWidth={2} />
                 </div>
-                <div className="text-[17px] font-bold text-ink text-center">잠시 멈췄어요</div>
-                <div className="text-[12px] leading-relaxed text-sub text-center">{detail.statusLabel}</div>
+                <div className="text-center text-lg font-bold text-ink">잠시 멈췄어요</div>
+                <div className="text-center text-sm leading-relaxed text-sub">{detail.statusLabel}</div>
               </>
             ) : (
               <>
                 <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center">
                   <Spinner size="lg" tone="primary" />
                 </div>
-                <div className="text-[17px] font-bold text-ink text-center">{activeStage?.label ?? detail.currentStageLabel}</div>
-                <div className="text-[12px] leading-relaxed text-sub text-center">{detail.statusLabel}</div>
+                <div className="text-center text-lg font-bold text-ink">{activeStage?.label ?? detail.currentStageLabel}</div>
+                <div className="text-center text-sm leading-relaxed text-sub">{detail.statusLabel}</div>
               </>
             )}
           </div>
@@ -365,10 +365,10 @@ export default function HistoryDetailPage() {
           <div className="card mb-3">
             <div className="flex items-start justify-between gap-3 mb-2">
               <div>
-                <div className="text-[15px] font-bold text-ink">{detail.documentTypeName}</div>
-                <div className="text-[12px] font-medium text-sub mt-0.5">{detail.issuerName} · {detail.issuerCountryCode}-{detail.issuerIconLabel}</div>
+                <div className="text-base font-bold text-ink">{detail.documentTypeName}</div>
+                <div className="mt-1 text-xs font-medium text-sub">{detail.issuerName} · {detail.issuerCountryCode}-{detail.issuerIconLabel}</div>
               </div>
-              <span className={`text-[12px] font-bold ${isDone ? 'text-success' : isError ? 'text-danger' : 'text-primary'}`}>
+              <span className={`text-xs font-bold ${isDone ? 'text-success' : isError ? 'text-danger' : 'text-primary'}`}>
                 {detail.statusLabel}
               </span>
             </div>
@@ -378,41 +378,41 @@ export default function HistoryDetailPage() {
             {!isDone && !isError && (
               <>
                 <ProgressFill value={progress} />
-                <div className="text-[12px] text-muted mt-1 text-right">{detail.currentStageLabel} 처리 중이에요</div>
+                <div className="mt-1 text-right text-xs text-muted">{detail.currentStageLabel} 처리 중이에요</div>
               </>
             )}
-            <div className="mt-2 text-[10px] text-muted">신청일 {formatDate(detail.requestedAt)}</div>
-            <div className="mt-1 text-[10px] text-muted font-mono break-all">문서 ID {detail.documentCode}</div>
+            <div className="mt-2 text-xs text-muted">신청일 {formatDate(detail.requestedAt)}</div>
+            <div className="mt-1 break-all font-mono text-xs text-muted">문서 ID {detail.documentCode}</div>
           </div>
 
           {shouldShowSigningCta && (
-            <div className="card mb-3" style={{ border: '1px solid #3182F6', background: '#E8F2FE' }}>
+            <div className="card status-primary mb-3">
               <div className="flex items-start gap-2">
                 <Bell size={16} className="text-primary mt-0.5 flex-shrink-0" strokeWidth={2.4} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold text-ink">{pendingStep?.label} 단계 서명이 필요해요</div>
-                  <div className="text-[11px] text-sub mt-0.5">다음 발급 단계로 보내려면 지갑 승인이 필요해요</div>
-                  <div className="text-[10px] text-muted mt-1">Testnet · XRPL CredentialAccept</div>
+                  <div className="text-sm font-bold text-ink">{pendingStep?.label} 단계 서명이 필요해요</div>
+                  <div className="mt-1 text-xs text-sub">다음 발급 단계로 보내려면 지갑 승인이 필요해요</div>
+                  <div className="mt-1 text-xs text-muted">Testnet · XRPL CredentialAccept</div>
                 </div>
               </div>
             </div>
           )}
 
           {isWaitingNextStep && !isDone && !isError && (
-            <div className="card mb-3" style={{ border: '1px solid #00A661', background: '#E6F8EE' }}>
+            <div className="card status-success mb-3">
               <div className="flex items-start gap-2">
                 <CheckCircle size={16} className="text-success mt-0.5 flex-shrink-0" strokeWidth={2.4} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold text-ink">서명에 성공했어요</div>
-                  <div className="text-[11px] text-sub mt-0.5">3초 뒤 다음 서명 알림을 확인할게요</div>
-                  <div className="text-[10px] text-muted mt-1">Testnet · 다음 단계 확인 중</div>
+                  <div className="text-sm font-bold text-ink">서명에 성공했어요</div>
+                  <div className="mt-1 text-xs text-sub">3초 뒤 다음 서명 알림을 확인할게요</div>
+                  <div className="mt-1 text-xs text-muted">Testnet · 다음 단계 확인 중</div>
                 </div>
               </div>
             </div>
           )}
 
           {!shouldShowSigningCta && !isDone && !isError && (
-            <div className="text-[12px] text-muted text-center">
+            <div className="text-center text-xs text-muted">
               <Clock size={14} className="inline-block mr-1 align-middle" strokeWidth={2} />
               다음 단계가 완료되면 알려드릴게요
             </div>
@@ -462,26 +462,26 @@ export default function HistoryDetailPage() {
                 <div className="w-8 h-8 rounded-full bg-primary-soft flex items-center justify-center text-primary">
                   {isSigning ? <Loader2 size={17} className="animate-spin" strokeWidth={2.4} /> : <FileSignature size={18} strokeWidth={2.4} />}
                 </div>
-                <div className="text-[17px] font-bold text-ink">서명이 필요해요</div>
+                <div className="text-lg font-bold text-ink">서명이 필요해요</div>
               </div>
-              <div className="text-[13px] text-sub mb-4 leading-relaxed">
+              <div className="mb-4 text-sm leading-relaxed text-sub">
                 {pendingStep?.label} 단계가 준비됐어요. 다음 단계로 보낼까요?
               </div>
-              <div className="card mb-4" style={{ background: '#F9FAFB' }}>
+              <div className="card surface-base mb-4">
                 <div className="flex justify-between gap-5 py-3 border-b border-border">
-                  <span className="text-[12px] text-muted">서류명</span>
-                  <span className="text-[12px] font-bold text-ink text-right">{detail.documentTypeName}</span>
+                  <span className="text-xs text-muted">서류명</span>
+                  <span className="text-right text-xs font-bold text-ink">{detail.documentTypeName}</span>
                 </div>
                 <div className="flex justify-between gap-5 py-3 border-b border-border">
-                  <span className="text-[12px] text-muted">발급기관</span>
-                  <span className="text-[12px] font-bold text-ink text-right">{detail.issuerCountryCode}-{detail.issuerIconLabel}</span>
+                  <span className="text-xs text-muted">발급기관</span>
+                  <span className="text-right text-xs font-bold text-ink">{detail.issuerCountryCode}-{detail.issuerIconLabel}</span>
                 </div>
                 <div className="flex justify-between gap-5 py-3">
-                  <span className="text-[12px] text-muted">단계</span>
-                  <span className="text-[12px] font-bold text-ink text-right">{pendingStep?.step}/{detail.uiSteps.length} · {pendingStep?.label}</span>
+                  <span className="text-xs text-muted">단계</span>
+                  <span className="text-right text-xs font-bold text-ink">{pendingStep?.step}/{detail.uiSteps.length} · {pendingStep?.label}</span>
                 </div>
               </div>
-              <div className={`text-[11px] mb-4 ${signingError ? 'text-danger' : 'text-muted'}`}>
+              <div className={`mb-4 text-xs ${signingError ? 'text-danger' : 'text-muted'}`}>
                 {signingError ?? signingMessage ?? 'Testnet · Pre-Check Only · XRPL Credential'}
               </div>
               <button
@@ -489,7 +489,6 @@ export default function HistoryDetailPage() {
                 onClick={() => void signPendingStep()}
                 disabled={isSigning || !accessToken}
                 className="btn-primary mb-3"
-                style={{ height: 52, fontSize: 16 }}
               >
                 {isSigning ? '서명 처리 중...' : '사인하기'}
               </button>
@@ -497,7 +496,6 @@ export default function HistoryDetailPage() {
                 type="button"
                 disabled={isSigning}
                 className="btn-secondary"
-                style={{ height: 40, fontSize: 14 }}
               >
                 나중에 할게요
               </button>
@@ -512,7 +510,7 @@ export default function HistoryDetailPage() {
     return (
       <div className="flex flex-col flex-1 min-h-full">
         <AppBar title="발급 진행 중" />
-        <AppContent scrollable={false} className="text-[12px] leading-relaxed text-sub">신청 내역을 찾을 수 없어요</AppContent>
+        <AppContent scrollable={false} className="text-sm leading-relaxed text-sub">신청 내역을 찾을 수 없어요</AppContent>
       </div>
     )
   }
@@ -536,32 +534,32 @@ export default function HistoryDetailPage() {
               <div className="w-16 h-16 rounded-full bg-success-soft flex items-center justify-center">
                 <CheckCircle size={36} className="text-success" strokeWidth={2} />
               </div>
-              <div className="text-[17px] font-bold text-ink text-center">서명을 모두 완료했어요</div>
-              <div className="text-[12px] leading-relaxed text-sub text-center">{app.documentType}가<br />곧 도착해요</div>
+              <div className="text-center text-lg font-bold text-ink">서명을 모두 완료했어요</div>
+              <div className="text-center text-sm leading-relaxed text-sub">{app.documentType}가<br />곧 도착해요</div>
             </>
           ) : isError ? (
             <>
               <div className="w-16 h-16 rounded-full bg-danger-soft flex items-center justify-center">
                 <AlertTriangle size={32} className="text-danger" strokeWidth={2} />
               </div>
-              <div className="text-[17px] font-bold text-ink text-center">잠시 멈췄어요</div>
-              <div className="text-[12px] leading-relaxed text-sub text-center">기관 응답이 없어요. 다시 시도할 수 있어요.</div>
+              <div className="text-center text-lg font-bold text-ink">잠시 멈췄어요</div>
+              <div className="text-center text-sm leading-relaxed text-sub">기관 응답이 없어요. 다시 시도할 수 있어요.</div>
             </>
           ) : (
             <>
               <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center">
                 <Spinner size="lg" tone="primary" />
               </div>
-              <div className="text-[17px] font-bold text-ink text-center">{activeStage?.label ?? '진행 중이에요'}</div>
-              <div className="text-[12px] leading-relaxed text-sub text-center">단계 {app.stage}/{app.totalStages}을 처리 중이에요</div>
+              <div className="text-center text-lg font-bold text-ink">{activeStage?.label ?? '진행 중이에요'}</div>
+              <div className="text-center text-sm leading-relaxed text-sub">단계 {app.stage}/{app.totalStages}을 처리 중이에요</div>
             </>
           )}
         </div>
 
         <div className="card mb-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[15px] font-bold text-ink">진행 단계</span>
-            <span className={`text-[12px] font-bold ${isDone ? 'text-success' : isError ? 'text-danger' : 'text-primary'}`}>
+            <span className="text-base font-bold text-ink">진행 단계</span>
+            <span className={`text-xs font-bold ${isDone ? 'text-success' : isError ? 'text-danger' : 'text-primary'}`}>
               {isDone ? `${app.totalStages}/${app.totalStages} 완료` : `${app.stage}/${app.totalStages} ${isError ? '오류' : '진행'}`}
             </span>
           </div>
@@ -571,14 +569,14 @@ export default function HistoryDetailPage() {
           {!isDone && !isError && (
             <>
               <ProgressFill value={stepProgress} />
-              <div className="text-[12px] text-muted mt-1 text-right">{activeStage?.label} 처리 중이에요</div>
+              <div className="mt-1 text-right text-xs text-muted">{activeStage?.label} 처리 중이에요</div>
             </>
           )}
-          <div className="mt-2 text-[10px] text-muted">신청일 {app.createdAt}</div>
+          <div className="mt-2 text-xs text-muted">신청일 {app.createdAt}</div>
         </div>
 
         {!isDone && !isError && (
-          <div className="text-[12px] text-muted text-center">
+          <div className="text-center text-xs text-muted">
             <Clock size={14} className="inline-block mr-1 align-middle" strokeWidth={2} />
             다음 단계가 완료되면 알려드릴게요
           </div>

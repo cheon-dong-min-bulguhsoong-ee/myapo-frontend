@@ -43,15 +43,15 @@ function LoginView() {
         <div className="w-16 h-16 rounded-full bg-primary-soft flex items-center justify-center mb-2">
           <ShieldCheck size={32} className="text-primary" strokeWidth={2} />
         </div>
-        <h1 className="text-[28px] font-bold text-primary">MyApo</h1>
-        <p className="text-[12px] leading-relaxed text-sub text-center">
+        <h1 className="text-3xl font-bold text-primary">MyApo</h1>
+        <p className="text-center text-sm leading-relaxed text-sub">
           해외 제출용 공공문서를<br />간편하게 발급하고 관리하세요
         </p>
       </div>
 
       <div className="px-5 pb-8 pt-3">
         {(error || expiredMessage) && (
-          <div className="mb-3 text-[12px] leading-relaxed text-danger text-center">{error ?? expiredMessage}</div>
+          <div className="mb-3 text-center text-xs leading-relaxed text-danger">{error ?? expiredMessage}</div>
         )}
         <button
           onClick={handleLogin}
@@ -70,7 +70,7 @@ function LoginView() {
             </>
           )}
         </button>
-        <div className="flex justify-center gap-4 text-[12px] text-muted">
+        <div className="flex justify-center gap-4 text-xs text-muted">
           <button onClick={() => setOpen('terms')} className="underline-offset-2 hover:underline">이용약관</button>
           <span aria-hidden>·</span>
           <button onClick={() => setOpen('privacy')} className="underline-offset-2 hover:underline">개인정보처리방침</button>
@@ -84,10 +84,10 @@ function LoginView() {
         >
           <div className="bottom-sheet" onClick={e => e.stopPropagation()}>
             <div className="bottom-sheet-handle" />
-            <h2 className="text-[17px] font-bold text-ink mb-3">
+            <h2 className="mb-3 text-lg font-bold text-ink">
               {open === 'terms' ? '이용약관' : '개인정보처리방침'}
             </h2>
-            <p className="text-[12px] leading-relaxed text-sub max-h-72 overflow-y-auto mb-4">
+            <p className="mb-4 max-h-72 overflow-y-auto text-sm leading-relaxed text-sub">
               {open === 'terms'
                 ? '본 서비스 이용약관은 MyApo가 제공하는 서비스 이용에 관한 조건 및 절차, 이용자와 당사의 권리·의무 및 책임사항을 규정합니다.'
                 : '개인정보 처리방침에 따라 수집한 개인정보는 서비스 제공 목적으로만 사용되며, 개인정보보호법 제17조에 따라 처리됩니다.'}
