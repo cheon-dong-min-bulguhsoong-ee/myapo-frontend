@@ -65,6 +65,7 @@ export type DocumentMvpStage =
   | 'TRANSLATOR_DOC_RECEIVED'
   | 'TRANSLATOR_DOC_NOTARIZED'
   | 'APOSTILLE_DOC_ISSUED'
+  | 'INSTITUTION_DOC_SUBMIT'
 
 export type DocumentMvpStepStatus = 'PENDING' | 'DONE' | 'FAILED' | null
 

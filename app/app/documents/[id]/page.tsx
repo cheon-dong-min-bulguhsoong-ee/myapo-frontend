@@ -207,7 +207,7 @@ export default function DocumentDetailPage() {
 
         <PageFooter>
           <button
-            onClick={() => router.push('/submission-request')}
+            onClick={() => router.push(`/submission-request?documentCode=${encodeURIComponent(detail.documentCode)}&documentTypeCode=${encodeURIComponent(detail.documentTypeCode)}`)}
             disabled={!detail.isSuccess}
             className="btn-primary"
           >
