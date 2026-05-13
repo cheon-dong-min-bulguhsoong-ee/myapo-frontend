@@ -8,14 +8,6 @@ import { BottomHomeBar } from '@/components/ui/bottom-home-bar'
 import { ProductNav } from '@/components/product-nav'
 
 const PRODUCT_ROUTES = new Set(['/'])
-const PRODUCT_NAV_ROUTES = new Set([
-  '/home',
-  '/persona-select',
-  '/issue/select',
-  '/documents',
-  '/history',
-  '/disputes',
-])
 
 export function RouteShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
@@ -24,7 +16,7 @@ export function RouteShell({ children }: { children: ReactNode }) {
     return children
   }
 
-  const showProductNav = PRODUCT_NAV_ROUTES.has(pathname)
+  const showProductNav = !PRODUCT_ROUTES.has(pathname)
 
   return (
     <div className={showProductNav ? 'app-body app-body-with-product-nav' : 'app-body'}>
